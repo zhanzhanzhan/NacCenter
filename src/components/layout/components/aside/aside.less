@@ -1,0 +1,47 @@
+.aside-wrap{
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+
+  /deep/.ivu-input{
+    border-radius: 16px;
+  }
+  .aside-list{
+    margin-top: 25px;
+    .aside-item{
+      padding: 20px;
+      margin-bottom: 10px;
+      background: #fff;
+      box-sizing: border-box;
+      .title{
+        font-size: 18px;
+        color: #999;
+        span{
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: #00e9bc;
+          margin-right: 10px;
+        }
+      }
+      .info{
+        color: #ccc;
+        padding-left: 23px;
+      }
+      &.active{
+        border-bottom: 2px solid #00e9bc;
+      }
+    }
+  }
+  .add-list{
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    font-size: 18px;
+    color: #fff;
+    background: #00e9bc;
+    box-shadow: 1px 1px 2px #888888;
+    cursor: pointer;
+  }
+}
