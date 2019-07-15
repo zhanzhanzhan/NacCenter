@@ -1,0 +1,158 @@
+import axios from '@/libs/api.request'
+/*
+* 图表
+* */
+
+/*
+*  获取所有名单信息
+* */
+export const getAllNameList = ({ nbCode, type }) => {
+  return axios.request({
+    url: '/getAllNameList',
+    method: 'post',
+    data: {
+      nbCode, type
+    }
+  })
+}
+
+/*
+*  获取在线数量
+* */
+export const getCurrentCount = () => {
+  return axios.request({
+    url: '/getCurrentCount',
+    method: 'post'
+  })
+}
+
+/*
+*  获取当前在线/活跃/入侵主机信息
+* */
+export const getMasterInfo = ({ nbCode, type }) => {
+  return axios.request({
+    url: '/getMasterInfo',
+    method: 'post',
+    params: {
+      nbCode, type
+    }
+  })
+}
+
+/*
+*  获取名单信息
+* */
+export const getNameList = ({ nbCode, type, pageNo, pageSize }) => {
+  return axios.request({
+    url: '/getNameList',
+    method: 'post',
+    data: {
+      nbCode, type, pageNo, pageSize
+    }
+  })
+}
+
+/*
+*  当前网络信息获取
+* */
+export const getNetworkInfo = ({ nbCode }) => {
+  return axios.request({
+    url: '/getNetworkInfo',
+    method: 'post',
+    params: {
+      nbCode
+    }
+  })
+}
+
+/*
+*   获取学习模式信息
+* */
+export const getStudyMode = ({ nbCode }) => {
+  return axios.request({
+    url: '/getStudyMode',
+    method: 'post',
+    params: {
+      nbCode
+    }
+  })
+}
+
+/*
+*   获取当前系统状态
+* */
+export const getSystemStatus = ({ nbCode }) => {
+  return axios.request({
+    url: '/getSystemStatus',
+    method: 'post',
+    params: {
+      nbCode
+    }
+  })
+}
+
+/*
+*   添加机器的资产管理
+* */
+export const insHostManage = ({ list }) => {
+  return axios.request({
+    url: '/insHostManage',
+    method: 'post',
+    data: {
+      list
+    }
+  })
+}
+
+/*
+*   获取白名单和忽略名单
+* */
+export const nbGetNameList = ({ nbCode, type }) => {
+  return axios.request({
+    url: '/nbGetNameList',
+    method: 'post',
+    params: {
+      nbCode, type
+    }
+  })
+}
+
+/*
+*   存储在线/活跃/入侵主机信息
+* */
+export const setMasterInfo = ({ nbCode, type, strings }) => {
+  return axios.request({
+    url: '/setMasterInfo',
+    method: 'post',
+    data: {
+      nbCode, type
+    }
+  })
+}
+/*
+*   存储当前网络信息
+
+* */
+export const setNetworkInfo = ({ networkInfo }) => {
+  return axios.request({
+    url: '/setNetworkInfo',
+    method: 'post',
+    data: {
+      networkInfo
+    }
+  })
+}
+
+/*
+*   存储当前系统状态
+
+* */
+export const setSystemStatus = ({ currentSystem }) => {
+  return axios.request({
+    url: '/setSystemStatus',
+    method: 'post',
+    data: {
+      currentSystem
+    }
+  })
+}

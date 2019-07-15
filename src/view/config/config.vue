@@ -124,9 +124,9 @@ export default {
       learnMode: true,
       single: false,
       navList: [
-        'Moca参数',
-        'whitelist',
-        'Ignorelist'
+        '模式参数',
+        '白名单',
+        '忽略名单'
       ],
       loading: false,
       columns12: [

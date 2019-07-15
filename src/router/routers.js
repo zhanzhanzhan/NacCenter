@@ -1,4 +1,3 @@
-// import Main from '@/components/main'
 import MyHome from '@/components/my-home'
 import Layout from '@/components/layout'
 // import parentView from '@/components/parent-view'
@@ -74,7 +73,7 @@ export default [
     children: [
       {
         path: '',
-        name: 'config',
+        name: 'chart.js',
         component: () => import('@/view/config/config.vue')
       }
     ]

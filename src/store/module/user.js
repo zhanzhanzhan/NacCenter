@@ -23,7 +23,7 @@ export default {
     messageUnreadList: [],
     messageReadedList: [],
     messageTrashList: [],
-    messageContentStore: {}
+    messageContentStore: {},
   },
   mutations: {
     setAvatar (state, avatarPath) {
@@ -65,7 +65,8 @@ export default {
       const msgItem = state[from].splice(index, 1)[0]
       msgItem.loading = false
       state[to].unshift(msgItem)
-    }
+    },
+
   },
   getters: {
     messageUnreadCount: state => state.messageUnreadList.length,

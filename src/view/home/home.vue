@@ -6,8 +6,8 @@
             Nacbox在线
           </div>
           <div class="body">
-            <div class="progress-num">78%</div>
-            <Progress :percent="25" :stroke-width="5" hide-info stroke-color="#fff"/>
+            <div class="progress-num">{{nbPercent}}%</div>
+            <Progress :percent="nbPercent" :stroke-width="5" hide-info stroke-color="#fff"/>
           </div>
         </div>
         <div class="content-item">
@@ -16,13 +16,13 @@
           </div>
           <div class="body">
             <div class="chart-head">
-              <span> <i></i>在线</span>
-              <span> <i></i>离线</span>
+              <span> <i></i>在线{{online.currentCount}}</span>
+              <span> <i></i>离线{{online.sumCount}}</span>
             </div>
             <div class="chart">
-                <div class="triangle-1">
-                  <div class="triangle-2"></div>
-                </div>
+              <i-circle :percent="onlinePercent" stroke-color="#00e9bc" :size="160">
+                <span class="demo-Circle-inner" style="font-size:24px">{{onlinePercent}}%</span>
+              </i-circle>
           </div>
           </div>
         </div>
@@ -31,7 +31,7 @@
             白名单
           </div>
           <div class="body">
-            <div class="progress-num">147 <span>个</span></div>
+            <div class="progress-num">{{whiteList}} <span>个</span></div>
           </div>
         </div>
         <div class="content-item">
@@ -40,12 +40,12 @@
           </div>
           <div class="body">
             <div class="chart-head">
-              <span> <i></i>活跃 51</span>
-              <span> <i></i>不活跃 192</span>
+              <span> <i></i>活跃 {{activeHost.live}}</span>
+              <span> <i></i>不活跃 {{activeHost.active}}</span>
             </div>
             <div class="chart">
               <div class="round-1">
-                <div class="round-2"></div>
+                <div class="round-2" :style="{width: activePercent + '%'}"></div>
               </div>
             </div>
           </div>
@@ -55,7 +55,7 @@
             忽略名单
           </div>
           <div class="body">
-            <div class="progress-num">39 <span>个</span></div>
+            <div class="progress-num">{{ignoreList}} <span>个</span></div>
           </div>
         </div>
         <div class="content-item">
@@ -69,6 +69,72 @@
       </div>
   </div>
 </template>
+<script>
+import { getActiveHostCount, getOnLineTotal, getRosterSum } from '../../api/home'
+import { getCurrentCount } from '../../api/chart'
+
+export default {
+  name: 'home',
+  data () {
+    return {
+      nbLive: {}, // nb在线
+      activeHost: {}, // 活跃主机
+      online: {}, // 在线
+      whiteList: {}, // 白名单
+      ignoreList: {}, // 忽略名单
+    }
+  },
+  computed: {
+    nbPercent () {
+      return Math.round(this.nbLive.totalOnline / this.nbLive.totalNB * 10000) / 100.00
+    },
+    onlinePercent () {
+      return Math.round(this.online.currentCount / this.online.sumCount * 10000) / 100.00
+    },
+    activePercent () {
+      return parseInt(this.activeHost.live / this.activeHost.active)
+    }
+  },
+  methods: {
+    async getActiveHostCount () {
+      let res = await getActiveHostCount()
+      console.log(res)
+      if (res.status === 200) {
+        this.activeHost = res.data.result
+      }
+    },
+    async getOnLineTotal () {
+      let res = await getOnLineTotal()
+      if (res.status === 200) {
+        this.nbLive = res.data.result
+      }
+      // console.log(res)
+    },
+    async getRosterSum (rosterType) {
+      let res = await getRosterSum(rosterType)
+      if (rosterType === 4 && res.status === 200){
+        this.whiteList = res.data.result
+      } else if (rosterType === 5 && res.status === 200) {
+        this.ignoreList = res.data.result
+      }
+    },
+    async getCurrentCount () {
+      let res = await getCurrentCount()
+      if (res.status === 200) {
+        this.online = res.data
+      }
+    }
+
+  },
+  mounted () {
+    this.getActiveHostCount()
+    this.getOnLineTotal()
+    this.getRosterSum(4)
+    this.getRosterSum(5)
+    this.getCurrentCount()
+  }
+}
+</script>
 <style lang="less" scoped>
   @import './home.less';
 </style>
