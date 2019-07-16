@@ -1,13 +1,4 @@
 import axios from '@/libs/api.request'
-/*
-通过NB序列号查询NB信息接口
-*/
-export const getNbInfo = (nbCode) => {
-  return axios.request({
-    url: `/nb/sel/${nbCode}`,
-    method: 'get'
-  })
-}
 
 /*
 *  获取所有Nb list

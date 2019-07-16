@@ -197,18 +197,16 @@ export default {
     },
     async getMasterInfo (nbCode, type) {
       let res = await getMasterInfo({ nbCode: nbCode, type: type })
-      console.log(res)
       if (res.status === 200) {
         this.liveMasteList = res.data
       }
     },
     async getSystemStatus (nbCode) {
       let res = await getSystemStatus({ nbCode: nbCode })
-      console.log(res)
       if (res.status === 200) {
         this.system = res.data
       }
-    },
+    }
   },
   computed: {
     ...mapState({
@@ -226,8 +224,8 @@ export default {
         this.getSystemStatus(this.activeNb.nbCode)
         this.$Loading.finish()
       },
-      deep: true,
-      immediate: true
+      deep: true
+      // immediate: true
     }
 
   },

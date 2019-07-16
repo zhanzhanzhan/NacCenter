@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import LoginForm from '_c/login-form'
+import { login } from '../../api/login'
 import { mapActions } from 'vuex'
 export default {
   components: {
@@ -35,6 +35,7 @@ export default {
           })
         })
       })*/
+
       this.$router.push({
         name: this.$config.homeName
       })

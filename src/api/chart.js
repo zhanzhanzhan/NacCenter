@@ -40,19 +40,6 @@ export const getMasterInfo = ({ nbCode, type }) => {
 }
 
 /*
-*  获取名单信息
-* */
-export const getNameList = ({ nbCode, type, pageNo, pageSize }) => {
-  return axios.request({
-    url: '/getNameList',
-    method: 'post',
-    data: {
-      nbCode, type, pageNo, pageSize
-    }
-  })
-}
-
-/*
 *  当前网络信息获取
 * */
 export const getNetworkInfo = ({ nbCode }) => {
