@@ -57,8 +57,8 @@ export default [
     },
     children: [
       {
-        path: '',
-        name: 'chart',
+        path: '/chart/:id',
+        name: 'chartChild',
         component: () => import('@/view/chart/chart.vue')
       }
     ]
@@ -72,8 +72,8 @@ export default [
     },
     children: [
       {
-        path: '',
-        name: 'chart.js',
+        path: '/config/:id',
+        name: 'configChild',
         component: () => import('@/view/config/config.vue')
       }
     ]

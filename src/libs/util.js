@@ -5,11 +5,22 @@ import { forEach, hasOneOf, objEqual } from '@/libs/tools'
 const { title, cookieExpires, useI18n } = config
 
 export const TOKEN_KEY = 'token'
+export const USERINFO_KEY = 'userInfo'
 
 export const setToken = (token) => {
   Cookies.set(TOKEN_KEY, token, { expires: cookieExpires || 1 })
 }
-
+export const setUserInfoCookie = (userInfo) => {
+  Cookies.set(USERINFO_KEY, userInfo, { expires: cookieExpires || 1 })
+}
+export const getUserInfoCookie = () => {
+  const userInfo = Cookies.getJSON(USERINFO_KEY)
+  if (userInfo) return userInfo
+  else return false
+}
+export const clearUserInfoCookie = () => {
+  Cookies.remove(USERINFO_KEY)
+}
 export const getToken = () => {
   const token = Cookies.get(TOKEN_KEY)
   if (token) return token

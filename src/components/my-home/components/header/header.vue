@@ -3,14 +3,14 @@
       <div class="logo"></div>
       <div class="tags-nav">
         <router-link :to="{path: '/home'}">系统概览</router-link>
-        <router-link :to="{path: '/chart'}">图表</router-link>
-        <router-link :to="{path: '/config'}">配置</router-link>
-        <router-link :to="{path: '/overview'}">报警</router-link>
+        <router-link :to="{path: `/chart/${activeNb.nbCode}`}">图表</router-link>
+        <router-link :to="{path: `/config/${activeNb.nbCode}`}">配置</router-link>
+        <router-link :to="{path: `/overview`}">报警</router-link>
       </div>
       <div class="profile">
-        <Dropdown style="margin-left: 20px" placement="bottom-end" trigger="click">
+        <Dropdown style="margin-left: 20px" placement="bottom-end" trigger="click"  @on-click="loginOut">
           <a href="javascript:void(0)"  class="trigger">
-            userName
+            {{userInfo.userName}}
             <Icon type="ios-arrow-down"></Icon>
           </a>
           <DropdownMenu slot="list">
@@ -22,8 +22,32 @@
     </row>
 </template>
 <script>
+import { mapState, mapActions } from 'vuex'
 export default {
-  name: 'my-header'
+  name: 'my-header',
+  data () {
+    return {}
+  },
+  computed: {
+    ...mapState({
+      userInfo: state => state.login.userInfo,
+      activeNb: state => state.app.activeNb
+    })
+  },
+  methods: {
+    ...mapActions([
+      'handleLoginOut'
+    ]),
+    loginOut () {
+      this.handleLoginOut().then(res => {
+        if (res.data.code === 'success') {
+          this.$router.push('/login')
+        }
+      })
+    }
+  },
+  mounted () {
+  }
 }
 </script>
 <style scoped lang="less">

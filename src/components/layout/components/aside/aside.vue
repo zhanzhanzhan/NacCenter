@@ -5,7 +5,7 @@
       <div class="aside-item" :class=" isActive === index  ? 'active' : ''" v-for="(item,index) in asideList"
            @click="changeActive(index,item)"
             :key="item.id">
-        <div class="title"> <span class="online"></span> <span class="offline"></span>{{item.nbName}}</div>
+        <div class="title"> <span class="online" v-if="item.onLineStatus"></span> <span class="offline" v-if="!item.onLineStatus"></span>{{item.nbName}}</div>
         <div class="info">{{item.nbCode}}</div>
       </div>
     </div>
@@ -18,11 +18,11 @@
       </p>
       <div style="text-align:center">
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" label-position="left">
-          <FormItem label="NbCode" prop="nbCode">
-            <Input v-model="formValidate.nbCode" placeholder="请输入NbCode"></Input>
+          <FormItem label="机器序列号" prop="nbCode">
+            <Input v-model="formValidate.nbCode" placeholder="请输入机器序列号"></Input>
           </FormItem>
-          <FormItem label="NbName" prop="nbName">
-            <Input v-model="formValidate.nbName" placeholder="请输入NbName"></Input>
+          <FormItem label="自定义名称" prop="nbName">
+            <Input v-model="formValidate.nbName" placeholder="请输入自定义名称"></Input>
           </FormItem>
 
         </Form>
@@ -71,6 +71,11 @@ export default {
     changeActive (index, item) {
       this.isActive = index
       this.setActiveNb(item)
+      if (this.$route.name === 'chartChild') {
+        this.$router.push({ path: `/chart/${this.activeNb.nbCode}` })
+      } else if (this.$route.name === 'configChild') {
+        this.$router.push({ path: `/config/${this.activeNb.nbCode}` })
+      }
     },
     async getAllNbList () {
       let res = await getAllNbList()

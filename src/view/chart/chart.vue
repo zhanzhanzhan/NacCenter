@@ -149,9 +149,9 @@
               在线主机列表
             </div>
             <div class="item-content">
-              <div class="list-item2" v-for="i in 15">
-                <span>00:0c:29 07:b7:e2</span>
-                <span>192.168.0.1</span>
+              <div class="list-item2" v-for="(item, index) in onlineMasteList">
+                <span>{{item.macAddress}}</span>
+                <span>{{item.ipAddress}}</span>
               </div>
             </div>
           </div>
@@ -173,6 +173,7 @@ export default {
       modeSet: {}, // 模式
       whiteList: [], // 白名单
       liveMasteList: [], // 活跃主机
+      onlineMasteList: [], // 在线主机
       system: {} // 当前现状
     }
   },
@@ -198,7 +199,12 @@ export default {
     async getMasterInfo (nbCode, type) {
       let res = await getMasterInfo({ nbCode: nbCode, type: type })
       if (res.status === 200) {
-        this.liveMasteList = res.data
+        if (type === 1) {
+          this.onlineMasteList = res.data
+          console.log(this.onlineMasteList)
+        } else if (type === 2) {
+          this.liveMasteList = res.data
+        }
       }
     },
     async getSystemStatus (nbCode) {
@@ -221,6 +227,7 @@ export default {
         this.getStudyMode(this.activeNb.nbCode)
         this.nbGetNameList(this.activeNb.nbCode, 4)
         this.getMasterInfo(this.activeNb.nbCode, 2)
+        this.getMasterInfo(this.activeNb.nbCode, 1)
         this.getSystemStatus(this.activeNb.nbCode)
         this.$Loading.finish()
       },
