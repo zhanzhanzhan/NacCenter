@@ -5,6 +5,7 @@
         <router-link :to="{path: '/home'}">系统概览</router-link>
         <router-link :to="{path: `/chart/${activeNb.nbCode}`}">图表</router-link>
         <router-link :to="{path: `/config/${activeNb.nbCode}`}">配置</router-link>
+        <router-link :to="{path: `/management/${activeNb.nbCode}`}">资产管理</router-link>
         <router-link :to="{path: `/overview`}">报警</router-link>
       </div>
       <div class="profile">
@@ -23,6 +24,8 @@
 </template>
 <script>
 import { mapState, mapActions } from 'vuex'
+import { clearUserInfoCookie } from '../../../../libs/util'
+
 export default {
   name: 'my-header',
   data () {
@@ -42,6 +45,7 @@ export default {
       this.handleLoginOut().then(res => {
         if (res.data.code === 'success') {
           this.$router.push('/login')
+          clearUserInfoCookie()
         }
       })
     }

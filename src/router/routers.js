@@ -79,6 +79,21 @@ export default [
     ]
   },
   {
+    path: '/management',
+    component: Layout,
+    meta: {
+      title: '资产管理',
+      notCache: true
+    },
+    children: [
+      {
+        path: '/management/:id',
+        name: 'managementChild',
+        component: () => import('@/view/management/management.vue')
+      }
+    ]
+  },
+  {
     path: '/401',
     name: 'error_401',
     component: () => import('@/view/error-page/401.vue')

@@ -24,7 +24,7 @@
                 <span class="value">{{networkInfo.geteway}}</span>
               </div>
               <div class="list-item">
-                <span class="name">DN服务器S</span>：
+                <span class="name">DNS服务器</span>：
                 <span class="value">{{networkInfo.serverAddress}}</span>
               </div>
             </div>
@@ -237,6 +237,12 @@ export default {
 
   },
   mounted () {
+    this.getNetworkInfo(this.activeNb.nbCode)
+    this.getStudyMode(this.activeNb.nbCode)
+    this.nbGetNameList(this.activeNb.nbCode, 4)
+    this.getMasterInfo(this.activeNb.nbCode, 2)
+    this.getMasterInfo(this.activeNb.nbCode, 1)
+    this.getSystemStatus(this.activeNb.nbCode)
   }
 
 }

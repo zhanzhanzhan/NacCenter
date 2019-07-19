@@ -1,6 +1,9 @@
 import axios from 'axios'
 import store from '@/store'
 // import { Spin } from 'iview'
+
+axios.defaults.withCredentials = true
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest' // 设置该请求头用于服务器判断是否Ajax请求
 const addErrorLog = errorInfo => {
   const { statusText, status, request: { responseURL } } = errorInfo
   let info = {
@@ -21,7 +24,7 @@ class HttpRequest {
     const config = {
       baseURL: this.baseUrl,
       headers: {
-        //
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
       }
     }
     return config

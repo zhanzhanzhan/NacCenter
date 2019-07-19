@@ -75,6 +75,8 @@ export default {
         this.$router.push({ path: `/chart/${this.activeNb.nbCode}` })
       } else if (this.$route.name === 'configChild') {
         this.$router.push({ path: `/config/${this.activeNb.nbCode}` })
+      } else if (this.$route.name === 'managementChild') {
+        this.$router.push({ path: `/management/${this.activeNb.nbCode}` })
       }
     },
     async getAllNbList () {

@@ -16,11 +16,11 @@
           </div>
           <div class="body">
             <div class="chart-head">
-              <span> <i></i>在线{{online.currentCount}}</span>
-              <span> <i></i>离线{{online.sumCount}}</span>
+              <span> <i></i>在线 {{online.currentCount}}</span>
+              <span> <i></i>全部 {{online.sumCount}}</span>
             </div>
             <div class="chart">
-              <i-circle :percent="onlinePercent" stroke-color="#00e9bc" :size="160">
+              <i-circle :percent="onlinePercent" stroke-color="#00e9bc" :size="150">
                 <span class="demo-Circle-inner" style="font-size:24px">{{onlinePercent}}%</span>
               </i-circle>
           </div>
@@ -40,12 +40,12 @@
           </div>
           <div class="body">
             <div class="chart-head">
-              <span> <i></i>活跃 {{activeHost.live}}</span>
-              <span> <i></i>不活跃 {{activeHost.active}}</span>
+              <span> <i></i>活跃 {{activeHost.active}}</span>
+              <span> <i></i>在线 {{activeHost.live}}</span>
             </div>
             <div class="chart">
               <div class="round-1">
-                <div class="round-2" :style="{width: activePercent + '%'}"></div>
+                <div class="round-2" :style="{width: activePercent + '%', height:activePercent + '%' }"></div>
               </div>
             </div>
           </div>
@@ -92,7 +92,7 @@ export default {
       return Math.round(this.online.currentCount / this.online.sumCount * 10000) / 100.00
     },
     activePercent () {
-      return parseInt(this.activeHost.live / this.activeHost.active)
+      return Math.round(this.activeHost.active / this.activeHost.live * 10000) / 100.00
     }
   },
   methods: {

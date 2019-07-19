@@ -143,3 +143,16 @@ export const setSystemStatus = ({ currentSystem }) => {
     }
   })
 }
+
+/*
+*  资产管理
+* */
+export const getManagement = ({ nbCode, pageNo, pageSize, ipAddress }) => {
+  return axios.request({
+    url: '/selHostManage',
+    method: 'get',
+    params: {
+      nbCode, pageNo, pageSize, ipAddress
+    }
+  })
+}

@@ -57,9 +57,9 @@
       <div class="nav-content2" v-show="activeNav === 1">
         <Row class="list-head" type="flex" justify="space-between" align="top">
           <Col span="6"> <h3>白名单列表:</h3></Col>
-          <Col span="6">
+          <!--<Col span="6">
             <Input suffix="ios-search" placeholder="Enter text" />
-          </Col>
+          </Col>-->
         </Row>
         <Row class="table-container">
           <Table :columns="white" :data="whiteList" :loading="loading" :show-header="false" stripe size="small">
@@ -76,11 +76,11 @@
         </Row>
         <Row type="flex" justify="space-between" class="opera">
           <Col>
-            <Page v-if="whiteList.length>0" :total="whitePageInfo.totalCount" @on-change="whitePageChange" prev-text="上一页" next-text="下一页" :page-size="this.whitePageInfo.pageSize" />
+            <Page :total="whitePageInfo.totalCount" @on-change="whitePageChange" prev-text="上一页" next-text="下一页" :page-size="this.whitePageInfo.pageSize" />
           </Col>
           <Col class="btn-group">
             <span @click="addWhiteModel = true">添加白名单</span>
-            <span>清空列表</span>
+            <span @click="removeAll" v-if="whiteList.length>0">清空列表</span>
           </Col>
         </Row>
         <Modal v-model="addWhiteModel" width="360">
@@ -95,11 +95,28 @@
               <FormItem label="ip地址" >
                 <Input v-model="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
-              <FormItem label="导入表格">
-                <Upload action="//jsonplaceholder.typicode.com/posts/">
-                  <Button icon="ios-cloud-upload-outline">导入表格</Button>
+             <!-- <FormItem label="导入表格">
+                <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
+                  <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件</Button>
                 </Upload>
-              </FormItem>
+                <Row>
+                  <div class="ivu-upload-list-file" v-if="file !== null">
+                    <Icon type="ios-stats"></Icon>
+                    {{ file.name }}
+                    <Icon v-show="showRemoveFile" type="ios-close" class="ivu-upload-list-remove" @click.native="handleRemove()"></Icon>
+                  </div>
+                </Row>
+                <Row>
+                  <transition name="fade">
+                    <Progress v-if="showProgress" :percent="progressPercent" :stroke-width="2">
+                      <div v-if="progressPercent == 100">
+                        <Icon type="ios-checkmark-circle"></Icon>
+                        <span>成功</span>
+                      </div>
+                    </Progress>
+                  </transition>
+                </Row>
+              </FormItem>-->
 
             </Form>
           </div>
@@ -112,17 +129,17 @@
       <div class="nav-content2" v-show="activeNav === 2">
         <Row class="list-head" type="flex" justify="space-between" align="top">
           <Col span="6"> <h3>忽略名单列表:</h3></Col>
-          <Col span="6">
+         <!-- <Col span="6">
             <Input suffix="ios-search" placeholder="Enter text" />
-          </Col>
+          </Col>-->
         </Row>
         <Row class="table-container">
           <Table :columns="ignore" :data="ignoreList" :loading="loading" :show-header="false" stripe size="small">
             <template slot-scope="{ row }" slot="mac">
-              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row }}</span></span>
+              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
             </template>
             <template slot-scope="{ row }" slot="ip">
-              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row }}</span></span>
+              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.ipAddress }}</span></span>
             </template>
             <template slot-scope="{ row, index }" slot="action">
               <Icon type="ios-trash" size="24" color="#00e9bc" @click="removeList(row.id, index)"/>
@@ -131,25 +148,71 @@
         </Row>
         <Row type="flex" justify="space-between" class="opera">
           <Col>
-            <Page v-if="ignoreList.length>0" :total="ignorePageInfo.totalCount" @on-change="ignorePageChange" prev-text="上一页" next-text="下一页" :page-size="ignorePageInfo.pageSize" />
+            <Page :total="ignorePageInfo.totalCount" @on-change="ignorePageChange" prev-text="上一页" next-text="下一页" :page-size="ignorePageInfo.pageSize" />
           </Col>
           <Col class="btn-group">
-            <span>添加忽略名单</span>
-            <span>清空列表</span>
+            <span @click="addIgnoreModel = true">添加忽略名单</span>
+            <span @click="removeAll" v-if="ignoreList.length>0">清空列表</span>
           </Col>
         </Row>
+        <Modal v-model="addIgnoreModel" width="360">
+          <p slot="header" style="color:#333;text-align:center">
+            <span>添加忽略名单</span>
+          </p>
+          <div style="text-align:center">
+            <Form :model="addWhiteForm" label-position="left">
+              <FormItem label="mac地址">
+                <Input v-model="addIgnoreForm.macAdress" placeholder="请输入mac地址"></Input>
+              </FormItem>
+              <FormItem label="ip地址" >
+                <Input v-model="addIgnoreForm.ipAdress" placeholder="请输入ip地址"></Input>
+              </FormItem>
+              <!-- <FormItem label="导入表格">
+                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
+                   <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件</Button>
+                 </Upload>
+                 <Row>
+                   <div class="ivu-upload-list-file" v-if="file !== null">
+                     <Icon type="ios-stats"></Icon>
+                     {{ file.name }}
+                     <Icon v-show="showRemoveFile" type="ios-close" class="ivu-upload-list-remove" @click.native="handleRemove()"></Icon>
+                   </div>
+                 </Row>
+                 <Row>
+                   <transition name="fade">
+                     <Progress v-if="showProgress" :percent="progressPercent" :stroke-width="2">
+                       <div v-if="progressPercent == 100">
+                         <Icon type="ios-checkmark-circle"></Icon>
+                         <span>成功</span>
+                       </div>
+                     </Progress>
+                   </transition>
+                 </Row>
+               </FormItem>-->
+
+            </Form>
+          </div>
+          <div slot="footer">
+            <Button type="info" size="large" long :loading="addIgnoreLoading" @click="handleSubmit">确认添加</Button>
+          </div>
+        </Modal>
       </div>
     </div>
   </div>
 </template>
 <script>
 import { mapState } from 'vuex'
-import { getNbConfig, changeNbConfig, getNameList, deleteNbList, deleteNbLists } from '../../api/nbConfig'
+import { getNbConfig, changeNbConfig, getNameList, deleteNbList, deleteNbLists, addIp} from '../../api/nbConfig'
+import { uploadFile } from '../../api/upload'
+import config from '@/config'
+import qs from 'qs'
+const baseUrl = process.env.NODE_ENV === 'development' ? config.baseUrl.dev : config.baseUrl.pro
 
 export default {
   name: 'config',
   data () {
     return {
+      baseUrl: baseUrl,
       activeNav: 0,
       navList: [
         '模式参数',
@@ -213,10 +276,15 @@ export default {
       },
       addIgnoreLoading: false,
       addIgnoreModel: false,
-      addWhiteForm2: {
-        nbName: '',
-        nbCode: ''
-      }
+      addIgnoreForm: {
+        macAdress: '',
+        ipAdress: ''
+      },
+      uploadLoading: false,
+      progressPercent: 0,
+      showProgress: false,
+      showRemoveFile: false,
+      file: null,
     }
   },
   computed: {
@@ -256,29 +324,20 @@ export default {
           break
       }
     },
-
-    show (index) {
-      this.$Modal.info({
-        title: 'User Info',
-        content: `Name：${this.data6[index].name}<br>Age：${this.data6[index].age}<br>Address：${this.data6[index].address}`
-      })
-    },
     async getDefaultConfig (nbCode) {
       let res = await getNbConfig({ nbCode: nbCode })
-      if (res.data.code === '成功') {
+      //console.log(res)
+      if (res.data.code) {
         this.defaultConfig = res.data.result[0]
-        this.defaultConfig.learning  = this.defaultConfig.learning !== 'off'
-        this.defaultConfig.single  = this.defaultConfig.single !== 'off'
-        console.log(this.defaultConfig)
+        this.defaultConfig.learning = this.defaultConfig.learning !== 'off'
+        this.defaultConfig.single = this.defaultConfig.single !== 'off'
       }
     },
     async save (arr) {
       let args = Object.assign({}, arr)
       args.learning = arr.learning ? 'on' : 'off'
       args.single = arr.single ? 'on' : 'off'
-      console.log(args)
       let res = await changeNbConfig({ ...args })
-      console.log(res)
       if (res.status === 200) {
         this.$Message.success('保存成功')
       }
@@ -287,27 +346,63 @@ export default {
       this.loading = true
       let res = await getNameList({ nbCode: nbCode, type: type, pageNo: pageNo, pageSize: pageSize })
       this.loading = false
-      console.log(res)
       if (res.status === 200) {
         if (type === 4) {
           this.whiteList = res.data.list
           this.whitePageInfo.totalCount = res.data.totalCount
         } else if (type === 5) {
+          console.log('忽略名单')
           this.ignoreList = res.data.list
+          console.log(this.ignoreList)
           this.ignorePageInfo.totalCount = res.data.totalCount
         }
       }
     },
     handleSubmit (name) {
-
+      this.addIp()
+    },
+    async upload () {
+      let fileFormData = new FormData()
+      console.log(this.file)
+      fileFormData.append('file', this.file)
+      console.log(fileFormData)
+      let res = await uploadFile({ file: 1232432 })
+      console.log(res)
+    },
+    async addIp () {
+      let type = ''
+      if (this.activeNav === 1) {
+        type = 4
+        this.addWhiteLoading = true
+        let res = await addIp({ nbCode: this.activeNb.nbCode, type: type, ipAddress: this.addWhiteForm.ipAdress, macAddress: this.addWhiteForm.macAdress })
+        this.addWhiteLoading = false
+       // console.log(res)
+        if (res.data.code === 'success') {
+          this.addWhiteModel = false
+          this.$Message.success('添加成功')
+          this.getNameList(this.activeNb.nbCode, 4, this.whitePageInfo.pageNo, this.whitePageInfo.pageSize)
+        } else {
+          this.$Message.error(res.data.result)
+        }
+      } else if (this.activeNav === 2) {
+        type = 5
+        this.addIgnoreLoading = true
+        let res = await addIp({ nbCode: this.activeNb.nbCode, type: type, ipAddress: this.addIgnoreForm.ipAdress, macAddress: this.addIgnoreForm.macAdress })
+        this.addIgnoreLoading = false
+        if (res.data.code === 'success') {
+          this.addIgnoreModel = false
+          this.$Message.success('添加成功')
+          this.getNameList(this.activeNb.nbCode, 5, this.ignorePageInfo.pageNo, this.ignorePageInfo.pageSize)
+        } else {
+          this.$Message.error(res.data.result)
+        }
+      }
     },
     /* 切换页码 */
     whitePageChange (page) {
-      console.log(page)
       this.getNameList(this.activeNb.nbCode, 4, page, this.whitePageInfo.pageSize)
     },
     ignorePageChange (page) {
-      console.log(page)
       this.getNameList(this.activeNb.nbCode, 5, page, this.whitePageInfo.pageSize)
     },
     /* 删除列表 */
@@ -319,7 +414,7 @@ export default {
         onOk: async () => {
           let res = await deleteNbList({ id: id })
           console.log(res)
-          if (res.status === 200) {
+          if (res.data.code === 'success') {
             this.$Modal.remove()
             this.$Message.info('删除成功')
             if (this.activeNav === 1) {
@@ -333,7 +428,92 @@ export default {
           }
         }
       })
+    },
+    removeAll () {
+      let ids = []
+      if (this.activeNav === 1) {
+        this.whiteList.map((item, index) => {
+          ids.push(item.id)
+        })
+      } else if (this.activeNav === 2) {
+        this.ignoreList.map((item, index) => {
+          ids.push(item.id)
+        })
+      }
+      this.$Modal.confirm({
+        title: '提示',
+        content: '<p>确定清空当前列表吗？</p>',
+        loading: true,
+        onOk: async () => {
+          let res = await deleteNbLists({ ids: ids.toString() })
+          console.log(res)
+          if (res.data.code === 'success') {
+            this.$Modal.remove()
+            this.$Message.info('删除成功')
+            if (this.activeNav === 1) {
+              this.whiteList = []
+            } else if (this.activeNav === 2) {
+              this.ignoreList = []
+            }
+            ids = []
+          } else {
+            this.$Modal.remove()
+            this.$Message.error('删除失败')
+          }
+        }
+      })
+    },
+    initUpload () {
+      this.file = null
+      this.showProgress = false
+      this.loadingProgress = 0
+    },
+    handleUploadFile () {
+      this.initUpload()
+    },
+    handleRemove () {
+      this.initUpload()
+      this.$Message.info('上传的文件已删除！')
+    },
+    handleBeforeUpload (file) {
+      const fileExt = file.name.split('.').pop().toLocaleLowerCase()
+      if (fileExt === 'xlsx' || fileExt === 'xls') {
+        this.readFile(file)
+        this.file = file
+      } else {
+        this.$Notice.warning({
+          title: '文件类型错误',
+          desc: '文件：' + file.name + '不是EXCEL文件，请选择后缀为.xlsx或者.xls的EXCEL文件。'
+        })
+      }
+      return false
+    },
+    // 读取文件
+    readFile (file) {
+      const reader = new FileReader()
+      reader.readAsArrayBuffer(file)
+      reader.onloadstart = e => {
+        this.uploadLoading = true
+        this.showProgress = true
+      }
+      reader.onprogress = e => {
+        this.progressPercent = Math.round(e.loaded / e.total * 100)
+      }
+      reader.onerror = e => {
+        this.$Message.error('文件读取出错')
+      }
+      reader.onload = e => {
+        this.$Message.info('文件读取成功')
+        const data = e.target.result
+       // const { header, results } = excel.read(data, 'array')
+        this.uploadLoading = false
+        this.showRemoveFile = true
+      }
     }
+  },
+  mounted () {
+    console.log(this.defaultConfig)
+    this.getDefaultConfig(this.activeNb.nbCode)
   }
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <Layout class="main" style="height: 100%;">
     <header-bar></header-bar>
-    <Layout style="height: 100%;overflow: hidden">
+    <Layout style="height: 100%;">
       <router-view/>
     </Layout>
   </Layout>
