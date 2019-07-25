@@ -1,5 +1,6 @@
 import MyHome from '@/components/my-home'
 import Layout from '@/components/layout'
+import Controler from '@/components/systemControl'
 // import parentView from '@/components/parent-view'
 
 /**
@@ -18,7 +19,7 @@ import Layout from '@/components/layout'
  * }
  */
 
-export default [
+let appRouters = [
   {
     path: '/login',
     name: 'login',
@@ -40,9 +41,7 @@ export default [
         path: '/home',
         name: 'home',
         meta: {
-          hideInMenu: true,
-          title: '首页',
-          notCache: true
+          title: '首页'
         },
         component: () => import('@/view/home/home.vue')
       }
@@ -51,14 +50,14 @@ export default [
   {
     path: '/chart',
     component: Layout,
-    meta: {
-      title: '图表',
-      notCache: true
-    },
     children: [
       {
-        path: '/chart/:id',
+        path: '',
         name: 'chartChild',
+        meta: {
+          title: '图表',
+          notCache: true
+        },
         component: () => import('@/view/chart/chart.vue')
       }
     ]
@@ -66,33 +65,107 @@ export default [
   {
     path: '/config',
     component: Layout,
-    meta: {
-      title: '配置',
-      notCache: true
-    },
     children: [
       {
-        path: '/config/:id',
+        path: '',
         name: 'configChild',
+        meta: {
+          title: '配置',
+          notCache: true
+        },
         component: () => import('@/view/config/config.vue')
       }
     ]
   },
+
   {
     path: '/management',
     component: Layout,
-    meta: {
-      title: '资产管理',
-      notCache: true
-    },
     children: [
       {
-        path: '/management/:id',
+        meta: {
+          title: '资产视图',
+          notCache: true
+        },
+        path: '',
         name: 'managementChild',
         component: () => import('@/view/management/management.vue')
       }
     ]
+  }
+]
+export const systemChild = [
+  {
+    path: '/system/userManage',
+    name: 'userManage',
+    meta: {
+      icon: 'ios-settings',
+      title: '用户管理'
+    },
+    component: () => import('@/view/system/userManage/userManage.vue')
   },
+  {
+    path: '/system/roleManage',
+    name: 'roleManage',
+    meta: {
+      icon: 'ios-contact',
+      title: '角色管理'
+    },
+    component: () => import('@/view/system/roleManage/roleManage.vue')
+  },
+  {
+    path: '/system/groupManage',
+    name: 'groupManage',
+    meta: {
+      icon: 'md-contacts',
+      title: '分组管理'
+    },
+    component: () => import('@/view/system/groupManage/groupManage.vue')
+  },
+  {
+    path: '/system/userInfo',
+    name: 'userInfo',
+    meta: {
+      icon: 'ios-build',
+      title: '修改个人信息'
+    },
+    component: () => import('@/view/system/userInfo/userInfo.vue')
+  }
+]
+let accessRouters = [
+  // 设置路由
+  {
+    path: '/system',
+    name: 'userConfig',
+    meta: {
+      title: '设置'
+    },
+    component: Controler,
+    redirect: '/system/userManage',
+    children: [...systemChild]
+  }
+  /*{
+    path: '/userManage',
+    name: 'userManage',
+    meta: {
+      icon: 'md-cloud-upload',
+      title: '用户管理'
+    },
+    component: MyHome,
+    children: [
+      {
+        path: 'distribute',
+        name: 'update_table_page',
+        meta: {
+          icon: 'ios-document',
+          title: '分配用户'
+        },
+        component: () => import('@/view/system/userManage/userManage.vue')
+      }
+    ]
+  }*/
+]
+let err = [
   {
     path: '/401',
     name: 'error_401',
@@ -108,4 +181,10 @@ export default [
     name: 'error_404',
     component: () => import('@/view/error-page/404.vue')
   }
+]
+
+export const routers = [
+  ...appRouters,
+  ...accessRouters,
+  ...err
 ]

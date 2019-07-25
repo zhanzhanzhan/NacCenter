@@ -1,15 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import routes from './routers'
+import { routers } from './routers'
 import store from '@/store'
 import iView from 'iview'
-import { canTurnTo, setTitle, getUserInfoCookie } from '@/libs/util'
+import { canTurnTo, setTitle, getToken } from '@/libs/util'
 import config from '@/config'
 const { homeName } = config
 
 Vue.use(Router)
 const router = new Router({
-  routes,
+  routes: routers,
   mode: 'history',
   base: '/NacCenter/'
 })
@@ -22,16 +22,16 @@ const turnTo = (to, access, next) => {
 
 router.beforeEach((to, from, next) => {
   iView.LoadingBar.start()
-  const userInfo = getUserInfoCookie()
-  if (!userInfo && to.name !== LOGIN_PAGE_NAME) {
+  const TOKEN = getToken()
+  if (!TOKEN && to.name !== LOGIN_PAGE_NAME) {
     // 未登录且要跳转的页面不是登录页
     next({
       name: LOGIN_PAGE_NAME // 跳转到登录页
     })
-  } else if (!userInfo && to.name === LOGIN_PAGE_NAME) {
+  } else if (!TOKEN && to.name === LOGIN_PAGE_NAME) {
     // 未登陆且要跳转的页面是登录页
     next() // 跳转
-  } else if (userInfo && to.name === LOGIN_PAGE_NAME) {
+  } else if (TOKEN && to.name === LOGIN_PAGE_NAME) {
     // 已登录且要跳转的页面是登录页
     next({
       name: homeName // 跳转到homeName页

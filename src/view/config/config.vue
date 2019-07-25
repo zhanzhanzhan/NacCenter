@@ -14,15 +14,15 @@
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">btime:</label>
-                <input type="text" class="my-input" v-model="defaultConfig.btime">
-                <span>请输入正整数，单位秒</span>
+                <input type="text" class="my-input" v-model="defaultConfig.btime" placeholder="请输入正整数，单位秒">
+                <!--<span>请输入正整数，单位秒</span>-->
               </div>
             </Col>
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">ctime:</label>
-                <input type="text" class="my-input" v-model="defaultConfig.ctime">
-                <span>请输入正整数，单位秒</span>
+                <input type="text" class="my-input" v-model="defaultConfig.ctime" placeholder="请输入正整数，单位秒">
+               <!-- <span>请输入正整数，单位秒</span>-->
               </div>
             </Col>
 
@@ -31,8 +31,8 @@
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">ltime:</label>
-                <input type="text" class="my-input" v-model="defaultConfig.ltime">
-                <span>请输入正整数，单位秒</span>
+                <input type="text" class="my-input" v-model="defaultConfig.ltime" placeholder="请输入正整数，单位秒">
+               <!-- <span>请输入正整数，单位秒</span>-->
               </div>
             </Col>
           </Row>
@@ -45,7 +45,7 @@
             </Col>
             <Col span="12">
               <div class="form-item">
-                <label for="" class="my-label">单个:</label>
+                <label for="" class="my-label">单项模式:</label>
                 <i-switch v-model="defaultConfig.single" />
               </div>
             </Col>
@@ -53,8 +53,55 @@
         </div>
         <div class="save"><span @click="save(defaultConfig)">保存</span></div>
       </div>
+      <!--网络配置-->
+      <div class="nav-content" v-show="activeNav === 1">
+        <div class="form-group">
+          <Row :gutter="30">
+            <Col span="12">
+              <div class="form-item">
+                <label for="" class="my-label">网关:</label>
+                <input type="text" class="my-input" v-model="netConfig.geteway" placeholder="请输入网关数据">
+                <!-- <span>请输入网关数据</span>-->
+              </div>
+            </Col>
+            <Col span="12">
+              <div class="form-item">
+                <label for="" class="my-label">IP地址:</label>
+                <input type="text" class="my-input" v-model="netConfig.ipAddress" placeholder="请输入IP地址">
+                <!--<span>请输入IP地址</span>-->
+              </div>
+            </Col>
+          </Row>
+          <Row :gutter="30">
+            <Col span="12">
+              <div class="form-item">
+                <label for="" class="my-label">IP子网:</label>
+                <input type="text" class="my-input" v-model="netConfig.ipSubnet" placeholder="请输入IP子网">
+                <!--<span>请输入IP子网</span>-->
+              </div>
+            </Col>
+            <!--<Col span="12">
+              <div class="form-item">
+                <label for="" class="my-label">NB序列号:</label>
+                <input type="text" class="my-input" v-model="netConfig.nbCode">
+                <span>请输入NB序列号</span>
+              </div>
+            </Col>-->
+            <Col span="12">
+              <div class="form-item">
+                <label for="" class="my-label">DNS服务地址:</label>
+                <input type="text" class="my-input" v-model="netConfig.serverAddress" placeholder="请输入DNS服务地址">
+<!--
+                <span>请输入DNS服务地址</span>
+-->
+              </div>
+            </Col>
+          </Row>
+        </div>
+        <div class="save"><span @click="saveNetInfo">保存</span></div>
+      </div>
       <!--白名单-->
-      <div class="nav-content2" v-show="activeNav === 1">
+      <div class="nav-content2" v-show="activeNav === 2">
         <Row class="list-head" type="flex" justify="space-between" align="top">
           <Col span="6"> <h3>白名单列表:</h3></Col>
           <!--<Col span="6">
@@ -79,7 +126,7 @@
             <Page :total="whitePageInfo.totalCount" @on-change="whitePageChange" prev-text="上一页" next-text="下一页" :page-size="this.whitePageInfo.pageSize" />
           </Col>
           <Col class="btn-group">
-            <span @click="addWhiteModel = true">添加白名单</span>
+            <span @click="addWhiteModel = true">添加</span>
             <span @click="removeAll" v-if="whiteList.length>0">清空列表</span>
           </Col>
         </Row>
@@ -126,7 +173,7 @@
         </Modal>
       </div>
       <!--忽略名单-->
-      <div class="nav-content2" v-show="activeNav === 2">
+      <div class="nav-content2" v-show="activeNav === 3">
         <Row class="list-head" type="flex" justify="space-between" align="top">
           <Col span="6"> <h3>忽略名单列表:</h3></Col>
          <!-- <Col span="6">
@@ -151,7 +198,7 @@
             <Page :total="ignorePageInfo.totalCount" @on-change="ignorePageChange" prev-text="上一页" next-text="下一页" :page-size="ignorePageInfo.pageSize" />
           </Col>
           <Col class="btn-group">
-            <span @click="addIgnoreModel = true">添加忽略名单</span>
+            <span @click="addIgnoreModel = true">添加</span>
             <span @click="removeAll" v-if="ignoreList.length>0">清空列表</span>
           </Col>
         </Row>
@@ -201,11 +248,11 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
-import { getNbConfig, changeNbConfig, getNameList, deleteNbList, deleteNbLists, addIp} from '../../api/nbConfig'
+import { mapState, mapActions } from 'vuex'
+import { getNbConfig, changeNbConfig, getNameList, deleteNbList, deleteNbLists, addIp } from '../../api/nbConfig'
 import { uploadFile } from '../../api/upload'
+import { setSystemStatus, getNetworkInfo } from '../../api/chart'
 import config from '@/config'
-import qs from 'qs'
 const baseUrl = process.env.NODE_ENV === 'development' ? config.baseUrl.dev : config.baseUrl.pro
 
 export default {
@@ -216,6 +263,7 @@ export default {
       activeNav: 0,
       navList: [
         '模式参数',
+        '网络配置',
         '白名单',
         '忽略名单'
       ],
@@ -285,6 +333,7 @@ export default {
       showProgress: false,
       showRemoveFile: false,
       file: null,
+      netConfig: {}
     }
   },
   computed: {
@@ -312,18 +361,25 @@ export default {
 
   },
   methods: {
+    ...mapActions([
+      'getAsideList'
+    ]),
     /* 切换tab */
     changeNav (index) {
       this.activeNav = index
       switch (index) {
         case 1:
-          this.getNameList(this.activeNb.nbCode, 4, this.whitePageInfo.pageNo, this.whitePageInfo.pageSize)
+          this.getNetInfo()
           break
         case 2:
+          this.getNameList(this.activeNb.nbCode, 4, this.whitePageInfo.pageNo, this.whitePageInfo.pageSize)
+          break
+        case 3:
           this.getNameList(this.activeNb.nbCode, 5, this.ignorePageInfo.pageNo, this.ignorePageInfo.pageSize)
           break
       }
     },
+    /*获取模式参数*/
     async getDefaultConfig (nbCode) {
       let res = await getNbConfig({ nbCode: nbCode })
       //console.log(res)
@@ -340,6 +396,13 @@ export default {
       let res = await changeNbConfig({ ...args })
       if (res.status === 200) {
         this.$Message.success('保存成功')
+      }
+    },
+    /*获取网络配置*/
+    async getNetInfo () {
+      let res = await getNetworkInfo({ nbCode: this.activeNb.nbCode })
+      if(res.status === 200){
+        this.netConfig = res.data
       }
     },
     async getNameList (nbCode, type, pageNo, pageSize) {
@@ -371,7 +434,7 @@ export default {
     },
     async addIp () {
       let type = ''
-      if (this.activeNav === 1) {
+      if (this.activeNav === 2) {
         type = 4
         this.addWhiteLoading = true
         let res = await addIp({ nbCode: this.activeNb.nbCode, type: type, ipAddress: this.addWhiteForm.ipAdress, macAddress: this.addWhiteForm.macAdress })
@@ -384,7 +447,7 @@ export default {
         } else {
           this.$Message.error(res.data.result)
         }
-      } else if (this.activeNav === 2) {
+      } else if (this.activeNav === 3) {
         type = 5
         this.addIgnoreLoading = true
         let res = await addIp({ nbCode: this.activeNb.nbCode, type: type, ipAddress: this.addIgnoreForm.ipAdress, macAddress: this.addIgnoreForm.macAdress })
@@ -431,11 +494,11 @@ export default {
     },
     removeAll () {
       let ids = []
-      if (this.activeNav === 1) {
+      if (this.activeNav === 2) {
         this.whiteList.map((item, index) => {
           ids.push(item.id)
         })
-      } else if (this.activeNav === 2) {
+      } else if (this.activeNav === 3) {
         this.ignoreList.map((item, index) => {
           ids.push(item.id)
         })
@@ -450,9 +513,9 @@ export default {
           if (res.data.code === 'success') {
             this.$Modal.remove()
             this.$Message.info('删除成功')
-            if (this.activeNav === 1) {
+            if (this.activeNav === 2) {
               this.whiteList = []
-            } else if (this.activeNav === 2) {
+            } else if (this.activeNav === 3) {
               this.ignoreList = []
             }
             ids = []
@@ -509,12 +572,24 @@ export default {
         this.uploadLoading = false
         this.showRemoveFile = true
       }
+    },
+    /* 存储网络信息 */
+    async saveNetInfo () {
+      let res = await setSystemStatus({ currentSystem: JSON.stringify(this.netConfig) })
+      console.log(res)
+      if (res.data.code === '200') {
+        this.$Message.success('保存成功')
+      } else {
+        this.$Message.error(`保存失败${res.data.msg}`)
+      }
     }
   },
   mounted () {
-    console.log(this.defaultConfig)
     this.getDefaultConfig(this.activeNb.nbCode)
-  }
+  },
+  /*beforeDestroy () {
+    this.getAsideList()
+  }*/
 }
 </script>
 <style lang="less" scoped>

@@ -28,7 +28,7 @@ export const addNb = ({ nbCode, nbName }) => {
 * */
 export const delNb = (nbCode) => {
   return axios.request({
-    url: `/nb/add/${nbCode}`,
+    url: `/nb/del/${nbCode}`,
     method: 'delete'
   })
 }

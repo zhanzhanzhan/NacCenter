@@ -3,9 +3,10 @@
       <div class="logo"></div>
       <div class="tags-nav">
         <router-link :to="{path: '/home'}">系统概览</router-link>
-        <router-link :to="{path: `/chart/${activeNb.nbCode}`}">图表</router-link>
-        <router-link :to="{path: `/config/${activeNb.nbCode}`}">配置</router-link>
-        <router-link :to="{path: `/management/${activeNb.nbCode}`}">资产管理</router-link>
+        <router-link :to="{path: `/chart`}">图表</router-link>
+        <router-link :to="{path: `/config`}" >配置</router-link>
+        <router-link :to="{path: `/management`}">资产视图</router-link>
+        <router-link :to="{path: `/system`}">系统管理</router-link>
         <router-link :to="{path: `/overview`}">报警</router-link>
       </div>
       <div class="profile">
@@ -23,9 +24,7 @@
     </row>
 </template>
 <script>
-import { mapState, mapActions } from 'vuex'
-import { clearUserInfoCookie } from '../../../../libs/util'
-
+import { mapState, mapActions, mapMutations } from 'vuex'
 export default {
   name: 'my-header',
   data () {
@@ -34,28 +33,29 @@ export default {
   computed: {
     ...mapState({
       userInfo: state => state.login.userInfo,
-      activeNb: state => state.app.activeNb
+      activeNb: state => state.app.activeNb,
+      asideList: state => state.app.asideList
     })
   },
   methods: {
     ...mapActions([
-      'handleLoginOut'
+      'handleLoginOut', 'getAsideList'
     ]),
+    ...mapMutations({
+      'setActiveNb': 'setActiveNb'
+    }),
     loginOut () {
       this.handleLoginOut().then(res => {
         if (res.data.code === 'success') {
           this.$router.push('/login')
-          clearUserInfoCookie()
         }
       })
     }
-  },
-  mounted () {
   }
 }
 </script>
 <style scoped lang="less">
-  .router-link-exact-active{
+  .router-link-exact-active,.router-link-active{
     color: #00c5a2!important;
   }
   .header{

@@ -4,6 +4,9 @@
       {{activeNb.nbName}} <span>{{activeNb.nbCode}}</span>
     </div>
     <div class="info-list">
+      <Row  style="text-align: right">
+        <Button icon="md-download" :loading="exportLoading" @click="exportExcel" style="margin: 20px;" type="info">导出excel表格</Button>
+      </Row>
       <Row class="table-container" style="width: 100%;overflow: auto">
         <Col span="24">
           <Table :columns="management" :data="managementList" :loading="loading" stripe class="table" align="">
@@ -38,17 +41,20 @@
           </Table>
         </Col>
       </Row>
-      <Row type="flex" justify="center" class="opera">
+
+
+     <!-- <Row type="flex" justify="center" class="opera">
         <Col>
           <Page :total="pageInfo.total" @on-change="pageChange" prev-text="上一页" next-text="下一页" :page-size="pageInfo.pageSize" />
         </Col>
-      </Row>
+      </Row>-->
     </div>
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions, mapMutations } from 'vuex'
 import { getManagement } from '../../api/chart'
+import excel from '@/libs/excel'
 
 export default {
   name: 'chart',
@@ -142,17 +148,42 @@ export default {
       ],
       managementList: [
       ],
+      exportLoading: false
     }
   },
   methods: {
-    async getManagement (page, ipAddress) {
-      let res = await getManagement({ nbCode: this.activeNb.nbCode, pageNo: page, pageSize: this.pageInfo.pageSize, ipAddress: ipAddress })
-      // console.log(res)
-      this.managementList = res.data.data
+    ...mapMutations([
+      'setActiveNb'
+    ]),
+    ...mapActions([
+      'getAsideList'
+    ]),
+    async getManagement () {
+      let res = await getManagement({ nbCode: this.activeNb.nbCode })
+      console.log(res)
+      if (res.data.code === '200') {
+        this.managementList = res.data.result
+      }
       this.pageInfo.total = res.data.totalCount
     },
     pageChange (page) {
       this.getManagement(page)
+    },
+    exportExcel () {
+      if (this.managementList.length) {
+        this.exportLoading = true
+        const params = {
+          title: [ '主机名', 'ipAddress',	'ip地址',	'主机MAC地址',	'主机MAC厂商',	'操作系统类型',	'终端类型',	'终端厂商', '开启的端口',	'服务进程'	],
+          key: ['f01', 'f02', 'f03', 'f04', 'f05', 'f06', 'f07', 'f08'],
+          data: this.managementList,
+          autoWidth: true,
+          filename: '资产列表'
+        }
+        excel.export_array_to_excel(params)
+        this.exportLoading = false
+      } else {
+        this.$Message.info('表格数据不能为空！')
+      }
     }
   },
   computed: {
@@ -173,7 +204,10 @@ export default {
   },
   mounted () {
     this.getManagement(1)
-  }
+  },
+/*  beforeDestroy () {
+    this.getAsideList()
+  }*/
 
 }
 </script>

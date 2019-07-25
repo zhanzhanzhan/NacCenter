@@ -1,5 +1,6 @@
 import axios from 'axios'
 import store from '@/store'
+import { getToken } from './util'
 // import { Spin } from 'iview'
 
 axios.defaults.withCredentials = true
@@ -12,7 +13,7 @@ const addErrorLog = errorInfo => {
     mes: statusText,
     url: responseURL
   }
-  if (!responseURL.includes('save_error_logger')) store.dispatch('addErrorLog', info)
+  //if (!responseURL.includes('save_error_logger')) store.dispatch('addErrorLog', info)
 }
 
 class HttpRequest {
@@ -24,7 +25,8 @@ class HttpRequest {
     const config = {
       baseURL: this.baseUrl,
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        //'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        AUTHORIZATION: getToken()
       }
     }
     return config
@@ -63,7 +65,7 @@ class HttpRequest {
           request: { responseURL: config.url }
         }
       }
-      addErrorLog(errorInfo)
+      // addErrorLog(errorInfo)
       return Promise.reject(error)
     })
   }

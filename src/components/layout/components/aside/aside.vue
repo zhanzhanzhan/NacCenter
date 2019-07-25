@@ -2,15 +2,16 @@
   <div class="aside-wrap">
     <Input suffix="ios-search" placeholder="输入nbCode搜索" v-model="searchText" clearable @on-clear="clear" @keyup.enter.native="search(searchText)"/>
     <div class="aside-list">
-      <div class="aside-item" :class=" isActive === index  ? 'active' : ''" v-for="(item,index) in asideList"
+      <div class="aside-item" :class="item.nbCode === activeNb.nbCode  ? 'active' : ''" v-for="(item,index) in asideList"
            @click="changeActive(index,item)"
             :key="item.id">
         <div class="title"> <span class="online" v-if="item.onLineStatus"></span> <span class="offline" v-if="!item.onLineStatus"></span>{{item.nbName}}</div>
         <div class="info">{{item.nbCode}}</div>
+        <Icon type="ios-close-circle" class="delete" size="18" color="#555" @click="removeNb(item.nbCode)"/>
       </div>
     </div>
     <div class="add-list" @click="addNbModel = true">
-      添加机器
+      <span>添加</span>
     </div>
     <Modal v-model="addNbModel" width="360">
       <p slot="header" style="color:#333;text-align:center">
@@ -34,14 +35,13 @@
   </div>
 </template>
 <script>
-import { getAllNbList, addNb, findNb } from '../../../../api/config'
-import { mapMutations, mapState } from 'vuex'
+import { addNb, findNb, delNb } from '../../../../api/config'
+import { mapMutations, mapState, mapActions } from 'vuex'
 export default {
   name: 'MyAside',
   data () {
     return {
       isActive: 0,
-      asideList: [],
       addNbModel: false, // 添加nb 弹窗
       modal_loading: false,
       formValidate: {
@@ -61,31 +61,33 @@ export default {
   },
   computed: {
     ...mapState({
-      activeNb: state => state.app.activeNb
+      activeNb: state => state.app.activeNb,
+      asideList: state => state.app.asideList
     })
   },
   methods: {
     ...mapMutations({
-      'setActiveNb': 'setActiveNb'
+      'setActiveNb': 'setActiveNb',
+      'setAsideList': 'setAsideList'
     }),
+    ...mapActions([
+      'getAsideList'
+    ]),
     changeActive (index, item) {
       this.isActive = index
       this.setActiveNb(item)
       if (this.$route.name === 'chartChild') {
-        this.$router.push({ path: `/chart/${this.activeNb.nbCode}` })
+        this.$router.push({ path: `/chart`,query: {nbCode: this.activeNb.nbCode} })
       } else if (this.$route.name === 'configChild') {
-        this.$router.push({ path: `/config/${this.activeNb.nbCode}` })
+        this.$router.push({ path: `/config`,query: {nbCode: this.activeNb.nbCode} })
       } else if (this.$route.name === 'managementChild') {
-        this.$router.push({ path: `/management/${this.activeNb.nbCode}` })
+        this.$router.push({ path: `/management`,query: {nbCode: this.activeNb.nbCode} })
       }
     },
-    async getAllNbList () {
-      let res = await getAllNbList()
-      if (res.data.code === 'success') {
-        this.asideList = res.data.result
-        this.setActiveNb(this.asideList[0])
-      }
+    getAllNbList () {
+      this.getAsideList()
     },
+
     async addNb (nbCode, nbName) {
       this.modal_loading = true
       let res = await addNb({ nbCode: nbCode, nbName: nbName })
@@ -93,9 +95,30 @@ export default {
       if (res.data.code === 'success') {
         this.addNbModel = false
         this.$Message.success('添加成功')
+        this.getAllNbList()
       } else {
         this.$Message.error('添加失败')
+        this.addNbModel = false
       }
+    },
+    async removeNb (nbCode) {
+      this.$Modal.confirm({
+        title: '提示',
+        content: '<p>确定要删除这条Nb吗？</p>',
+        loading: true,
+        onOk: async () => {
+          let res = await delNb(nbCode)
+          console.log(res)
+          if (res.data.code === 'success') {
+            this.$Modal.remove()
+            this.$Message.info('删除成功')
+            this.getAllNbList()
+          } else {
+            this.$Modal.remove()
+            this.$Message.error('删除失败')
+          }
+        }
+      })
     },
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
@@ -112,8 +135,7 @@ export default {
       if (res.data.code === 'success' && res.data.result !== null) {
         let arr = []
         arr.push(res.data.result)
-        this.asideList = arr
-        this.setActiveNb(this.asideList[0])
+        this.setAsideList(arr)
       } else {
         this.$Message.error('没有找到，请检查输入的nbCode是否正确')
       }

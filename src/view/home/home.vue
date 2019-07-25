@@ -82,6 +82,7 @@ export default {
       online: {}, // 在线
       whiteList: {}, // 白名单
       ignoreList: {}, // 忽略名单
+      timer: null,
     }
   },
   computed: {
@@ -99,7 +100,7 @@ export default {
     async getActiveHostCount () {
       let res = await getActiveHostCount()
       console.log(res)
-      if (res.status === 200) {
+      if (res.data.code === 'success') {
         this.activeHost = res.data.result
       }
     },
@@ -112,7 +113,7 @@ export default {
     },
     async getRosterSum (rosterType) {
       let res = await getRosterSum(rosterType)
-      if (rosterType === 4 && res.status === 200){
+      if (rosterType === 4 && res.status === 200) {
         this.whiteList = res.data.result
       } else if (rosterType === 5 && res.status === 200) {
         this.ignoreList = res.data.result
@@ -123,15 +124,28 @@ export default {
       if (res.status === 200) {
         this.online = res.data
       }
+    },
+    funhandle () {
+      this.getActiveHostCount()
+      this.getOnLineTotal()
+      this.getRosterSum(4)
+      this.getRosterSum(5)
+      this.getCurrentCount()
     }
 
   },
   mounted () {
-    this.getActiveHostCount()
-    this.getOnLineTotal()
-    this.getRosterSum(4)
-    this.getRosterSum(5)
-    this.getCurrentCount()
+    this.funhandle()
+    if (this.timer) {
+      clearInterval(timer)
+    } else {
+      this.timer = setInterval(() => {
+        this.funhandle()
+      }, 1000 * 60 * 30)
+    }
+  },
+  beforeDestroy () {
+    clearInterval(this.timer)
   }
 }
 </script>

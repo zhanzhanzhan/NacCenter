@@ -23,7 +23,7 @@ export default {
     messageUnreadList: [],
     messageReadedList: [],
     messageTrashList: [],
-    messageContentStore: {},
+    messageContentStore: {}
   },
   mutations: {
     setAvatar (state, avatarPath) {
@@ -95,7 +95,6 @@ export default {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
           commit('setToken', '')
-          commit('setAccess', [])
           resolve()
         }).catch(err => {
           reject(err)

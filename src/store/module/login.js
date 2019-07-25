@@ -1,18 +1,21 @@
 import { login, loginOut } from '../../api/login'
-import { setUserInfoCookie, clearUserInfoCookie } from '@/libs/util'
+import { setToken } from '@/libs/util'
 
 export default {
   state: {
     userInfo: {},
+    token: ''
   },
   mutations: {
     setUserInfo (state, userInfo) {
       state.userInfo = userInfo
-      setUserInfoCookie(userInfo)
     },
     clearUserInfo (state) {
       state.userInfo = {}
-      clearUserInfoCookie()
+    },
+    setToken (state, token) {
+      state.token = token
+      setToken(token)
     }
   },
   actions: {
@@ -23,8 +26,11 @@ export default {
           userNo,
           password
         }).then(res => {
-          const data = res.data.result
-          commit('setUserInfo', data)
+          if (res.data.code === 'success') {
+            const data = res.data.result
+            commit('setUserInfo', data)
+            commit('setToken', data.token)
+          }
           resolve(res)
         }).catch(err => {
           reject(err)
@@ -37,6 +43,7 @@ export default {
         loginOut().then(res => {
           console.log(res)
           commit('clearUserInfo')
+          commit('setToken', '')
           resolve(res)
         }).catch(err => {
           reject(err)

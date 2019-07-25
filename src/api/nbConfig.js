@@ -90,3 +90,4 @@ export const getNameList = ({ nbCode, type, pageNo, pageSize }) => {
     }
   })
 }
+
