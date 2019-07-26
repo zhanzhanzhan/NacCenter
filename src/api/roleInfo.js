@@ -9,9 +9,7 @@ export const bindTreeInfoByRoleId = ({ roleId, list }) => {
     params: {
       roleId
     },
-    data: {
-      list
-    },
+    data: list,
     method: 'post'
   })
 }

@@ -17,9 +17,10 @@ export default {
    * @description api请求基础路径
    */
   baseUrl: {
-    dev: 'http://2586384dz1.wicp.vip',
-    //dev: 'http://192.168.1.126',
-   // dev: 'http://wingsbro.mynetgear.com:8070',
+    //dev: 'http://2586384dz1.wicp.vip',
+    dev: 'http://192.168.1.157:8070',
+   // dev: 'http://192.168.1.126',
+    //dev: 'http://wingsbro.mynetgear.com:8070',
     pro: 'http://wingsbro.mynetgear.com:8070'
   },
   /**

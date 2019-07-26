@@ -230,7 +230,6 @@ export default {
     },
     async nbGetNameList (nbCode, type) {
       let res = await nbGetNameList({ nbCode: nbCode, type: type })
-      console.log(res)
       if (res.data.code === '200') {
         if (type === 4) {
           this.whiteList = res.data.result

@@ -62,8 +62,8 @@
                <Input v-model="activeUserInfo.userNo" disabled></Input>
              </FormItem>-->
              <FormItem label="角色名称">
-               <Select v-model="activeUserInfo.roleName">
-                 <Option :value="item.roleName" v-for="(item, index) in roleNameList">{{item.roleName}}</Option>
+               <Select v-model="activeUserInfo.roleId">
+                 <Option :value="item.roleId" v-for="(item, index) in roleNameList">{{item.roleName}}</Option>
                </Select>
              </FormItem>
             <FormItem label="激活" style="text-align: right">
@@ -159,7 +159,7 @@ export default {
         password: [
           { required: true, message: '密码不能为空', trigger: 'blur' },
           { type: 'string', min: 6, message: '密码不能少于6位', trigger: 'blur' },
-          { type: 'string', max: 12, message: '密码不能大于12位', trigger: 'blur' }
+          { type: 'string', max: 15, message: '密码不能大于15位', trigger: 'blur' }
         ],
         roleId: [
           { required: true, message: '请选择角色', trigger: 'change', type: 'number' }
@@ -201,7 +201,6 @@ export default {
       this.tableLoad = true
       let res = await selUserInfo({ userName: userName })
       this.tableLoad = false
-      console.log(res)
       if (res.status === 200) {
         this.userList = res.data
       }
@@ -230,7 +229,6 @@ export default {
     /* 获取角色列表 */
     async selRoleInfo () {
       let res = await selRoleInfo()
-      console.log(res)
       if (res.status === 200) {
         this.roleNameList = res.data
       }

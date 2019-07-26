@@ -14,6 +14,9 @@
               <FormItem label="密码" prop="password">
                 <Input v-model="insUserForm.password" placeholder="请输入密码" type="password"></Input>
               </FormItem>
+              <FormItem label="确认密码" prop="ensurePassword">
+                <Input v-model="insUserForm.ensurePassword" placeholder="请确认密码" type="password"></Input>
+              </FormItem>
               <FormItem label="角色名称">
                 <Select v-model="insUserForm.roleName" disabled>
                   <Option :value="item.roleName" v-for="(item, index) in roleNameList">{{item.roleName}}</Option>
@@ -33,9 +36,19 @@
 import { selUserInfo, updateUser, insUser, uptUserStatus } from '../../../api/userManage'
 import { selRoleInfo } from '../../../api/roleInfo'
 import { mapState, mapActions } from 'vuex'
+
 export default {
   name: 'userInfo',
   data () {
+    const validatePassword = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('请确认密码'))
+      } else if (value !== this.insUserForm.password) {
+        callback('两次输入的密码不一致')
+      } else {
+        callback()
+      }
+    }
     return {
       saveLoading: false,
       roleNameList: [],
@@ -48,10 +61,15 @@ export default {
         password: [
           { required: true, message: '密码不能为空', trigger: 'blur' },
           { type: 'string', min: 6, message: '密码不能少于6位', trigger: 'blur' },
-          { type: 'string', max: 12, message: '密码不能大于12位', trigger: 'blur' }
+          { type: 'string', max: 15, message: '密码不能大于15位', trigger: 'blur' }
         ],
         roleId: [
           { required: true, message: '请选择角色', trigger: 'change', type: 'number' }
+        ],
+        ensurePassword: [
+          { required: true, trigger: 'blur', validator: validatePassword },
+          { type: 'string', min: 6, message: '密码不能少于6位', trigger: 'blur' },
+          { type: 'string', max: 15, message: '密码不能大于15位', trigger: 'blur' }
         ]
       }
     }
@@ -65,11 +83,12 @@ export default {
     ...mapActions([
       'handleLogin'
     ]),
-    /* 获取用户列表 */
+    /* 获取用户信息 */
     async selUserInfo (userName) {
       let res = await selUserInfo({ userName: userName })
       if (res.status === 200) {
         this.insUserForm = res.data[0]
+        this.insUserForm.password = ''
       }
     },
     /* 修改用户信息 */
@@ -107,7 +126,6 @@ export default {
   mounted () {
     this.selRoleInfo()
     this.selUserInfo(this.userInfo.userName)
-
   }
 }
 </script>
