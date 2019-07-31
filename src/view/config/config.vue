@@ -45,7 +45,7 @@
             </Col>
             <Col span="12">
               <div class="form-item">
-                <label for="" class="my-label">单项模式:</label>
+                <label for="" class="my-label">单向模式:</label>
                 <i-switch v-model="defaultConfig.single" />
               </div>
             </Col>
@@ -60,14 +60,14 @@
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">网关:</label>
-                <input type="text" class="my-input" v-model="netConfig.geteway" placeholder="请输入网关数据">
+                <input type="text" class="my-input" v-model.trim="netConfig.gateway" placeholder="请输入网关数据">
                 <!-- <span>请输入网关数据</span>-->
               </div>
             </Col>
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">IP地址:</label>
-                <input type="text" class="my-input" v-model="netConfig.ipAddress" placeholder="请输入IP地址">
+                <input type="text" class="my-input" v-model="netConfig.ipaddress" placeholder="请输入IP地址">
                 <!--<span>请输入IP地址</span>-->
               </div>
             </Col>
@@ -76,7 +76,7 @@
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">IP子网:</label>
-                <input type="text" class="my-input" v-model="netConfig.ipSubnet" placeholder="请输入IP子网">
+                <input type="text" class="my-input" v-model="netConfig.ipsubnet" placeholder="请输入IP子网">
                 <!--<span>请输入IP子网</span>-->
               </div>
             </Col>
@@ -90,7 +90,7 @@
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">DNS服务地址:</label>
-                <input type="text" class="my-input" v-model="netConfig.serverAddress" placeholder="请输入DNS服务地址">
+                <input type="text" class="my-input" v-model="netConfig.dnsser" placeholder="请输入DNS服务地址">
 <!--
                 <span>请输入DNS服务地址</span>
 -->
@@ -109,7 +109,7 @@
           </Col>-->
         </Row>
         <Row class="table-container">
-          <Table :columns="white" :data="whiteList" :loading="loading" :show-header="false" stripe size="small">
+          <Table :columns="white" :data="whiteList" :loading="loading" height="300" :show-header="false" stripe size="small">
             <template slot-scope="{ row }" slot="macAddress">
               <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
             </template>
@@ -123,7 +123,6 @@
         </Row>
         <Row type="flex" justify="space-between" class="opera">
           <Col>
-            <Page :total="whitePageInfo.totalCount" @on-change="whitePageChange" prev-text="上一页" next-text="下一页" :page-size="this.whitePageInfo.pageSize" />
           </Col>
           <Col class="btn-group">
             <span @click="addWhiteModel = true">添加</span>
@@ -142,7 +141,7 @@
               <FormItem label="ip地址" >
                 <Input v-model="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
-             <!-- <FormItem label="导入表格">
+              <FormItem label="导入表格">
                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
                   <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件</Button>
                 </Upload>
@@ -163,7 +162,7 @@
                     </Progress>
                   </transition>
                 </Row>
-              </FormItem>-->
+              </FormItem>
 
             </Form>
           </div>
@@ -181,7 +180,7 @@
           </Col>-->
         </Row>
         <Row class="table-container">
-          <Table :columns="ignore" :data="ignoreList" :loading="loading" :show-header="false" stripe size="small">
+          <Table :columns="ignore" height="300" :data="ignoreList" :loading="loading" :show-header="false" stripe size="small">
             <template slot-scope="{ row }" slot="mac">
               <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
             </template>
@@ -195,7 +194,9 @@
         </Row>
         <Row type="flex" justify="space-between" class="opera">
           <Col>
+<!--
             <Page :total="ignorePageInfo.totalCount" @on-change="ignorePageChange" prev-text="上一页" next-text="下一页" :page-size="ignorePageInfo.pageSize" />
+-->
           </Col>
           <Col class="btn-group">
             <span @click="addIgnoreModel = true">添加</span>
@@ -249,7 +250,7 @@
 </template>
 <script>
 import { mapState, mapActions } from 'vuex'
-import { getNbConfig, changeNbConfig, getNameList, deleteNbList, deleteNbLists, addIp } from '../../api/nbConfig'
+import { getNbConfig, changeNbConfig, updateNetWork, getNameList, deleteNbList, deleteNbLists, addIp } from '../../api/nbConfig'
 import { uploadFile } from '../../api/upload'
 import { setSystemStatus, getNetworkInfo } from '../../api/chart'
 import config from '@/config'
@@ -308,14 +309,6 @@ export default {
       ],
       ignoreList: [],
       defaultConfig: {},
-      whitePageInfo: {
-        pageNo: 1,
-        pageSize: 8
-      },
-      ignorePageInfo: {
-        pageNo: 1,
-        pageSize: 8
-      },
       addWhiteModel: false,
       addWhiteLoading: false,
       addWhiteForm: {
@@ -333,7 +326,12 @@ export default {
       showProgress: false,
       showRemoveFile: false,
       file: null,
-      netConfig: {}
+      netConfig: {
+        ipaddress: '',
+        dnsser: '',
+        ipsubnet: '',
+        gateway: ''
+      }
     }
   },
   computed: {
@@ -366,58 +364,78 @@ export default {
     ]),
     /* 切换tab */
     changeNav (index) {
+      console.log(index)
       this.activeNav = index
       switch (index) {
         case 1:
           this.getNetInfo()
           break
         case 2:
-          this.getNameList(this.activeNb.nbCode, 4, this.whitePageInfo.pageNo, this.whitePageInfo.pageSize)
+          this.getNameList(4)
           break
         case 3:
-          this.getNameList(this.activeNb.nbCode, 5, this.ignorePageInfo.pageNo, this.ignorePageInfo.pageSize)
+          this.getNameList(5)
           break
       }
     },
-    /*获取模式参数*/
+    /* 获取模式参数 */
     async getDefaultConfig (nbCode) {
       let res = await getNbConfig({ nbCode: nbCode })
-      //console.log(res)
-      if (res.data.code) {
+      if (res.data.code === 'success') {
         this.defaultConfig = res.data.result[0]
         this.defaultConfig.learning = this.defaultConfig.learning !== 'off'
         this.defaultConfig.single = this.defaultConfig.single !== 'off'
       }
     },
+    /* 保存模式设置 */
     async save (arr) {
       let args = Object.assign({}, arr)
       args.learning = arr.learning ? 'on' : 'off'
       args.single = arr.single ? 'on' : 'off'
       let res = await changeNbConfig({ ...args })
-      if (res.status === 200) {
+      if (res.data.code === 'success') {
         this.$Message.success('保存成功')
       }
     },
-    /*获取网络配置*/
+    /* 获取网络配置 */
     async getNetInfo () {
-      let res = await getNetworkInfo({ nbCode: this.activeNb.nbCode })
-      if(res.status === 200){
-        this.netConfig = res.data
+      let res = await getNbConfig({ nbCode: this.activeNb.nbCode })
+      if (res.data.code === 'success') {
+        this.netConfig = {
+          ipaddress: res.data.result[0].ipaddress,
+          dnsser: res.data.result[0].dnsser,
+          ipsubnet: res.data.result[0].ipsubnet,
+          gateway: res.data.result[0].gateway
+        }
       }
     },
-    async getNameList (nbCode, type, pageNo, pageSize) {
+    /* 存储网络配置 */
+    async saveNetInfo () {
+      let json = {
+        nbCode: this.activeNb.nbCode,
+        ipaddress: this.netConfig.ipaddress,
+        dnsser: this.netConfig.dnsser,
+        ipsubnet: this.netConfig.ipsubnet,
+        gateway: this.netConfig.gateway
+      }
+      let res = await updateNetWork(json)
+      if (res.data.code === 'success') {
+        this.$Message.success('保存成功')
+        this.getNetInfo()
+      } else {
+        this.$Message.error(`保存失败${res.data.msg}`)
+      }
+    },
+    /* 获取名单 */
+    async getNameList (type) {
       this.loading = true
-      let res = await getNameList({ nbCode: nbCode, type: type, pageNo: pageNo, pageSize: pageSize })
+      let res = await getNameList({ nbCode: this.activeNb.nbCode, type: type })
       this.loading = false
-      if (res.status === 200) {
+      if (res.data.code === 'success') {
         if (type === 4) {
-          this.whiteList = res.data.list
-          this.whitePageInfo.totalCount = res.data.totalCount
+          this.whiteList = res.data.result
         } else if (type === 5) {
-          console.log('忽略名单')
-          this.ignoreList = res.data.list
-          console.log(this.ignoreList)
-          this.ignorePageInfo.totalCount = res.data.totalCount
+          this.ignoreList = res.data.result
         }
       }
     },
@@ -426,47 +444,53 @@ export default {
     },
     async upload () {
       let fileFormData = new FormData()
-      console.log(this.file)
       fileFormData.append('file', this.file)
-      console.log(fileFormData)
-      let res = await uploadFile({ file: 1232432 })
+      let res = await uploadFile(fileFormData)
       console.log(res)
     },
     async addIp () {
       let type = ''
+      /* 白名单 */
       if (this.activeNav === 2) {
         type = 4
         this.addWhiteLoading = true
-        let res = await addIp({ nbCode: this.activeNb.nbCode, type: type, ipAddress: this.addWhiteForm.ipAdress, macAddress: this.addWhiteForm.macAdress })
+        let json = {
+          nbCode: this.activeNb.nbCode,
+          type: type,
+          ipAddress: this.addWhiteForm.ipAdress,
+          macAddress: this.addWhiteForm.macAdress
+        }
+        let res = await addIp(json)
         this.addWhiteLoading = false
-       // console.log(res)
         if (res.data.code === 'success') {
           this.addWhiteModel = false
           this.$Message.success('添加成功')
-          this.getNameList(this.activeNb.nbCode, 4, this.whitePageInfo.pageNo, this.whitePageInfo.pageSize)
+          this.getNameList(4)
         } else {
           this.$Message.error(res.data.result)
         }
-      } else if (this.activeNav === 3) {
+        this.upload()
+      }
+      /* 忽略名单 */
+      else if (this.activeNav === 3) {
         type = 5
         this.addIgnoreLoading = true
-        let res = await addIp({ nbCode: this.activeNb.nbCode, type: type, ipAddress: this.addIgnoreForm.ipAdress, macAddress: this.addIgnoreForm.macAdress })
+        let json = {
+          nbCode: this.activeNb.nbCode,
+          type: type,
+          ipAddress: this.addIgnoreForm.ipAdress,
+          macAddress: this.addIgnoreForm.macAdress
+        }
+        let res = await addIp(json)
         this.addIgnoreLoading = false
         if (res.data.code === 'success') {
           this.addIgnoreModel = false
           this.$Message.success('添加成功')
-          this.getNameList(this.activeNb.nbCode, 5, this.ignorePageInfo.pageNo, this.ignorePageInfo.pageSize)
+          this.getNameList(5)
         } else {
           this.$Message.error(res.data.result)
         }
       }
-    },
-    /* 切换页码 */
-    whitePageChange (page) {
-      this.getNameList(this.activeNb.nbCode, 4, page, this.whitePageInfo.pageSize)
-    },
-    ignorePageChange (page) {
-      this.getNameList(this.activeNb.nbCode, 5, page, this.whitePageInfo.pageSize)
     },
     /* 删除列表 */
     removeList (id, index) {
@@ -480,9 +504,9 @@ export default {
           if (res.data.code === 'success') {
             this.$Modal.remove()
             this.$Message.info('删除成功')
-            if (this.activeNav === 1) {
+            if (this.activeNav === 2) {
               this.whiteList.splice(index, 1)
-            } else if (this.activeNav === 2) {
+            } else if (this.activeNav === 3) {
               this.ignoreList.splice(index, 1)
             }
           } else {
@@ -492,23 +516,15 @@ export default {
         }
       })
     },
+    /* 清空列表 */
     removeAll () {
-      let ids = []
-      if (this.activeNav === 2) {
-        this.whiteList.map((item, index) => {
-          ids.push(item.id)
-        })
-      } else if (this.activeNav === 3) {
-        this.ignoreList.map((item, index) => {
-          ids.push(item.id)
-        })
-      }
+      let type = this.activeNav === 2 ? 4 : 5
       this.$Modal.confirm({
         title: '提示',
         content: '<p>确定清空当前列表吗？</p>',
         loading: true,
         onOk: async () => {
-          let res = await deleteNbLists({ ids: ids.toString() })
+          let res = await deleteNbLists({ nbCode: this.activeNb.nbCode, type: type })
           console.log(res)
           if (res.data.code === 'success') {
             this.$Modal.remove()
@@ -518,7 +534,6 @@ export default {
             } else if (this.activeNav === 3) {
               this.ignoreList = []
             }
-            ids = []
           } else {
             this.$Modal.remove()
             this.$Message.error('删除失败')
@@ -573,16 +588,8 @@ export default {
         this.showRemoveFile = true
       }
     },
-    /* 存储网络信息 */
-    async saveNetInfo () {
-      let res = await setSystemStatus({ currentSystem: JSON.stringify(this.netConfig) })
-      console.log(res)
-      if (res.data.code === '200') {
-        this.$Message.success('保存成功')
-      } else {
-        this.$Message.error(`保存失败${res.data.msg}`)
-      }
-    }
+    /**/
+
   },
   mounted () {
     this.getDefaultConfig(this.activeNb.nbCode)

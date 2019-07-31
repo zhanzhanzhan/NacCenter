@@ -5,16 +5,6 @@ import { getToken } from './util'
 
 axios.defaults.withCredentials = true
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest' // 设置该请求头用于服务器判断是否Ajax请求
-const addErrorLog = errorInfo => {
-  const { statusText, status, request: { responseURL } } = errorInfo
-  let info = {
-    type: 'ajax',
-    code: status,
-    mes: statusText,
-    url: responseURL
-  }
-  //if (!responseURL.includes('save_error_logger')) store.dispatch('addErrorLog', info)
-}
 
 class HttpRequest {
   constructor (baseUrl = baseURL) {

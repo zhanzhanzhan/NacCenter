@@ -86,15 +86,15 @@ export default {
     /* 获取用户信息 */
     async selUserInfo (userName) {
       let res = await selUserInfo({ userName: userName })
-      if (res.status === 200) {
-        this.insUserForm = res.data[0]
+      if (res.data.code === 'success') {
+        this.insUserForm = res.data.result[0]
         this.insUserForm.password = ''
       }
     },
     /* 修改用户信息 */
     async updateUser () {
       let res = await updateUser(this.insUserForm)
-      if (res.data.code === '200') {
+      if (res.data.code === 'success') {
         this.$Message.success('操作成功')
         this.handleLogin({ userNo: this.insUserForm.userNo, password: this.insUserForm.password }).then(res => {
           if (res.data.code === 'success') {
@@ -109,8 +109,8 @@ export default {
     /* 获取角色列表 */
     async selRoleInfo () {
       let res = await selRoleInfo()
-      if (res.status === 200) {
-        this.roleNameList = res.data
+      if (res.data.code === 'success') {
+        this.roleNameList = res.data.result
       }
     },
     handleSubmit (name) {

@@ -57,7 +57,7 @@ export const getNetworkInfo = ({ nbCode }) => {
 * */
 export const getStudyMode = ({ nbCode }) => {
   return axios.request({
-    url: '/getStudyMode',
+    url: '/getStudyModeInfo',
     method: 'post',
     params: {
       nbCode
@@ -150,6 +150,35 @@ export const setSystemStatus = ({ currentSystem }) => {
 export const getManagement = ({ nbCode }) => {
   return axios.request({
     url: '/selHostManage',
+    method: 'get',
+    params: {
+      nbCode
+    }
+  })
+}
+
+/*
+*  根据nbCode修改机器资产管理状态
+*  type: 1 资产拉取 ， 2重启
+* */
+
+export const changeStatus = ({ nbCode, type }) => {
+  return axios.request({
+    url: '/uptHostManageStaus',
+    method: 'get',
+    params: {
+      nbCode, type
+    }
+  })
+}
+
+/*
+*  删除机器资产
+* */
+
+export const delHostManage = ({ nbCode }) => {
+  return axios.request({
+    url: '/delHostManage',
     method: 'get',
     params: {
       nbCode

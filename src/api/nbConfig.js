@@ -4,7 +4,7 @@ import axios from '@/libs/api.request'
 * */
 export const addIp = ({ nbCode, type, ipAddress, macAddress }) => {
   return axios.request({
-    url: `/nb/addip`,
+    url: `/nb/run/addip`,
     method: 'post',
     params: {
       nbCode, type, ipAddress, macAddress
@@ -17,7 +17,7 @@ export const addIp = ({ nbCode, type, ipAddress, macAddress }) => {
 * */
 export const deleteNbList = ({ id }) => {
   return axios.request({
-    url: `/nb/delent`,
+    url: `/nb/run/delent`,
     method: 'delete',
     params: {
       id
@@ -29,22 +29,30 @@ export const deleteNbList = ({ id }) => {
 * 批量删除名单
 * ids: array
 * */
-export const deleteNbLists = ({ ids }) => {
+/*export const deleteNbLists = ({ ids }) => {
   return axios.request({
-    url: `/nb/delents`,
+    url: `/nb/run/delents`,
     method: 'delete',
     params: {
       ids
     }
   })
+}*/
+export const deleteNbLists = ({ nbCode, type }) => {
+  return axios.request({
+    url: `/nb/run/delentname`,
+    method: 'delete',
+    params: {
+      nbCode, type
+    }
+  })
 }
-
 /*
 * 通过NB序列号查询配置参数
 * */
 export const getNbConfig = ({ nbCode }) => {
   return axios.request({
-    url: `/nb/list`,
+    url: `/nb/run/list`,
     method: 'post',
     params: {
       nbCode
@@ -57,7 +65,7 @@ export const getNbConfig = ({ nbCode }) => {
 * */
 export const getNbType = ({ nbCode, type }) => {
   return axios.request({
-    url: `/nb/listAll`,
+    url: `/nb/run/listAll`,
     method: 'post',
     params: {
       nbCode, type
@@ -68,26 +76,37 @@ export const getNbType = ({ nbCode, type }) => {
 /*
 * 用户修改NB运行参数
 * */
-export const changeNbConfig = ({ nbCode, single, learning, ctime, btime, ltime, ipadress, gateway, dnsser, ipsubnet }) => {
+export const changeNbConfig = ({ nbCode, single, learning, ctime, btime, ltime }) => {
   return axios.request({
-    url: `/nb/update`,
+    url: `/nb/run/update`,
     method: 'put',
     params: {
-      nbCode, single, learning, ctime, btime, ltime, ipadress, gateway, dnsser, ipsubnet
+      nbCode, single, learning, ctime, btime, ltime
     }
   })
 }
 
 /*
-*  获取名单信息
+* 用户修改网络参数
 * */
-export const getNameList = ({ nbCode, type, pageNo, pageSize }) => {
+export const updateNetWork = ({ nbCode, ipaddress, dnsser, ipsubnet, gateway }) => {
   return axios.request({
-    url: '/getNameList',
-    method: 'post',
+    url: `/nb/run/updatenetwork`,
+    method: 'put',
     params: {
-      nbCode, type, pageNo, pageSize
+      nbCode, ipaddress, dnsser, ipsubnet, gateway
     }
   })
 }
-
+/*
+*  获取名单信息
+* */
+export const getNameList = ({ nbCode, type }) => {
+  return axios.request({
+    url: '/getAllNameList',
+    method: 'post',
+    params: {
+      nbCode, type
+    }
+  })
+}

@@ -58,11 +58,11 @@ export const getTreeByRoleId = ({ roleId }) => {
 /*
 *  新增角色信息
 * */
-export const insRoleInfo = ({ roleName, unitId }) => {
+export const insRoleInfo = ({ roleName, parentId }) => {
   return axios.request({
     url: '/insRoleInfo',
     params: {
-      roleName, unitId
+      roleName, parentId
     },
     method: 'post'
   })
@@ -81,12 +81,12 @@ export const selRoleInfo = () => {
 /*
 *  判断角色名称是否存在
 * */
-export const selRoleName = ({ roleName, unitId }) => {
+export const selRoleName = ({ roleName, parentId }) => {
   return axios.request({
     url: '/selRoleName',
     method: 'post',
     params: {
-      roleName, unitId
+      roleName, parentId
     }
   })
 }
@@ -94,12 +94,12 @@ export const selRoleName = ({ roleName, unitId }) => {
 /*
 *  修改角色信息
 * */
-export const uptRoleInfo = ({ roleName, unitId }) => {
+export const uptRoleInfo = ({ roleName, parentId }) => {
   return axios.request({
     url: '/uptRoleInfo',
     method: 'post',
     params: {
-      roleName, unitId
+      roleName, parentId
     }
   })
 }

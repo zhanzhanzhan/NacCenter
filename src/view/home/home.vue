@@ -106,24 +106,24 @@ export default {
     },
     async getOnLineTotal () {
       let res = await getOnLineTotal()
-      if (res.status === 200) {
+      if (res.data.code === 'success') {
         this.nbLive = res.data.result
       }
-      // console.log(res)
     },
     async getRosterSum (rosterType) {
       let res = await getRosterSum(rosterType)
-      if (rosterType === 4 && res.status === 200) {
+      if (rosterType === 4 && res.data.code === 'success') {
         this.whiteList = res.data.result
-      } else if (rosterType === 5 && res.status === 200) {
+      } else if (rosterType === 5 && res.data.code === 'success') {
         this.ignoreList = res.data.result
       }
     },
     async getCurrentCount () {
       let res = await getCurrentCount()
-      if (res.status === 200) {
-        this.online = res.data
+      if (res.data.code === 'success') {
+        this.online = res.data.result
       }
+      console.log(res)
     },
     funhandle () {
       this.getActiveHostCount()

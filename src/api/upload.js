@@ -3,8 +3,8 @@ import qs from 'qs'
 /*
 *  上传文件
 * */
-export const uploadFile = ({ file }) => {
-  console.log(qs.stringify({file}))
+export const uploadFile = (file) => {
+  console.log(file)
   return axios.request({
     url: '/importResult',
     method: 'post',
@@ -12,8 +12,7 @@ export const uploadFile = ({ file }) => {
       //'Content-Type': 'multipart/form-data;chartset=UTF-8'
       'Content-Type': 'application/x-www-form-urlencoded'
     },
-    data: {
-      file
-    }
+    processData: false, // 告诉axios不要去处理发送的数据(重要参数)
+    data: file
   })
 }

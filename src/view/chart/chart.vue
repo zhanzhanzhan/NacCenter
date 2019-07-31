@@ -4,13 +4,13 @@
       {{activeNb.nbName}} <span>{{activeNb.nbCode}}</span>
     </div>
     <div class="info-list">
-      <Row :gutter="10">
+      <Row :gutter="10" type="flex" style="flex-wrap: wrap">
         <Col span="8">
           <div class="info-item">
             <div class="item-title">
               网络信息
             </div>
-            <div class="item-content" v-if="networkInfo !==''">
+            <div class="item-content" v-if="networkInfo">
               <div class="list-item">
                 <span class="name">IP地址</span>：
                 <span class="value">{{networkInfo.ipAddress}}</span>
@@ -28,7 +28,7 @@
                 <span class="value">{{networkInfo.serverAddress}}</span>
               </div>
             </div>
-            <div class="item-content" v-if="networkInfo === ''" style="text-align: center">暂无数据</div>
+            <div class="item-content" v-if="!networkInfo" style="text-align: center">暂无数据</div>
           </div>
         </Col>
         <Col span="8">
@@ -36,7 +36,7 @@
             <div class="item-title">
               系统现状
             </div>
-            <div class="item-content" v-if="system !== ''">
+            <div class="item-content" v-if="system">
               <div class="list-item">
                 <span class="name">系统负载</span>：
                 <span class="value">{{system.systemLoad}}</span>
@@ -83,11 +83,15 @@
                 <span class="value">{{system.hostProtection}}</span>
               </div>-->
               <div class="list-item">
+                <span class="name">运行时长</span>：
+                <span class="value">{{system.squadLeader}}</span>
+              </div>
+              <div class="list-item">
                 <span class="name">版本号</span>：
                 <span class="value">{{system.version}}</span>
               </div>
             </div>
-            <div class="item-content" v-if="system === ''" style="text-align: center">暂无数据</div>
+            <div class="item-content" v-if="!system" style="text-align: center">暂无数据</div>
           </div>
         </Col>
         <Col span="8">
@@ -95,7 +99,7 @@
             <div class="item-title">
               模式设置
             </div>
-            <div class="item-content">
+            <div class="item-content" v-if="modeSet">
               <div class="list-item" >
                 <span class="name">单向模式</span>：
                 <span class="value">{{modeSet.single}}</span>
@@ -117,6 +121,7 @@
                 <span class="value">{{modeSet.ltime}}</span>
               </div>
             </div>
+            <div style="text-align: center" class="item-content" v-if="!modeSet">暂无数据</div>
           </div>
         </Col>
         <Col span="8">
@@ -124,8 +129,8 @@
             <div class="item-title">
               白名单
             </div>
-            <div class="item-content">
-              <div style="text-align: center" v-if="!whiteList.length">暂无数据</div>
+            <div style="text-align: center" class="item-content" v-if="!whiteList.length">暂无数据</div>
+            <div class="item-content" v-if="whiteList.length">
               <div class="list-item2" v-for="(item, index) in whiteList">
                 <span>{{item.split(' ')[0]}}</span>
                 <span>{{item.split(' ')[1]}}</span>
@@ -153,8 +158,8 @@
               活跃主机列表
             </div>
             <div class="item-content">
-              <div style="text-align: center" v-if="!liveMasteList.length">暂无数据</div>
-              <div class="list-item2" v-for="(item, index) in liveMasteList" >
+              <div style="text-align: center" v-if="!liveMasteList">暂无数据</div>
+              <div class="list-item2" v-for="(item, index) in liveMasteList" v-if="liveMasteList">
                 <span>{{item.macAddress}}</span>
                 <span>{{item.ipAddress}}</span>
               </div>
@@ -167,8 +172,8 @@
               在线主机列表
             </div>
             <div class="item-content">
-              <div style="text-align: center" v-if="onlineMasteList === ''">暂无数据</div>
-              <div class="list-item2" v-for="(item, index) in onlineMasteList" v-if="onlineMasteList !== ''">
+              <div style="text-align: center" v-if="!onlineMasteList">暂无数据</div>
+              <div class="list-item2" v-for="(item, index) in onlineMasteList" v-if="onlineMasteList">
                 <span>{{item.macAddress}}</span>
                 <span>{{item.ipAddress}}</span>
               </div>
@@ -181,8 +186,8 @@
               入侵主机列表
             </div>
             <div class="item-content">
-              <div style="text-align: center" v-if="blockingHost === ''">暂无数据</div>
-              <div class="list-item2" v-for="(item, index) in blockingHost" v-if="blockingHost !== ''">
+              <div style="text-align: center" v-if="!blockingHost">暂无数据</div>
+              <div class="list-item2" v-for="(item, index) in blockingHost" v-if="blockingHost">
                 <span>{{item.macAddress}}</span>
                 <span>{{item.ipAddress}}</span>
               </div>
@@ -208,7 +213,8 @@ export default {
       ignoreList: [], // 忽略名单
       liveMasteList: [], // 活跃主机
       onlineMasteList: [], // 在线主机
-      system: {}, // 当前现状
+      system: {
+      }, // 当前现状
       blockingHost: {} // 入侵主机
     }
   },
@@ -216,21 +222,26 @@ export default {
     ...mapActions([
       'getAsideList'
     ]),
+    /* 网络信息*/
     async getNetworkInfo (nbCode) {
       let res = await getNetworkInfo({ nbCode: nbCode })
-      if (res.status === 200) {
-        this.networkInfo = res.data
+      if (res.data.code === 'success') {
+        this.networkInfo = res.data.result
       }
     },
+    /*模式设置*/
     async getStudyMode (nbCode) {
       let res = await getStudyMode({ nbCode: nbCode })
-      if (res.status === 200) {
-        this.modeSet = res.data
+      console.log(res)
+      if (res.data.code === 'success') {
+        this.modeSet = res.data.result
       }
     },
+    /* 名单列表 */
     async nbGetNameList (nbCode, type) {
       let res = await nbGetNameList({ nbCode: nbCode, type: type })
-      if (res.data.code === '200') {
+      //console.log(res)
+      if (res.data.code === 'success') {
         if (type === 4) {
           this.whiteList = res.data.result
         } else if (type === 5) {
@@ -238,26 +249,37 @@ export default {
         }
       }
     },
+    /* 主机列表*/
     async getMasterInfo (nbCode, type) {
       let res = await getMasterInfo({ nbCode: nbCode, type: type })
-      if (res.status === 200) {
+      if (res.data.code === 'success') {
         switch (type) {
           case 1:
-            this.onlineMasteList = res.data
+            this.onlineMasteList = res.data.result
             break
           case 2:
-            this.liveMasteList = res.data
+            this.liveMasteList = res.data.result
             break
           case 3:
-            this.blockingHost = res.data
+            this.blockingHost = res.data.result
             break
         }
       }
     },
+
+    /* 系统现状 */
     async getSystemStatus (nbCode) {
       let res = await getSystemStatus({ nbCode: nbCode })
-      if (res.status === 200) {
-        this.system = res.data
+      if (res.data.code === 'success') {
+        this.system = res.data.result
+        if (!res.data.result) return
+        let time = {
+          day: res.data.result.squadLeader.split('-')[0],
+          hour: res.data.result.squadLeader.split('-')[1].split(':')[0],
+          minute: res.data.result.squadLeader.split('-')[1].split(':')[1],
+          second: res.data.result.squadLeader.split('-')[1].split(':')[2]
+        }
+        this.system.squadLeader = `${time.day}天${time.hour}时${time.minute}分${time.second}秒`
       }
     },
     funHandle () {
@@ -277,23 +299,18 @@ export default {
     })
   },
   watch: {
-    activeNb: {
+    $route: {
       handler (newVal, old) {
         this.$Loading.start()
         this.funHandle()
         this.$Loading.finish()
-      },
-      deep: true
-      // immediate: true
+      }
     }
 
   },
   mounted () {
     this.funHandle()
-  },
- /* beforeDestroy () {
-    this.getAsideList()
-  }*/
+  }
 }
 </script>
 <style lang="less" scoped>

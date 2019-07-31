@@ -1,5 +1,4 @@
 import { getAllNbList } from '../../api/config'
-import { login } from '../../api/login'
 
 export default {
   state: {
@@ -17,12 +16,15 @@ export default {
     }
   },
   actions: {
-    getAsideList ({ commit }) {
+    getAsideList ({ commit }, refresh) {
       return new Promise((resolve, reject) => {
         getAllNbList().then(res => {
+          console.log(res)
           if (res.data.code === 'success') {
             commit('setAsideList', res.data.result)
-            commit('setActiveNb', res.data.result[0])
+            if (!this.state.app.activeNb || refresh) {
+              commit('setActiveNb', res.data.result[0])
+            }
             resolve(res)
           }
         }).catch(err => {

@@ -40,12 +40,12 @@ module.exports = {
   // devServer: {
   //   proxy: 'localhost:3000'
   // }
-  /*devServer: {
-    proxy: {
-      '': {
-        target: 'http://192.168.1.126:8080', // 接口服务器域名地址
-        changeOrigin: true
-      }
-    }
-  }*/
+  // devServer: {
+  //   proxy: {
+  //     '': {
+  //       target: 'http://192.168.1.126:8080', // 接口服务器域名地址
+  //       changeOrigin: true
+  //     }
+  //   }
+  // }
 }

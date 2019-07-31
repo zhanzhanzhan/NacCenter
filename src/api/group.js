@@ -48,12 +48,12 @@ export const getAllGroup = () => {
 
 /* 修改nb分组信息 */
 
-export const updateNbGroup = ({ groupId, groupName, unitId, remarks }) => {
+export const updateNbGroup = ({ groupId, groupName, parentId, remarks }) => {
   return axios.request({
     url: `/groups/update`,
     method: 'put',
     params: {
-      groupId, groupName, unitId, remarks
+      groupId, groupName, parentId, remarks
     }
   })
 }

@@ -5,11 +5,15 @@
     </div>
     <div class="info-list">
       <Row  style="text-align: right">
+        <ButtonGroup>
+          <Button @click="getManage">拉取数据</Button>
+          <Button type="warning" @click="deleteManage">清除数据</Button>
+        </ButtonGroup>
         <Button icon="md-download" :loading="exportLoading" @click="exportExcel" style="margin: 20px;" type="info">导出excel表格</Button>
       </Row>
       <Row class="table-container" style="width: 100%;overflow: auto">
         <Col span="24">
-          <Table :columns="management" :data="managementList" :loading="loading" stripe class="table" align="">
+          <Table :columns="management" :data="managementList" height="500" :loading="loading" stripe class="table" align="">
             <template slot-scope="{ row }" slot="f01">
               <span style="font-size: 12px;color: #666"><span style="color: #333;margin-left: 20px">{{ row.f01 }}</span></span>
             </template>
@@ -53,7 +57,7 @@
 </template>
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex'
-import { getManagement } from '../../api/chart'
+import { getManagement, delHostManage, changeStatus } from '../../api/chart'
 import excel from '@/libs/excel'
 
 export default {
@@ -159,15 +163,46 @@ export default {
       'getAsideList'
     ]),
     async getManagement () {
+      this.loading = true
       let res = await getManagement({ nbCode: this.activeNb.nbCode })
+      this.loading = false
       console.log(res)
-      if (res.data.code === '200') {
+      if (res.data.code === 'success') {
         this.managementList = res.data.result
       }
       this.pageInfo.total = res.data.totalCount
     },
-    pageChange (page) {
-      this.getManagement(page)
+    /* 清除数据 */
+    async deleteManage () {
+      this.$Modal.confirm({
+        title: '提示',
+        content: '<p>确定要清除数据吗？</p>',
+        loading: true,
+        onOk: async () => {
+          let res = await delHostManage({ nbCode: this.activeNb.nbCode })
+          console.log(res)
+          if (res.data.code === 'success') {
+            this.$Modal.remove()
+            this.$Message.info('清除成功')
+            this.managementList = []
+          } else {
+            this.$Modal.remove()
+            this.$Message.error('删除失败')
+          }
+        }
+      })
+    },
+    /* 拉取数据 */
+    async getManage () {
+      this.loading = true
+      let res = await changeStatus({ nbCode: this.activeNb.nbCode, type: 1 })
+      this.loading = false
+      console.log(res)
+      if (res.data.code === 'success') {
+        this.$Message.success('拉取数据中，请稍后刷新！')
+      } else {
+        this.$Message.error('拉取失败！')
+      }
     },
     exportExcel () {
       if (this.managementList.length) {

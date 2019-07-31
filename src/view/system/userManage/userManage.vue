@@ -15,7 +15,7 @@
         </Table>
         <!-- <Table border :columns="columns7" :data="data6" max-height="500"></Table>-->
       </TabPane>
-      <TabPane label="分配用户" name="tab2">
+     <!-- <TabPane label="分配用户" name="tab2">
         <Row justify="center" type="flex" style="margin-top: 50px;">
           <Col span="8">
             <Form :model="insUserForm" :label-width="80" ref="addUser" :rules="insUserFormValidate"  label-position="left">
@@ -46,7 +46,7 @@
           </Col>
         </Row>
 
-      </TabPane>
+      </TabPane>-->
       <Input search v-model="searchText" placeholder="输入用户名查询" slot="extra" @on-search="selUserInfo(searchText)" v-if="tab === 'tab1'"/>
       <!--对话框-->
       <Modal
@@ -103,9 +103,6 @@ export default {
       saveLoading: false,
       searchText: '',
       activeUserInfo: {
-        userName: '',
-        roleId: '',
-        activation: null
       },
       tableColumns: [
         {
@@ -142,12 +139,7 @@ export default {
       userList: [],
       roleNameList: [], // 角色名称列表
       insUserForm: {
-        userNo: '',
-        userName: '',
-        password: '',
-        unitId: '',
-        roleId: '',
-        activation: false
+
       },
       insUserFormValidate: {
         userNo: [
@@ -162,13 +154,13 @@ export default {
           { type: 'string', max: 15, message: '密码不能大于15位', trigger: 'blur' }
         ],
         roleId: [
-          { required: true, message: '请选择角色', trigger: 'change', type: 'number' }
+          { required: true, message: '请选择角色', trigger: 'change', type: 'string' }
         ]
       },
       uptUserValidate: {
-        userName: [
+        /*userName: [
           { required: true, message: '用户名不能为空', trigger: 'blur' }
-        ]
+        ]*/
       }
     }
   },
@@ -185,7 +177,8 @@ export default {
     show (index, row) {
       this.modal = true
       this.activeUserInfo = Object.assign(this.activeUserInfo, row)
-      console.log(this.activeUserInfo)
+      this.activeUserInfo.userName = row.userName
+      //console.log(this.activeUserInfo)
     },
     ok () {
       this.$refs['uptUser'].validate((valid) => {
@@ -201,8 +194,9 @@ export default {
       this.tableLoad = true
       let res = await selUserInfo({ userName: userName })
       this.tableLoad = false
-      if (res.status === 200) {
-        this.userList = res.data
+      console.log(res)
+      if (res.data.code === 'success') {
+        this.userList = res.data.result
       }
     },
     /* 新增用户 */
@@ -211,7 +205,7 @@ export default {
         userNo: this.insUserForm.userNo,
         userName: this.insUserForm.userName,
         password: this.insUserForm.password,
-        unitId: this.userInfo.unitId,
+        parentId: this.userInfo.parentId,
         activation: this.insUserForm.activation,
         roleId: this.insUserForm.roleId,
         userId: this.insUserForm.userId
@@ -219,7 +213,7 @@ export default {
       this.saveLoading = true
       let res = await insUser(json)
       this.saveLoading = false
-      if (res.data.code === '200') {
+      if (res.data.code === 'success') {
         this.$Message.success('保存成功')
       } else {
         this.$Message.error('保存失败')
@@ -229,8 +223,8 @@ export default {
     /* 获取角色列表 */
     async selRoleInfo () {
       let res = await selRoleInfo()
-      if (res.status === 200) {
-        this.roleNameList = res.data
+      if (res.data.code === 'success') {
+        this.roleNameList = res.data.result
       }
     },
     /* 修改用户信息 */
@@ -239,13 +233,14 @@ export default {
         userNo: this.activeUserInfo.userNo,
         userName: this.activeUserInfo.userName,
         password: this.activeUserInfo.password,
-        unitId: this.activeUserInfo.unitId,
+        parentId: this.activeUserInfo.parentId,
         activation: this.activeUserInfo.activation,
         roleId: this.activeUserInfo.roleId,
         userId: this.insUserForm.userId
       }
       let res = await updateUser(json)
-      if (res.data.code === '200') {
+      console.log(res)
+      if (res.data.code === 'success') {
         this.$Message.success('操作成功')
         this.selUserInfo()
       }
@@ -258,7 +253,7 @@ export default {
         activation: this.activeUserInfo.activation
       })
       //console.log(res)
-      if (res.data.code === '200') {
+      if (res.data.code === 'success') {
         this.$Message.success(res.data.result)
         this.selUserInfo()
       }
@@ -277,6 +272,7 @@ export default {
   mounted () {
     this.selUserInfo()
     this.selRoleInfo()
+    console.log(this.userInfo)
     //console.log(this.roleNameList)
   }
 }

@@ -3,11 +3,11 @@ import axios from '@/libs/api.request'
 /*
 *  添加用户角色
 * */
-export const insUserRole = ({ userNo, userName, password, unitId, activation }) => {
+export const insUserRole = ({ userNo, userName, password, parentId, activation }) => {
   return axios.request({
     url: '/insUserRole',
     params: {
-      userNo, userName, password, unitId, activation
+      userNo, userName, password, parentId, activation
     },
     method: 'post'
   })
@@ -54,11 +54,11 @@ export const selUserInfo = ({ userName }) => {
 /*
 *  修改用户信息
 * */
-export const updateUser = ({ userNo, userName, password, unitId, activation, roleId, userId }) => {
+export const updateUser = ({ userNo, userName, password, parentId, activation, roleId, userId }) => {
   return axios.request({
     url: '/updateUser',
     params: {
-      userNo, userName, password, unitId, activation, roleId, userId
+      userNo, userName, password, parentId, activation, roleId, userId
     },
     method: 'get'
   })
@@ -66,11 +66,11 @@ export const updateUser = ({ userNo, userName, password, unitId, activation, rol
 /*
 *  新增用户信息
 * */
-export const insUser = ({ userNo, userName, password, unitId, activation, roleId, userId }) => {
+export const insUser = ({ userNo, userName, password, parentId, activation, roleId, userId }) => {
   return axios.request({
     url: '/insUser',
     params: {
-      userNo, userName, password, unitId, activation, roleId, userId
+      userNo, userName, password, parentId, activation, roleId, userId
     },
     method: 'get'
   })

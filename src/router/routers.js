@@ -29,6 +29,22 @@ let appRouters = [
     component: () => import('@/view/login/login.vue')
   },
   {
+    path: '/register',
+    name: 'register',
+    meta: {
+      title: 'register - 注册'
+    },
+    component: () => import('@/view/register/register.vue')
+  },
+  {
+    path: '/bind',
+    name: 'bind',
+    meta: {
+      title: '绑定'
+    },
+    component: () => import('@/view/bind/bind.vue')
+  },
+  {
     path: '/',
     name: '_myHome',
     redirect: '/home',
@@ -144,26 +160,6 @@ let accessRouters = [
     redirect: '/system/userManage',
     children: [...systemChild]
   }
-  /*{
-    path: '/userManage',
-    name: 'userManage',
-    meta: {
-      icon: 'md-cloud-upload',
-      title: '用户管理'
-    },
-    component: MyHome,
-    children: [
-      {
-        path: 'distribute',
-        name: 'update_table_page',
-        meta: {
-          icon: 'ios-document',
-          title: '分配用户'
-        },
-        component: () => import('@/view/system/userManage/userManage.vue')
-      }
-    ]
-  }*/
 ]
 let err = [
   {

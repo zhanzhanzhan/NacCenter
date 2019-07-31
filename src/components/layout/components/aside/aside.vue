@@ -5,9 +5,15 @@
       <div class="aside-item" :class="item.nbCode === activeNb.nbCode  ? 'active' : ''" v-for="(item,index) in asideList"
            @click="changeActive(index,item)"
             :key="item.id">
-        <div class="title"> <span class="online" v-if="item.onLineStatus"></span> <span class="offline" v-if="!item.onLineStatus"></span>{{item.nbName}}</div>
+        <div class="title">
+        <!--  <span class="online" v-if="item.onLineStatus"></span>
+          <span class="offline" v-if="!item.onLineStatus"></span>-->
+          <Icon type="md-power" size="20" color="#ccc" v-if="!item.onLineStatus"/>
+          <Icon type="md-power" size="20" color="#00e9bc" title="点击重启" @click="changeStatus(item.nbCode,2)" v-if="item.onLineStatus"/>
+          {{item.nbName}}
+        </div>
         <div class="info">{{item.nbCode}}</div>
-        <Icon type="ios-close-circle" class="delete" size="18" color="#555" @click="removeNb(item.nbCode)"/>
+        <Icon type="ios-close-circle" title="删除此项" class="delete" size="18" color="#555" @click="removeNb(item.nbCode)"/>
       </div>
     </div>
     <div class="add-list" @click="addNbModel = true">
@@ -36,6 +42,7 @@
 </template>
 <script>
 import { addNb, findNb, delNb } from '../../../../api/config'
+import { changeStatus } from '../../../../api/chart'
 import { mapMutations, mapState, mapActions } from 'vuex'
 export default {
   name: 'MyAside',
@@ -73,21 +80,32 @@ export default {
     ...mapActions([
       'getAsideList'
     ]),
+    clear () {
+      this.getAllNbList()
+    },
     changeActive (index, item) {
       this.isActive = index
       this.setActiveNb(item)
       if (this.$route.name === 'chartChild') {
-        this.$router.push({ path: `/chart`,query: {nbCode: this.activeNb.nbCode} })
+        this.$router.push({ path: `/chart`, query: { nbCode: this.activeNb.nbCode } })
       } else if (this.$route.name === 'configChild') {
-        this.$router.push({ path: `/config`,query: {nbCode: this.activeNb.nbCode} })
+        this.$router.push({ path: `/config`, query: { nbCode: this.activeNb.nbCode } })
       } else if (this.$route.name === 'managementChild') {
-        this.$router.push({ path: `/management`,query: {nbCode: this.activeNb.nbCode} })
+        this.$router.push({ path: `/management`, query: { nbCode: this.activeNb.nbCode } })
       }
     },
-    getAllNbList () {
-      this.getAsideList()
+    getAllNbList (refresh) {
+      this.getAsideList(refresh)
     },
-
+    handleSubmit (name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          this.addNb(this.formValidate.nbCode, this.formValidate.nbName)
+        } else {
+          // this.$Message.error('Fail!')
+        }
+      })
+    },
     async addNb (nbCode, nbName) {
       this.modal_loading = true
       let res = await addNb({ nbCode: nbCode, nbName: nbName })
@@ -95,6 +113,10 @@ export default {
       if (res.data.code === 'success') {
         this.addNbModel = false
         this.$Message.success('添加成功')
+        this.formValidate = {
+          nbName: '',
+          nbCode: ''
+        }
         this.getAllNbList()
       } else {
         this.$Message.error('添加失败')
@@ -108,24 +130,16 @@ export default {
         loading: true,
         onOk: async () => {
           let res = await delNb(nbCode)
-          console.log(res)
           if (res.data.code === 'success') {
             this.$Modal.remove()
             this.$Message.info('删除成功')
-            this.getAllNbList()
+            this.getAllNbList(true)
+            console.log(this.asideList)
+            this.$router.push({ path: this.$route.path, query: { nbCode: this.asideList[0].nbCode } })
           } else {
             this.$Modal.remove()
             this.$Message.error('删除失败')
           }
-        }
-      })
-    },
-    handleSubmit (name) {
-      this.$refs[name].validate((valid) => {
-        if (valid) {
-          this.addNb(this.formValidate.nbCode, this.formValidate.nbName)
-        } else {
-          // this.$Message.error('Fail!')
         }
       })
     },
@@ -140,12 +154,28 @@ export default {
         this.$Message.error('没有找到，请检查输入的nbCode是否正确')
       }
     },
-    clear () {
-      this.getAllNbList()
+    /* 重启nb */
+    async changeStatus (nbCode, type) {
+      this.$Modal.confirm({
+        title: '提示',
+        content: '<p>确定要重启这个Nb吗？</p>',
+        loading: true,
+        onOk: async () => {
+          let res = await changeStatus({ nbCode: nbCode, type: type })
+          console.log(res)
+          if (res.data.code === 'success') {
+            this.$Modal.remove()
+            this.$Message.info('重启成功')
+          } else {
+            this.$Modal.remove()
+            this.$Message.error('重启失败')
+          }
+        }
+      })
     }
   },
   mounted () {
-    this.getAllNbList()
+    this.getAllNbList(true)
   }
 }
 </script>

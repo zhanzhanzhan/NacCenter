@@ -99,7 +99,7 @@ export default {
         return callback(new Error('请输入角色名！'))
       }
       // 模拟异步验证效果
-      selRoleName({ roleName: value, unitId: this.userInfo.unitId }).then((res) => {
+      selRoleName({ roleName: value, parentId: this.userInfo.parentId }).then((res) => {
         if (res.data.result === '角色名已存在！') {
           callback(new Error('该角色名已存在！'))
         } else {
@@ -135,16 +135,22 @@ export default {
     /* 获取所有角色 */
     async selRoleInfo () {
       let res = await selRoleInfo()
-      this.roleList = res.data
-      this.changeRole(this.roleList[0].roleId, 0)
+      if (res.data.code === 'success') {
+        this.roleList = res.data.result
+        this.changeRole(this.roleList[0].roleId, 0)
+      } else {
+        console.log(res)
+      }
     },
     /* 根据id获取菜单 */
     async getTreeByRoleId (roleId) {
       let res = await getTreeByRoleId({ roleId: roleId })
       this.checkAllGroup = []
-      res.data.map((item, index) => {
-        this.checkAllGroup.push(item.treeId)
-      })
+      if (res.data.code === 'success') {
+        res.data.result.map((item, index) => {
+          this.checkAllGroup.push(item.treeId)
+        })
+      }
       // console.log(this.checkAllGroup)
     },
     /* 查询所有菜单 */
@@ -157,9 +163,8 @@ export default {
     /* 新增角色信息 */
     async insRoleInfo (roleName) {
       this.loading = true
-      let res = await insRoleInfo({ roleName: roleName, unitId: this.userInfo.unitId })
-      // console.log(res)
-      if (res.data === 1) {
+      let res = await insRoleInfo({ roleName: roleName, parentId: this.userInfo.parentId })
+      if (res.data.code === 'success') {
         this.$Message.success('新增角色成功')
         this.loading = false
         this.addRoleForm.roleName = ''
@@ -169,8 +174,9 @@ export default {
     /* 修改角色信息 */
     async uptRoleInfo (roleName) {
       this.loading = true
-      let res = await uptRoleInfo({ roleName: roleName, unitId: this.userInfo.unitId })
-      if (res.data !== null) {
+      let res = await uptRoleInfo({ roleName: roleName, parentId: this.userInfo.parentId })
+      console.log(res)
+      if (res.data.code === 'success') {
         this.loading = false
         this.$Message.success('修改角色成功')
         this.selRoleInfo()
@@ -178,9 +184,9 @@ export default {
     },
     /* 根据角色Id绑定菜单 */
     async bindTreeInfoByRoleId () {
-      console.log(this.activeRoleId)
       let res = await bindTreeInfoByRoleId({ roleId: this.activeRoleId, list: this.checkAllGroup })
-      if (res.data !== null) {
+      console.log(res)
+      if (res.data.code === 'success') {
         this.$Message.success('保存成功')
       } else {
         this.$Message.error('保存失败')
@@ -250,7 +256,7 @@ export default {
         onOk: () => {
           delRoleInfo({ roleId: roleId }).then((res) => {
             console.log(res)
-            if (res.data.code === '200') {
+            if (res.data.code === 'success') {
               this.$Modal.remove()
               this.selRoleInfo()
             }

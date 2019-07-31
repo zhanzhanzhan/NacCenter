@@ -8,27 +8,52 @@
       <Card icon="log-in" title="欢迎登录" :bordered="false">
         <div class="form-con">
           <login-form @on-success-valid="handleSubmit"></login-form>
-          <p class="login-tip"></p>
+          <div class="other">
+            <div>
+              <span>其他登录方式：</span>
+              <Icons type="icon-yooxi" @click.native="weChatLogin"></Icons>
+            </div>
+            <router-link to="/register" style=" font-size: 12px;">注册</router-link>
+          </div>
         </div>
       </Card>
     </div>
+    <Modal
+      v-model="qrCodeModal"
+      title="请使用微信扫码登录！"
+      class-name="vertical-center-modal"
+      footer-hide width="300">
+      <div class="qrcode" ref="qrCodeUrl" v-if="qrCodeModal" ></div>
+    </Modal>
   </div>
 </template>
 
 <script>
 import LoginForm from '_c/login-form'
-import { mapActions } from 'vuex'
+import { wxUserLogin, wxUserBinding } from '../../api/login'
+import { mapActions, mapMutations } from 'vuex'
+import Icons from '_c/icons'
+import QRCode from 'qrcodejs2'
 export default {
+  data () {
+    return {
+      path: 'ws://192.168.1.126://websocket/',
+      qrCodeModal: false
+    }
+  },
   components: {
-    LoginForm
+    LoginForm, Icons
   },
   methods: {
     ...mapActions([
       'handleLogin'
     ]),
+    ...mapMutations([
+      'setUserInfo',
+      'setToken'
+    ]),
     handleSubmit (data) {
       this.handleLogin({ userNo: data.userName, password: data.password }).then(res => {
-        // console.log(res)
         if (res.data.code === 'success') {
           this.$router.push({
             name: this.$config.homeName
@@ -37,7 +62,74 @@ export default {
           this.$Message.error(res.data.msg)
         }
       })
+    },
+    async weChatLogin () {
+      this.qrCodeModal = true
+      let sid = +new Date()
+      let res = await wxUserLogin(sid)
+      console.log(res)
+      if (res.data.code === 'success') {
+        this.creatQrCode(res.data.result)
+        this.init(this.path + sid)
+        // 三分钟后关闭连接
+        setTimeout(() => {
+          this.wsClose()
+        }, 1000 * 60 * 3)
+      } else {
+        this.$Message.error(`登录错误：${res.data.result}`)
+      }
+    },
+    /* 生成二维码 */
+    creatQrCode (url) {
+      let qrcode = new QRCode(this.$refs.qrCodeUrl, {
+        text: url,
+        width: 200,
+        height: 200,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      })
+    },
+    init (url) {
+      if (typeof (WebSocket) === 'undefined') {
+        alert('您的浏览器不支持socket,请升级浏览器或更换浏览器')
+      } else {
+        // 实例化socket
+        this.socket = new WebSocket(url)
+        // 监听socket连接
+        this.socket.onopen = this.open
+        // 监听socket错误信息
+        this.socket.onerror = this.error
+        // 监听socket消息
+        this.socket.onmessage = this.getMessage
+        this.socket.onclose = this.wsClose
+      }
+    },
+    open () {
+      //console.log('socket连接成功')
+    },
+    error () {
+      //console.log('连接错误')
+    },
+    getMessage (msg) {
+      if (msg.data === '连接成功') return
+      let data = JSON.parse(msg.data)
+      let res = JSON.parse(data.result)
+      if (data.code === 'success') {
+        this.setUserInfo(res)
+        this.setToken(res.token)
+        this.$router.push({ name: 'home' })
+      }
+    },
+    send () {
+      this.socket.send('')
+    },
+    wsClose () {
+      //console.log('socket已经关闭')
     }
+  },
+  destroyed () {
+    this.wsClose()
   }
 }
 </script>
