@@ -47,7 +47,7 @@ export default {
     loginOut () {
       this.handleLoginOut().then(res => {
         if (res.data.code === 'success') {
-          sessionStorage.clear()
+          localStorage.clear()
           this.$router.push('/login')
         }
       })

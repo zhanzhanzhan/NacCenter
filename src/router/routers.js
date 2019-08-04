@@ -139,6 +139,15 @@ export const systemChild = [
     component: () => import('@/view/system/groupManage/groupManage.vue')
   },
   {
+    path: '/system/applyManage',
+    name: 'applyManage',
+    meta: {
+      icon: 'md-text',
+      title: '申请管理'
+    },
+    component: () => import('@/view/system/bind-apply/bindApply.vue')
+  },
+  {
     path: '/system/userInfo',
     name: 'userInfo',
     meta: {

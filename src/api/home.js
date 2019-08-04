@@ -26,6 +26,18 @@ export const getOnLineTotal = () => {
 
 export const getRosterSum = (rosterType) => {
   return axios.request({
-    url: `/sysOverview/rosterSum/${rosterType}`
+    url: `/sysOverview/rosterSum/${rosterType}`,
+    method: 'get'
+  })
+}
+
+/*
+*  获取入侵名单总数
+* */
+
+export const getBlockHostCount = () => {
+  return axios.request({
+    url: `/sysOverview/getBlockHostCount`,
+    method: 'get'
   })
 }

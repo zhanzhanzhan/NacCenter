@@ -3,7 +3,8 @@ import Router from 'vue-router'
 import { routers } from './routers'
 import store from '@/store'
 import iView from 'iview'
-import { canTurnTo, setTitle, getToken } from '@/libs/util'
+import { canTurnTo, setTitle, getToken, removeToken } from '@/libs/util'
+import { isEmptyObject } from '@/libs/vue-expand'
 import config from '@/config'
 const { homeName } = config
 
@@ -15,22 +16,21 @@ const router = new Router({
 })
 const LOGIN_PAGE_NAME = 'login'
 
-const turnTo = (to, access, next) => {
-  if (canTurnTo(to.name, access, routes)) next() // 有权限，可访问
-  else next({ replace: true, name: 'error_401' }) // 无权限，重定向到401页面
-}
-
 router.beforeEach((to, from, next) => {
   iView.LoadingBar.start()
+  /*if (isEmptyObject(store.state.login.userInfo)) {
+    console.log('无')
+    removeToken()
+  }*/
   const TOKEN = getToken()
   if (!TOKEN) {
     // 未登录且要跳转的页面不是登录页 也不是注册页 也不是用户绑定页面
     if (to.name !== LOGIN_PAGE_NAME && to.name !== 'register' && to.name !== 'bind') {
       next({
-        name: LOGIN_PAGE_NAME // 跳转到登录页
+        replace: true, name: LOGIN_PAGE_NAME
+        // name: LOGIN_PAGE_NAME // 跳转到登录页
       })
     }
-
   } else if (!TOKEN && to.name === LOGIN_PAGE_NAME) {
     // 未登陆且要跳转的页面是登录页
     next() // 跳转

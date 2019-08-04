@@ -4,8 +4,8 @@
       {{activeNb.nbName}} <span>{{activeNb.nbCode}}</span>
     </div>
     <div class="info-list">
-      <Row :gutter="10" type="flex" style="flex-wrap: wrap">
-        <Col span="8">
+      <Row type="flex" :gutter="10" style="flex-wrap: wrap" class="info-item-wrap">
+        <Col :xxl="6" :xl="8" :lg="12" :xs="13" :sm="13" :md="13">
           <div class="info-item">
             <div class="item-title">
               网络信息
@@ -31,7 +31,7 @@
             <div class="item-content" v-if="!networkInfo" style="text-align: center">暂无数据</div>
           </div>
         </Col>
-        <Col span="8">
+        <Col :xxl="6" :xl="8" :lg="12" :xs="13" :sm="13" :md="13" >
           <div class="info-item">
             <div class="item-title">
               系统现状
@@ -70,21 +70,29 @@
                 <span class="value">{{system.nbCode}}</span>
               </div>
 
-              <div class="list-item">
+             <!-- <div class="list-item">
                 <span class="name">单机模式</span>：
                 <span class="value">{{system.single}}</span>
               </div>
               <div class="list-item">
                 <span class="name">学习模式</span>：
                 <span class="value">{{system.studyMode}}</span>
-              </div>
+              </div>-->
               <!--<div class="list-item">
                 <span class="name">保护宿主总数</span>：
                 <span class="value">{{system.hostProtection}}</span>
               </div>-->
               <div class="list-item">
+                <span class="name">学习时长</span>：
+                <span class="value">{{system.le_time ? system.le_time : '未开启学习模式'}}</span>
+              </div>
+              <div class="list-item">
+                <span class="name">阻挡进程数</span>：
+                <span class="value">{{system.runningBlk}}</span>
+              </div>
+              <div class="list-item">
                 <span class="name">运行时长</span>：
-                <span class="value">{{system.squadLeader}}</span>
+                <span class="value">{{system.squadLeader !== '' ? system.squadLeader : '未开始运行'}}</span>
               </div>
               <div class="list-item">
                 <span class="name">版本号</span>：
@@ -94,7 +102,79 @@
             <div class="item-content" v-if="!system" style="text-align: center">暂无数据</div>
           </div>
         </Col>
-        <Col span="8">
+
+        <Col :xxl="6" :xl="8" :lg="12" :xs="13" :sm="13" :md="13">
+          <div class="info-item">
+            <div class="item-title">
+              白名单
+            </div>
+            <div style="text-align: center" class="item-content" v-if="!whiteList.length ">暂无数据</div>
+            <div class="item-content" v-if="whiteList.length">
+              <div class="list-item2" v-for="(item, index) in whiteList">
+                <span>{{item.ipAddress}}</span>
+                <span>{{item.macAddress}}</span>
+              </div>
+            </div>
+          </div>
+        </Col>
+        <Col :xxl="6" :xl="8" :lg="12" :xs="13" :sm="13" :md="13" >
+          <div class="info-item">
+            <div class="item-title">
+              忽略名单
+            </div>
+            <div class="item-content">
+              <div style="text-align: center" v-if="!ignoreList.length">暂无数据</div>
+              <div class="list-item2" v-for="(item, index) in ignoreList" v-if="ignoreList.length">
+                <span>{{item.ipAddress}}</span>
+                <span>{{item.macAddress}}</span>
+              </div>
+            </div>
+          </div>
+        </Col>
+
+        <Col :xxl="6" :xl="8" :lg="12" :xs="13" :sm="13" :md="13" >
+          <div class="info-item">
+            <div class="item-title">
+              在线主机列表
+            </div>
+            <div class="item-content">
+              <div style="text-align: center" v-if="!onlineMasteList.length">暂无数据</div>
+              <div class="list-item2" v-for="(item, index) in onlineMasteList" v-if="onlineMasteList.length">
+                <span>{{item.macAddress}}</span>
+                <span>{{item.ipAddress}}</span>
+              </div>
+            </div>
+          </div>
+        </Col>
+        <Col :xxl="6" :xl="8" :lg="12" :xs="13" :sm="13" :md="13" >
+          <div class="info-item">
+            <div class="item-title">
+              入侵主机列表
+            </div>
+            <div class="item-content">
+              <div style="text-align: center" v-if="!blockingHost.length">暂无数据</div>
+              <div class="list-item2" v-for="(item, index) in blockingHost" v-if="blockingHost.length">
+                <span>{{item.macAddress}}</span>
+                <span>{{item.ipAddress}}</span>
+              </div>
+            </div>
+          </div>
+        </Col>
+        <Col :xxl="6" :xl="8" :lg="12" :xs="13" :sm="13" :md="13" >
+          <div class="info-item">
+            <div class="item-title">
+              活跃主机列表
+            </div>
+            <div class="item-content">
+              <div style="text-align: center" v-if="!liveMasteList.length">暂无数据</div>
+              <div class="list-item2" v-for="(item, index) in liveMasteList" v-if="liveMasteList.length">
+                <span>{{item.macAddress}}</span>
+                <span>{{item.ipAddress}}</span>
+              </div>
+            </div>
+          </div>
+        </Col>
+        <Col :xxl="6" :xl="8" :lg="12" :xs="13" :sm="13" :md="13" >
           <div class="info-item">
             <div class="item-title">
               模式设置
@@ -124,89 +204,19 @@
             <div style="text-align: center" class="item-content" v-if="!modeSet">暂无数据</div>
           </div>
         </Col>
-        <Col span="8">
-          <div class="info-item">
-            <div class="item-title">
-              白名单
-            </div>
-            <div style="text-align: center" class="item-content" v-if="!whiteList.length">暂无数据</div>
-            <div class="item-content" v-if="whiteList.length">
-              <div class="list-item2" v-for="(item, index) in whiteList">
-                <span>{{item.split(' ')[0]}}</span>
-                <span>{{item.split(' ')[1]}}</span>
-              </div>
-            </div>
-          </div>
-        </Col>
-        <Col span="8">
-          <div class="info-item">
-            <div class="item-title">
-              忽略名单
-            </div>
-            <div class="item-content">
-              <div style="text-align: center" v-if="!ignoreList.length">暂无数据</div>
-              <div class="list-item2" v-for="(item, index) in ignoreList" v-if="ignoreList.length">
-                <span>{{item.macAddress}}</span>
-                <span>{{item.ipAddress}}</span>
-              </div>
-            </div>
-          </div>
-        </Col>
-        <Col span="8">
-          <div class="info-item">
-            <div class="item-title">
-              活跃主机列表
-            </div>
-            <div class="item-content">
-              <div style="text-align: center" v-if="!liveMasteList">暂无数据</div>
-              <div class="list-item2" v-for="(item, index) in liveMasteList" v-if="liveMasteList">
-                <span>{{item.macAddress}}</span>
-                <span>{{item.ipAddress}}</span>
-              </div>
-            </div>
-          </div>
-        </Col>
-        <Col span="8">
-          <div class="info-item">
-            <div class="item-title">
-              在线主机列表
-            </div>
-            <div class="item-content">
-              <div style="text-align: center" v-if="!onlineMasteList">暂无数据</div>
-              <div class="list-item2" v-for="(item, index) in onlineMasteList" v-if="onlineMasteList">
-                <span>{{item.macAddress}}</span>
-                <span>{{item.ipAddress}}</span>
-              </div>
-            </div>
-          </div>
-        </Col>
-        <Col span="8">
-          <div class="info-item">
-            <div class="item-title">
-              入侵主机列表
-            </div>
-            <div class="item-content">
-              <div style="text-align: center" v-if="!blockingHost">暂无数据</div>
-              <div class="list-item2" v-for="(item, index) in blockingHost" v-if="blockingHost">
-                <span>{{item.macAddress}}</span>
-                <span>{{item.ipAddress}}</span>
-              </div>
-            </div>
-          </div>
-        </Col>
-
       </Row>
     </div>
   </div>
 </template>
 <script>
 import { mapState, mapActions } from 'vuex'
-import { getNetworkInfo, getStudyMode, nbGetNameList, getMasterInfo, getSystemStatus } from '../../api/chart'
+import { getNetworkInfo, getStudyMode, getMasterInfo, getSystemStatus } from '../../api/chart'
 
 export default {
   name: 'chart',
   data () {
     return {
+      timer: null,
       networkInfo: {}, // 网络信息
       modeSet: {}, // 模式
       whiteList: [], // 白名单
@@ -232,70 +242,112 @@ export default {
     /*模式设置*/
     async getStudyMode (nbCode) {
       let res = await getStudyMode({ nbCode: nbCode })
-      console.log(res)
       if (res.data.code === 'success') {
         this.modeSet = res.data.result
+      } else {
+        this.modeSet = null
       }
     },
-    /* 名单列表 */
-    async nbGetNameList (nbCode, type) {
-      let res = await nbGetNameList({ nbCode: nbCode, type: type })
-      //console.log(res)
-      if (res.data.code === 'success') {
-        if (type === 4) {
-          this.whiteList = res.data.result
-        } else if (type === 5) {
-          this.ignoreList = res.data.result
-        }
-      }
-    },
+    // /* 名单列表 */
+    // async nbGetNameList (nbCode, type) {
+    //   let res = await nbGetNameList({ nbCode: nbCode, type: type })
+    //
+    //   if (res.data.code === 'success') {
+    //
+    //     if (type === 4) {
+    //       this.whiteList = res.data.result
+    //     } else if (type === 5) {
+    //       console.log(res)
+    //       this.ignoreList = res.data.result
+    //     }
+    //   }
+    // },
     /* 主机列表*/
     async getMasterInfo (nbCode, type) {
       let res = await getMasterInfo({ nbCode: nbCode, type: type })
       if (res.data.code === 'success') {
+       // console.log(res)
         switch (type) {
           case 1:
-            this.onlineMasteList = res.data.result
+            this.onlineMasteList = res.data.result ? res.data.result : []
             break
           case 2:
-            this.liveMasteList = res.data.result
+            this.liveMasteList = res.data.result ? res.data.result : []
             break
           case 3:
-            this.blockingHost = res.data.result
+            this.blockingHost = res.data.result ? res.data.result : []
+            break
+          case 4:
+            this.whiteList = res.data.result ? res.data.result : []
+            break
+          case 5:
+            this.ignoreList = res.data.result ? res.data.result : []
             break
         }
       }
     },
+    forMateDate (date) {
+      if (!date) return 0
+      let day, hour, minute, second
+      if (date.split('-')[1]) {
+        day = date.split('-')[0] + '天'
+        hour = date.split('-')[0].split(':')[0] + '时'
+        minute = date.split('-')[0].split(':')[1] + '分'
+        second = date.split('-')[0].split(':')[2] + '秒'
+      } else if (date.split('-')[0].split(':').length === 3) {
+        day = ''
+        hour = date.split('-')[0].split(':')[0] + '时'
+        minute = date.split('-')[0].split(':')[1] + '分'
+        second = date.split('-')[0].split(':')[2] + '秒'
+      } else if (date.split('-')[0].split(':').length === 2) {
+        day = ''
+        hour = ''
+        minute = date.split('-')[0].split(':')[0] + '分'
+        second = date.split('-')[0].split(':')[1] + '秒'
+      } else if (date.split('-')[0].split(':').length === 1) {
+        day = ''
+        hour = ''
+        minute = ''
+        second = date.split('-')[0].split(':')[0] + '秒'
+      } else {
 
+      }
+
+      let time = {
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second
+      }
+      return `${time.day}${time.hour}${time.minute}${time.second}`
+    },
     /* 系统现状 */
     async getSystemStatus (nbCode) {
       let res = await getSystemStatus({ nbCode: nbCode })
+      console.log(res)
       if (res.data.code === 'success') {
         this.system = res.data.result
         if (!res.data.result) return
-        let time = {
-          day: res.data.result.squadLeader.split('-')[0],
-          hour: res.data.result.squadLeader.split('-')[1].split(':')[0],
-          minute: res.data.result.squadLeader.split('-')[1].split(':')[1],
-          second: res.data.result.squadLeader.split('-')[1].split(':')[2]
-        }
-        this.system.squadLeader = `${time.day}天${time.hour}时${time.minute}分${time.second}秒`
+
+        this.system.squadLeader = this.forMateDate(res.data.result.squadLeader)
+        this.system.le_time = this.forMateDate(res.data.result.le_time)
       }
     },
     funHandle () {
       this.getNetworkInfo(this.activeNb.nbCode)
       this.getStudyMode(this.activeNb.nbCode)
-      this.nbGetNameList(this.activeNb.nbCode, 4)
-      this.nbGetNameList(this.activeNb.nbCode, 5)
       this.getMasterInfo(this.activeNb.nbCode, 1)
       this.getMasterInfo(this.activeNb.nbCode, 2)
       this.getMasterInfo(this.activeNb.nbCode, 3)
+      this.getMasterInfo(this.activeNb.nbCode, 4)
+      this.getMasterInfo(this.activeNb.nbCode, 5)
       this.getSystemStatus(this.activeNb.nbCode)
     }
   },
   computed: {
     ...mapState({
-      activeNb: state => state.app.activeNb
+      activeNb: state => state.app.activeNb,
+      asideList: state => state.app.asideList
     })
   },
   watch: {
@@ -310,6 +362,13 @@ export default {
   },
   mounted () {
     this.funHandle()
+    this.timer = setInterval(() => {
+      this.funHandle()
+    }, 1000 * 60)
+  },
+  destroyed () {
+    clearInterval(this.timer) // 清除定时器
+    this.timer = null
   }
 }
 </script>

@@ -1,6 +1,13 @@
 <template>
   <div class="aside-wrap">
     <Input suffix="ios-search" placeholder="输入nbCode搜索" v-model="searchText" clearable @on-clear="clear" @keyup.enter.native="search(searchText)"/>
+    <div style="display: flex; justify-content: center">
+      <div class="add-list" @click="addNbModel = true">
+        <!--      <span>添加</span>-->
+        <Icon type="md-add" color="#fff" :size="25"/>
+      </div>
+    </div>
+
     <div class="aside-list">
       <div class="aside-item" :class="item.nbCode === activeNb.nbCode  ? 'active' : ''" v-for="(item,index) in asideList"
            @click="changeActive(index,item)"
@@ -15,10 +22,9 @@
         <div class="info">{{item.nbCode}}</div>
         <Icon type="ios-close-circle" title="删除此项" class="delete" size="18" color="#555" @click="removeNb(item.nbCode)"/>
       </div>
+      <div style="text-align: center" v-if="asideList.length === 0">暂无数据</div>
     </div>
-    <div class="add-list" @click="addNbModel = true">
-      <span>添加</span>
-    </div>
+
     <Modal v-model="addNbModel" width="360">
       <p slot="header" style="color:#333;text-align:center">
         <span>添加机器</span>
@@ -38,16 +44,38 @@
         <Button type="info" size="large" long :loading="modal_loading" @click="handleSubmit('formValidate')">确认添加</Button>
       </div>
     </Modal>
+    <Modal v-model="applyModel" width="360">
+      <p slot="header" style="color:#333;text-align:center">
+        <span>填写申请信息</span>
+      </p>
+      <div style="text-align:center">
+        <Form ref="applyForm" :model="applyForm" :rules="applyRules" label-position="left">
+          <FormItem label="机器序列号" prop="nbCode">
+            <Input v-model="applyForm.nbCode" placeholder="请输入机器序列号"></Input>
+          </FormItem>
+          <FormItem label="申请理由" >
+            <Input v-model="applyForm.applyReason" type="textarea" placeholder="请输入申请理由"></Input>
+          </FormItem>
+
+        </Form>
+      </div>
+      <div slot="footer">
+        <Button type="info" size="large" long :loading="modal_loading" @click="checkApplyForm('applyForm')">申请</Button>
+      </div>
+    </Modal>
+
   </div>
 </template>
 <script>
 import { addNb, findNb, delNb } from '../../../../api/config'
+import { userApplyBind } from '../../../../api/userBind'
 import { changeStatus } from '../../../../api/chart'
 import { mapMutations, mapState, mapActions } from 'vuex'
 export default {
   name: 'MyAside',
   data () {
     return {
+      timer: '',
       isActive: 0,
       addNbModel: false, // 添加nb 弹窗
       modal_loading: false,
@@ -63,7 +91,17 @@ export default {
           { required: true, message: 'nbName不能为空', trigger: 'blur' }
         ]
       },
-      searchText: ''
+      searchText: '',
+      applyModel: false,
+      applyForm: {
+        nbCode: '',
+        applyReason: ''
+      },
+      applyRules: {
+        nbCode: [
+          { required: true, message: 'nbCode不能为空', trigger: 'blur' }
+        ],
+      },
     }
   },
   computed: {
@@ -75,7 +113,6 @@ export default {
   methods: {
     ...mapMutations({
       'setActiveNb': 'setActiveNb',
-      'setAsideList': 'setAsideList'
     }),
     ...mapActions([
       'getAsideList'
@@ -89,9 +126,9 @@ export default {
       if (this.$route.name === 'chartChild') {
         this.$router.push({ path: `/chart`, query: { nbCode: this.activeNb.nbCode } })
       } else if (this.$route.name === 'configChild') {
-        this.$router.push({ path: `/config`, query: { nbCode: this.activeNb.nbCode } })
+        this.$router.push({ path: `/config`, query: { nbCode: this.activeNb.nbCode }  })
       } else if (this.$route.name === 'managementChild') {
-        this.$router.push({ path: `/management`, query: { nbCode: this.activeNb.nbCode } })
+        this.$router.push({ path: `/management`, query: { nbCode: this.activeNb.nbCode  } })
       }
     },
     getAllNbList (refresh) {
@@ -106,9 +143,30 @@ export default {
         }
       })
     },
+    checkApplyForm (name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          this.applyModel = false
+          userApplyBind({ nbCode: this.applyForm.nbCode, applyReason: this.applyForm.applyReason }).then((res) => {
+
+            this.applyModel = false
+
+            if (res.data.code === 'success') {
+              this.$Message.success('申请成功')
+              this.applyForm = {}
+            } else {
+              this.$Message.error(res.data.msg)
+            }
+          })
+        } else {
+          // this.$Message.error('Fail!')
+        }
+      })
+    },
     async addNb (nbCode, nbName) {
       this.modal_loading = true
       let res = await addNb({ nbCode: nbCode, nbName: nbName })
+      console.log(res)
       this.modal_loading = false
       if (res.data.code === 'success') {
         this.addNbModel = false
@@ -118,6 +176,15 @@ export default {
           nbCode: ''
         }
         this.getAllNbList()
+      } else if (res.data.code === 4001) {
+        this.addNbModel = false
+        this.$Modal.confirm({
+          title: '提示',
+          content: `<p>${res.data.msg}</p>`,
+          onOk: () => {
+            this.applyModel = true
+          },
+        })
       } else {
         this.$Message.error('添加失败')
         this.addNbModel = false
@@ -176,6 +243,16 @@ export default {
   },
   mounted () {
     this.getAllNbList(true)
+    this.timer = setInterval(() => {
+      this.getAllNbList()
+    }, 1000 * 60)
+  },
+  beforeDestroy () {
+    this.getAllNbList(true)
+  },
+  destroyed () {
+    clearInterval(this.timer) // 清除定时器
+    this.timer = null
   }
 }
 </script>

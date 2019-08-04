@@ -96,7 +96,7 @@ export const insHostManage = ({ list }) => {
 * */
 export const nbGetNameList = ({ nbCode, type }) => {
   return axios.request({
-    url: '/nbGetNameList',
+    url: '/getAllNameList',
     method: 'post',
     params: {
       nbCode, type

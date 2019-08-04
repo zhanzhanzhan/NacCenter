@@ -25,12 +25,12 @@ export const loginOut = () => {
 /*
 * 注册
 * */
-export const register = ({ userNo, userName, password, smsCode }) => {
+export const register = ({ userNo, userName, password, smsCode, openid }) => {
   return axios.request({
     url: `/user/register`,
     method: 'post',
     params: {
-      userNo, userName, password, smsCode
+      userNo, userName, password, smsCode, openid
     }
   })
 }
@@ -70,7 +70,7 @@ export const wxUserBinding = ({ userNo, openid, smsCode }) => {
     url: `/user/wxUserBinding`,
     method: 'post',
     params: {
-      userNo
+      userNo, smsCode, openid
     }
   })
 }

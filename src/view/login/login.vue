@@ -1,4 +1,4 @@
-<style lang="less">
+<style lang="less" scoped>
   @import './login.less';
 </style>
 
@@ -25,12 +25,42 @@
       footer-hide width="300">
       <div class="qrcode" ref="qrCodeUrl" v-if="qrCodeModal" ></div>
     </Modal>
+    <Modal v-model="bindModel" footer-hide fullscreen title="" class-name="bind-modal">
+      <Row type="flex" justify="center" >
+        <div class="select-box">
+          <div class="select-panel">
+            <div class="title">
+              选择注册或关联账号
+            </div>
+            <div class="item">
+              <h3>注册新账号</h3>
+              <p>
+                使用此微信注册一个新账号
+              </p>
+              <div class="arrow"  @click="$router.push({ path:'register',query:{ openid: openid }})">
+                <Icons type="icon-arrow-up" color="#00a4ff" :size="40" ></Icons>
+              </div>
+            </div>
+            <div class="item" >
+              <h3>关联已有账号</h3>
+              <p>
+                关联此微信到已有账号，，您可以通过微信快速登录
+              </p>
+              <div class="arrow" @click="$router.push({ path:'bind',query:{ openid: openid }})">
+                <Icons type="icon-arrow-up" :size="40" ></Icons>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Row>
+
+    </Modal>
   </div>
 </template>
 
 <script>
 import LoginForm from '_c/login-form'
-import { wxUserLogin, wxUserBinding } from '../../api/login'
+import { wxUserLogin } from '../../api/login'
 import { mapActions, mapMutations } from 'vuex'
 import Icons from '_c/icons'
 import QRCode from 'qrcodejs2'
@@ -38,7 +68,9 @@ export default {
   data () {
     return {
       path: 'ws://192.168.1.126://websocket/',
-      qrCodeModal: false
+      qrCodeModal: false,
+      bindModel: false,
+      openid: ''
     }
   },
   components: {
@@ -74,6 +106,7 @@ export default {
         // 三分钟后关闭连接
         setTimeout(() => {
           this.wsClose()
+          this.qrCodeModal = false
         }, 1000 * 60 * 3)
       } else {
         this.$Message.error(`登录错误：${res.data.result}`)
@@ -112,21 +145,29 @@ export default {
       //console.log('连接错误')
     },
     getMessage (msg) {
-      if (msg.data === '连接成功') return
-      let data = JSON.parse(msg.data)
-      let res = JSON.parse(data.result)
+      console.log(msg)
+      let data, res
+      if (msg.data === '连接成功') {
+        return
+      } else {
+        data = JSON.parse(msg.data)
+      }
       if (data.code === 'success') {
+        res = JSON.parse(data.result)
         this.setUserInfo(res)
         this.setToken(res.token)
         this.$router.push({ name: 'home' })
+      } else {
+        this.bindModel = true
+        this.openid = data.result
       }
     },
     send () {
       this.socket.send('')
     },
     wsClose () {
-      //console.log('socket已经关闭')
-    }
+      // console.log('socket已经关闭')
+    },
   },
   destroyed () {
     this.wsClose()

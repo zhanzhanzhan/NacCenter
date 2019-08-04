@@ -1,2 +1,2 @@
-import RegForm from './bind-form.vue'
-export default RegForm
+import BindForm from './bind-form.vue'
+export default BindForm

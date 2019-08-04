@@ -63,14 +63,14 @@
             红色警报
           </div>
           <div class="body">
-            <div class="progress-num">15</div>
+            <div class="progress-num">{{warning}}</div>
           </div>
         </div>
       </div>
   </div>
 </template>
 <script>
-import { getActiveHostCount, getOnLineTotal, getRosterSum } from '../../api/home'
+import { getActiveHostCount, getOnLineTotal, getRosterSum, getBlockHostCount } from '../../api/home'
 import { getCurrentCount } from '../../api/chart'
 
 export default {
@@ -83,6 +83,7 @@ export default {
       whiteList: {}, // 白名单
       ignoreList: {}, // 忽略名单
       timer: null,
+      warning: ''
     }
   },
   computed: {
@@ -99,7 +100,6 @@ export default {
   methods: {
     async getActiveHostCount () {
       let res = await getActiveHostCount()
-      console.log(res)
       if (res.data.code === 'success') {
         this.activeHost = res.data.result
       }
@@ -123,7 +123,14 @@ export default {
       if (res.data.code === 'success') {
         this.online = res.data.result
       }
+    },
+    /* 获取入侵主机 /报警 */
+    async getBlockHostCount () {
+      let res = await getBlockHostCount()
       console.log(res)
+      if (res.data.code === 'success') {
+        this.warning = res.data.result.blockHostCount || 0
+      }
     },
     funhandle () {
       this.getActiveHostCount()
@@ -131,17 +138,18 @@ export default {
       this.getRosterSum(4)
       this.getRosterSum(5)
       this.getCurrentCount()
+      this.getBlockHostCount()
     }
 
   },
   mounted () {
     this.funhandle()
     if (this.timer) {
-      clearInterval(timer)
+      clearInterval(this.timer)
     } else {
       this.timer = setInterval(() => {
         this.funhandle()
-      }, 1000 * 60 * 30)
+      }, 1000 * 60)
     }
   },
   beforeDestroy () {

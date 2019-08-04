@@ -3,7 +3,7 @@ import qs from 'qs'
 /*
 *  上传文件
 * */
-export const uploadFile = (file) => {
+export const uploadFile = ({ file, nbCode }) => {
   console.log(file)
   return axios.request({
     url: '/importResult',
@@ -13,6 +13,9 @@ export const uploadFile = (file) => {
       'Content-Type': 'application/x-www-form-urlencoded'
     },
     processData: false, // 告诉axios不要去处理发送的数据(重要参数)
-    data: file
+    data: file,
+    params: {
+      nbCode
+    }
   })
 }

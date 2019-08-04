@@ -7,27 +7,6 @@
         </span>
       </Input>
     </FormItem>
-    <FormItem prop="userName">
-      <Input v-model="form.userName" placeholder="请输入用户名">
-        <span slot="prepend">
-          <Icon :size="16" type="ios-person"></Icon>
-        </span>
-      </Input>
-    </FormItem>
-    <FormItem prop="password">
-      <Input type="password" v-model="form.password" placeholder="请输入密码">
-        <span slot="prepend">
-          <Icon :size="14" type="md-lock"></Icon>
-        </span>
-      </Input>
-    </FormItem>
-    <FormItem prop="ensurePassword" >
-      <Input type="password" v-model="form.ensurePassword" placeholder="请再次输入密码">
-        <span slot="prepend">
-          <Icon :size="14" type="md-lock"></Icon>
-        </span>
-      </Input>
-    </FormItem>
     <FormItem prop="smsCode">
       <div style="display: flex; align-items: center;justify-content: center">
         <Input v-model="form.smsCode" placeholder="请输入验证码">
@@ -39,7 +18,7 @@
       </div>
     </FormItem>
     <FormItem>
-      <Button @click="handleSubmit" type="primary" long>注册</Button>
+      <Button @click="handleSubmit" type="primary" long>绑定</Button>
     </FormItem>
   </Form>
 </template>
@@ -55,53 +34,14 @@ export default {
         const  validatePhone = (rule, value, callback) => {
           if (!value) {
             return callback(new Error('手机号不能为空'))
-          } else if (!/^1[34578]\d{9}$/.test(value)) {
+          } else if (!/^1[345789]\d{9}$/.test(value)) {
             callback('手机号格式不正确')
-          } else {
-            checkUserNo({ userNo: value }).then((res) => {
-              if (res.data.code === 'fail') {
-                callback(res.data.result)
-              } else {
-                callback()
-              }
-            })
-          }
-        }
-        return [
-          { required: true, validator: validatePhone, trigger: 'blur' }
-        ]
-      }
-    },
-    userNameRules: {
-      type: Array,
-      default: () => {
-        return [
-          { required: true, message: '用户名不能为空', trigger: 'blur' }
-        ]
-      }
-    },
-    passwordRules: {
-      type: Array,
-      default: function () {
-        return [
-          { required: true, message: '密码不能为空', trigger: 'blur' }
-        ]
-      }
-    },
-    ensurePasswordRules: {
-      type: Array,
-      default: function () {
-        const validatePassCheck = (rule, value, callback) => {
-          if (value === '') {
-            return callback(new Error('请再次输入密码'))
-          } else if (value !== this.form.password) {
-            return callback(new Error('两次密码不一致'))
           } else {
             callback()
           }
         }
         return [
-          { required: true, validator: validatePassCheck, trigger: 'blur' }
+          { required: true, validator: validatePhone, trigger: 'blur' }
         ]
       }
     },
@@ -120,9 +60,6 @@ export default {
     return {
       form: {
         userNo: '',
-        userName: '',
-        password: '',
-        ensurePassword: '',
         smsCode: ''
       },
       content: '获取验证码', // 按钮内容
@@ -134,9 +71,6 @@ export default {
     rules () {
       return {
         userNo: this.userNoRules,
-        userName: this.userNameRules,
-        password: this.passwordRules,
-        ensurePassword: this.ensurePasswordRules,
         smsCode: this.smsCodeRules
       }
     }
@@ -147,8 +81,6 @@ export default {
         if (valid) {
           this.$emit('on-success-valid', {
             userNo: this.form.userNo,
-            userName: this.form.userName,
-            password: this.form.password,
             smsCode: this.form.smsCode
           })
         }

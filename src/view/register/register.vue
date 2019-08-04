@@ -25,7 +25,14 @@ export default {
   },
   methods: {
     async handleSubmit (data) {
-      let res = await register({ userNo: data.userNo, userName: data.userName, password: data.password, smsCode: data.smsCode })
+      let json = {
+        userNo: data.userNo,
+        userName: data.userName,
+        password: data.password,
+        smsCode: data.smsCode,
+        openid: this.$route.query.openid ? this.$route.query.openid : ''
+      }
+      let res = await register(json)
       if (res.data.code === 'success') {
         this.$Notice.open({
           title: '恭喜！',

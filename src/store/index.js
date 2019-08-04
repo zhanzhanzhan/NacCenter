@@ -23,5 +23,5 @@ export default new Vuex.Store({
     app,
     login
   },
-  plugins: [createPersistedState({ storage: window.sessionStorage })]
+  plugins: [createPersistedState()]
 })

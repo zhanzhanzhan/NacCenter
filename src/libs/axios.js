@@ -1,8 +1,8 @@
 import axios from 'axios'
 import store from '@/store'
-import { getToken } from './util'
+import config from '@/config'
+import { getToken, removeToken } from './util'
 // import { Spin } from 'iview'
-
 axios.defaults.withCredentials = true
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest' // 设置该请求头用于服务器判断是否Ajax请求
 
@@ -45,6 +45,19 @@ class HttpRequest {
       const { data, status } = res
       return { data, status }
     }, error => {
+      switch (error.response.status) {
+        case 401:
+          /** 无权限访问 **/
+          break
+        case 403:
+          console.log('token已失效')
+          removeToken()
+          window.location.href = config.path.location + '/login'
+          if (typeof error.response.data.code !== 'undefined') {
+            return error.response.data
+          }
+          break
+      }
       this.destroy(url)
       let errorInfo = error.response
       if (!errorInfo) {

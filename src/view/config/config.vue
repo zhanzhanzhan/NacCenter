@@ -134,12 +134,12 @@
             <span>添加白名单</span>
           </p>
           <div style="text-align:center">
-            <Form :model="addWhiteForm" label-position="left">
+            <Form :model="addWhiteForm" label-position="left" >
               <FormItem label="mac地址">
-                <Input v-model="addWhiteForm.macAdress" placeholder="请输入mac地址"></Input>
+                <Input v-model.trim="addWhiteForm.macAdress" placeholder="请输入mac地址"></Input>
               </FormItem>
               <FormItem label="ip地址" >
-                <Input v-model="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
+                <Input v-model.trim="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
               <FormItem label="导入表格">
                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
@@ -203,19 +203,19 @@
             <span @click="removeAll" v-if="ignoreList.length>0">清空列表</span>
           </Col>
         </Row>
-        <Modal v-model="addIgnoreModel" width="360">
+        <Modal v-model="addIgnoreModel" width="360" >
           <p slot="header" style="color:#333;text-align:center">
             <span>添加忽略名单</span>
           </p>
           <div style="text-align:center">
             <Form :model="addWhiteForm" label-position="left">
               <FormItem label="mac地址">
-                <Input v-model="addIgnoreForm.macAdress" placeholder="请输入mac地址"></Input>
+                <Input v-model.trim="addIgnoreForm.macAdress" placeholder="请输入mac地址"></Input>
               </FormItem>
               <FormItem label="ip地址" >
-                <Input v-model="addIgnoreForm.ipAdress" placeholder="请输入ip地址"></Input>
+                <Input v-model.trim="addIgnoreForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
-              <!-- <FormItem label="导入表格">
+               <FormItem label="导入表格">
                  <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
                    <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件</Button>
                  </Upload>
@@ -236,7 +236,7 @@
                      </Progress>
                    </transition>
                  </Row>
-               </FormItem>-->
+               </FormItem>
 
             </Form>
           </div>
@@ -442,17 +442,32 @@ export default {
     handleSubmit (name) {
       this.addIp()
     },
-    async upload () {
+    async upload (type) {
+      if (!this.fill) return
       let fileFormData = new FormData()
       fileFormData.append('file', this.file)
-      let res = await uploadFile(fileFormData)
-      console.log(res)
+      let res = await uploadFile({ file: fileFormData, nbCode: this.activeNb.nbCode })
+      if (type === 4) {
+        this.addWhiteModel = false
+      } else {
+        this.addIgnoreModel = false
+      }
+      if (res.data.code === 'success') {
+        this.getNameList(type)
+      } else {
+        // this.$Message.error('添加失败')
+      }
     },
     async addIp () {
       let type = ''
       /* 白名单 */
       if (this.activeNav === 2) {
         type = 4
+        if (this.addWhiteForm.ipAdress === '' && this.addWhiteForm.macAdress === '') {
+          this.upload(type)
+          return
+        }
+
         this.addWhiteLoading = true
         let json = {
           nbCode: this.activeNb.nbCode,
@@ -462,18 +477,23 @@ export default {
         }
         let res = await addIp(json)
         this.addWhiteLoading = false
+        this.addWhiteModel = false
         if (res.data.code === 'success') {
-          this.addWhiteModel = false
           this.$Message.success('添加成功')
           this.getNameList(4)
         } else {
           this.$Message.error(res.data.result)
         }
-        this.upload()
+        this.upload(type)
       }
       /* 忽略名单 */
       else if (this.activeNav === 3) {
         type = 5
+        if (this.addIgnoreForm.ipAdress === '' && this.addIgnoreForm.macAdress === '') {
+          this.upload(type)
+          this.addIgnoreModel = false
+          return
+        }
         this.addIgnoreLoading = true
         let json = {
           nbCode: this.activeNb.nbCode,
@@ -482,14 +502,15 @@ export default {
           macAddress: this.addIgnoreForm.macAdress
         }
         let res = await addIp(json)
+        this.addIgnoreModel = false
         this.addIgnoreLoading = false
         if (res.data.code === 'success') {
-          this.addIgnoreModel = false
           this.$Message.success('添加成功')
           this.getNameList(5)
         } else {
           this.$Message.error(res.data.result)
         }
+        this.upload(type)
       }
     },
     /* 删除列表 */
@@ -500,7 +521,6 @@ export default {
         loading: true,
         onOk: async () => {
           let res = await deleteNbList({ id: id })
-          console.log(res)
           if (res.data.code === 'success') {
             this.$Modal.remove()
             this.$Message.info('删除成功')
