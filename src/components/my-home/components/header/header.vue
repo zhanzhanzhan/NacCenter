@@ -1,13 +1,16 @@
 <template>
     <Row class="header">
-      <div class="logo"></div>
+      <div class="logo">
+        <div class="img"></div>
+        <div class="text">NacCenter</div>
+      </div>
       <div class="tags-nav">
         <router-link :to="{path: '/home'}">系统概览</router-link>
         <router-link :to="{path: `/chart`}">图表</router-link>
         <router-link :to="{path: `/config`}" >配置</router-link>
         <router-link :to="{path: `/management`}">资产视图</router-link>
         <router-link :to="{path: `/system`}">系统管理</router-link>
-        <router-link :to="{path: `/overview`}">报警</router-link>
+        <router-link :to="{path: `/warning`}">报警</router-link>
       </div>
       <div class="profile">
         <Dropdown style="margin-left: 20px" placement="bottom-end" trigger="click"  @on-click="loginOut">
@@ -66,10 +69,21 @@ export default {
     background: #fff;
     align-items: center;
     .logo{
+      display: flex;
+     align-items: center;
+      .img{
+        height: 50px;
+        width: 50px;
+        background: url(../../../../assets/images/logo.png) no-repeat;
+        background-size: 80%;
+      }
+      .text{
+        font-size: 30px;
+      }
       width: 239px;
       height: 69px;
       margin-left: 20px;
-      background: url(../../../../assets/images/logo.png) no-repeat;
+
     }
     .tags-nav{
       flex: 1;
@@ -95,7 +109,7 @@ export default {
         height: 100%;
         display: flex;
         align-items: center;
-        font-size: 24px;
+        font-size: 16px;
         padding: 0 30px;
         a{
           color: #666;

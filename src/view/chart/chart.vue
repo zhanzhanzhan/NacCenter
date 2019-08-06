@@ -42,20 +42,8 @@
                 <span class="value">{{system.systemLoad}}</span>
               </div>
               <div class="list-item">
-                <span class="name">活跃主机</span>：
-                <span class="value">{{system.activeHost}}</span>
-              </div>
-              <div class="list-item">
-                <span class="name">入侵主机</span>：
-                <span class="value">{{system.blockingHost}}</span>
-              </div>
-              <div class="list-item">
-                <span class="name">保护主机</span>：
-                <span class="value">{{system.hostProtection}}</span>
-              </div>
-              <div class="list-item">
-                <span class="name">忽略名单</span>：
-                <span class="value">{{system.ignoreHost}}</span>
+                <span class="name">运行时长</span>：
+                <span class="value">{{system.squadLeader !== '' ? system.squadLeader : '未开始运行'}}</span>
               </div>
               <div class="list-item">
                 <span class="name">在线主机</span>：
@@ -66,33 +54,24 @@
                 <span class="value">{{system.nameList}}</span>
               </div>
               <div class="list-item">
-                <span class="name">nb序列号</span>：
-                <span class="value">{{system.nbCode}}</span>
-              </div>
-
-             <!-- <div class="list-item">
-                <span class="name">单机模式</span>：
-                <span class="value">{{system.single}}</span>
+                <span class="name">忽略名单</span>：
+                <span class="value">{{system.ignoreHost}}</span>
               </div>
               <div class="list-item">
-                <span class="name">学习模式</span>：
-                <span class="value">{{system.studyMode}}</span>
-              </div>-->
-              <!--<div class="list-item">
-                <span class="name">保护宿主总数</span>：
-                <span class="value">{{system.hostProtection}}</span>
-              </div>-->
+                <span class="name">入侵主机</span>：
+                <span class="value">{{system.blockingHost}}</span>
+              </div>
+              <div class="list-item">
+                <span class="name">阻挡进程</span>：
+                <span class="value">{{system.runningBlk}}</span>
+              </div>
               <div class="list-item">
                 <span class="name">学习时长</span>：
                 <span class="value">{{system.le_time ? system.le_time : '未开启学习模式'}}</span>
               </div>
               <div class="list-item">
-                <span class="name">阻挡进程数</span>：
-                <span class="value">{{system.runningBlk}}</span>
-              </div>
-              <div class="list-item">
-                <span class="name">运行时长</span>：
-                <span class="value">{{system.squadLeader !== '' ? system.squadLeader : '未开始运行'}}</span>
+                <span class="name">nb序列号</span>：
+                <span class="value">{{system.nbCode}}</span>
               </div>
               <div class="list-item">
                 <span class="name">版本号</span>：
@@ -179,26 +158,26 @@
             <div class="item-title">
               模式设置
             </div>
-            <div class="item-content" v-if="modeSet">
+            <div class="item-content" v-if="system">
               <div class="list-item" >
                 <span class="name">单向模式</span>：
-                <span class="value">{{modeSet.single}}</span>
+                <span class="value">{{system.single}}</span>
               </div>
               <div class="list-item" >
                 <span class="name">学习模式</span>：
-                <span class="value">{{modeSet.learning}}</span>
+                <span class="value">{{system.studyMode}}</span>
               </div>
               <div class="list-item" >
                 <span class="name">btime</span>：
-                <span class="value">{{modeSet.ctime}}</span>
+                <span class="value">{{system.ctime}}</span>
               </div>
               <div class="list-item" >
                 <span class="name">ctime</span>：
-                <span class="value">{{modeSet.btime}}</span>
+                <span class="value">{{system.btime}}</span>
               </div>
               <div class="list-item" >
                 <span class="name">ltime</span>：
-                <span class="value">{{modeSet.ltime}}</span>
+                <span class="value">{{system.ltime}}</span>
               </div>
             </div>
             <div style="text-align: center" class="item-content" v-if="!modeSet">暂无数据</div>

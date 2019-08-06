@@ -98,7 +98,6 @@ export default {
       if (!value) {
         return callback(new Error('请输入角色名！'))
       }
-      // 模拟异步验证效果
       selRoleName({ roleName: value, parentId: this.userInfo.parentId }).then((res) => {
         if (res.data.result === '角色名已存在！') {
           callback(new Error('该角色名已存在！'))
@@ -145,6 +144,7 @@ export default {
     /* 根据id获取菜单 */
     async getTreeByRoleId (roleId) {
       let res = await getTreeByRoleId({ roleId: roleId })
+      console.log(res)
       this.checkAllGroup = []
       if (res.data.code === 'success') {
         res.data.result.map((item, index) => {

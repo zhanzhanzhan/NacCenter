@@ -12,12 +12,12 @@ const resolve = dir => {
 // 例如：https://www.foobar.com/my-app/
 // 需要将它改为'/my-app/'
 // iview-admin线上演示打包路径： https://file.iviewui.com/admin-dist/
-/*const BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'http://wingsbro.mynetgear.com:8081/NacCenter'
-  : '/'*/
 const BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'http://nc.wingsbro.com:8081/NacCenter'
+  ? 'http://wingsbro.mynetgear.com:8081/NacCenter'
   : '/'
+/*const BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'http://nc.wingsbro.com:8081/NacCenter'
+  : '/'*/
 module.exports = {
   // Project deployment base
   // By default we assume your app will be deployed at the root of a domain,

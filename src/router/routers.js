@@ -108,6 +108,21 @@ let appRouters = [
         component: () => import('@/view/management/management.vue')
       }
     ]
+  },
+  {
+    path: '/warning',
+    component: Layout,
+    children: [
+      {
+        meta: {
+          title: '报警',
+          notCache: true
+        },
+        path: '',
+        name: 'warningChild',
+        component: () => import('@/view/warning/warning.vue')
+      }
+    ]
   }
 ]
 export const systemChild = [

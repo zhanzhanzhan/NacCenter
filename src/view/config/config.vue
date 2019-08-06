@@ -5,7 +5,9 @@
     </div>
     <div class="nav-box">
       <div class="nav-bar">
-        <div class="nav-item" v-for="(item,index) in navList" :class="activeNav === index ? 'active' : ''" @click="changeNav(index)">{{item}}</div>
+        <div class="nav-item" v-for="(item,index) in navList" :class="activeNav === index ? 'active' : ''"
+             @click="changeNav(index)">{{item}}
+        </div>
       </div>
       <!--模式参数-->
       <div class="nav-content" v-show="activeNav === 0">
@@ -14,15 +16,17 @@
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">btime:</label>
-                <input type="text" class="my-input" v-model="defaultConfig.btime" placeholder="请输入正整数，单位秒">
+                <input type="number" class="my-input" @input="handleInput('btime',defaultConfig.btime)"
+                       v-model.trim="defaultConfig.btime" placeholder="请输入正整数，单位秒">
                 <!--<span>请输入正整数，单位秒</span>-->
               </div>
             </Col>
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">ctime:</label>
-                <input type="text" class="my-input" v-model="defaultConfig.ctime" placeholder="请输入正整数，单位秒">
-               <!-- <span>请输入正整数，单位秒</span>-->
+                <input type="number" class="my-input" @input="handleInput('ctime',defaultConfig.ctime)"
+                       v-model.trim="defaultConfig.ctime" placeholder="请输入正整数，单位秒">
+                <!-- <span>请输入正整数，单位秒</span>-->
               </div>
             </Col>
 
@@ -31,8 +35,9 @@
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">ltime:</label>
-                <input type="text" class="my-input" v-model="defaultConfig.ltime" placeholder="请输入正整数，单位秒">
-               <!-- <span>请输入正整数，单位秒</span>-->
+                <input type="number" class="my-input" @input="handleInput('ltime',defaultConfig.ltime)"
+                       v-model.trim="defaultConfig.ltime" placeholder="请输入正整数，单位秒">
+                <!-- <span>请输入正整数，单位秒</span>-->
               </div>
             </Col>
           </Row>
@@ -40,13 +45,13 @@
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">学习模式:</label>
-                <i-switch v-model="defaultConfig.learning" />
+                <i-switch v-model="defaultConfig.learning"/>
               </div>
             </Col>
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">单向模式:</label>
-                <i-switch v-model="defaultConfig.single" />
+                <i-switch v-model="defaultConfig.single"/>
               </div>
             </Col>
           </Row>
@@ -56,60 +61,80 @@
       <!--网络配置-->
       <div class="nav-content" v-show="activeNav === 1">
         <div class="form-group">
-          <Row :gutter="30">
-            <Col span="12">
-              <div class="form-item">
-                <label for="" class="my-label">网关:</label>
-                <input type="text" class="my-input" v-model.trim="netConfig.gateway" placeholder="请输入网关数据">
-                <!-- <span>请输入网关数据</span>-->
-              </div>
-            </Col>
-            <Col span="12">
-              <div class="form-item">
-                <label for="" class="my-label">IP地址:</label>
-                <input type="text" class="my-input" v-model="netConfig.ipaddress" placeholder="请输入IP地址">
-                <!--<span>请输入IP地址</span>-->
-              </div>
-            </Col>
-          </Row>
-          <Row :gutter="30">
-            <Col span="12">
-              <div class="form-item">
-                <label for="" class="my-label">IP子网:</label>
-                <input type="text" class="my-input" v-model="netConfig.ipsubnet" placeholder="请输入IP子网">
-                <!--<span>请输入IP子网</span>-->
-              </div>
-            </Col>
-            <!--<Col span="12">
-              <div class="form-item">
-                <label for="" class="my-label">NB序列号:</label>
-                <input type="text" class="my-input" v-model="netConfig.nbCode">
-                <span>请输入NB序列号</span>
-              </div>
-            </Col>-->
-            <Col span="12">
-              <div class="form-item">
-                <label for="" class="my-label">DNS服务地址:</label>
-                <input type="text" class="my-input" v-model="netConfig.dnsser" placeholder="请输入DNS服务地址">
-<!--
-                <span>请输入DNS服务地址</span>
--->
-              </div>
-            </Col>
-          </Row>
+          <!-- <Row :gutter="30">
+             <Col span="12">
+               <div class="form-item">
+                 <label for="" class="my-label">网关:</label>
+                 <input type="text" class="my-input" v-model.trim="netConfig.gateway" placeholder="请输入网关数据">
+                 &lt;!&ndash; <span>请输入网关数据</span>&ndash;&gt;
+               </div>
+             </Col>
+             <Col span="12">
+               <div class="form-item">
+                 <label for="" class="my-label">IP地址:</label>
+                 <input type="text" class="my-input" v-model="netConfig.ipaddress" placeholder="请输入IP地址">
+                 &lt;!&ndash;<span>请输入IP地址</span>&ndash;&gt;
+               </div>
+             </Col>
+           </Row>
+           <Row :gutter="30">
+             <Col span="12">
+               <div class="form-item">
+                 <label for="" class="my-label">IP子网:</label>
+                 <input type="text" class="my-input" v-model="netConfig.ipsubnet" placeholder="请输入IP子网">
+                 &lt;!&ndash;<span>请输入IP子网</span>&ndash;&gt;
+               </div>
+             </Col>
+             <Col span="12">
+               <div class="form-item">
+                 <label for="" class="my-label">DNS服务地址:</label>
+                 <input type="text" class="my-input" v-model="netConfig.dnsser" placeholder="请输入DNS服务地址">
+ &lt;!&ndash;
+                 <span>请输入DNS服务地址</span>
+ &ndash;&gt;
+               </div>
+             </Col>
+           </Row>-->
+          <Form ref="netConfigForm" :model="netConfig" :rules="netConfigRules" :label-width="130" label-position="left">
+            <Row :gutter="30">
+              <Col :span="12">
+                <FormItem label="网关：" prop="gateway">
+                  <Input type="text" v-model.trim="netConfig.gateway" placeholder="请输入网关数据"></Input>
+                </FormItem>
+              </Col>
+              <Col span="12">
+                <FormItem label="IP地址：" prop="ipaddress">
+                  <Input type="text" v-model.trim="netConfig.ipaddress" placeholder="请输入IP地址"></Input>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row :gutter="30">
+              <Col :span="12">
+                <FormItem label="IP子网：" prop="ipsubnet">
+                  <Input type="text" v-model.trim="netConfig.ipsubnet" placeholder="请输入IP子网"></Input>
+                </FormItem>
+              </Col>
+              <Col span="12">
+                <FormItem label="DNS地址：" prop="dnsser">
+                  <Input type="text" v-model.trim="netConfig.dnsser" placeholder="请输入DNS服务地址"></Input>
+                </FormItem>
+              </Col>
+            </Row>
+          </Form>
         </div>
         <div class="save"><span @click="saveNetInfo">保存</span></div>
       </div>
       <!--白名单-->
       <div class="nav-content2" v-show="activeNav === 2">
         <Row class="list-head" type="flex" justify="space-between" align="top">
-          <Col span="6"> <h3>白名单列表:</h3></Col>
+          <Col span="6"><h3>白名单列表:</h3></Col>
           <!--<Col span="6">
             <Input suffix="ios-search" placeholder="Enter text" />
           </Col>-->
         </Row>
         <Row class="table-container">
-          <Table :columns="white" :data="whiteList" :loading="loading" height="300" :show-header="false" stripe size="small">
+          <Table :columns="white" :data="whiteList" :loading="loading" height="300" :show-header="false" stripe
+                 size="small">
             <template slot-scope="{ row }" slot="macAddress">
               <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
             </template>
@@ -134,22 +159,24 @@
             <span>添加白名单</span>
           </p>
           <div style="text-align:center">
-            <Form :model="addWhiteForm" label-position="left" >
+            <Form :model="addWhiteForm" label-position="left">
               <FormItem label="mac地址">
                 <Input v-model.trim="addWhiteForm.macAdress" placeholder="请输入mac地址"></Input>
               </FormItem>
-              <FormItem label="ip地址" >
+              <FormItem label="ip地址">
                 <Input v-model.trim="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
               <FormItem label="导入表格">
                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
-                  <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件</Button>
+                  <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件
+                  </Button>
                 </Upload>
                 <Row>
                   <div class="ivu-upload-list-file" v-if="file !== null">
                     <Icon type="ios-stats"></Icon>
                     {{ file.name }}
-                    <Icon v-show="showRemoveFile" type="ios-close" class="ivu-upload-list-remove" @click.native="handleRemove()"></Icon>
+                    <Icon v-show="showRemoveFile" type="ios-close" class="ivu-upload-list-remove"
+                          @click.native="handleRemove()"></Icon>
                   </div>
                 </Row>
                 <Row>
@@ -174,13 +201,14 @@
       <!--忽略名单-->
       <div class="nav-content2" v-show="activeNav === 3">
         <Row class="list-head" type="flex" justify="space-between" align="top">
-          <Col span="6"> <h3>忽略名单列表:</h3></Col>
-         <!-- <Col span="6">
-            <Input suffix="ios-search" placeholder="Enter text" />
-          </Col>-->
+          <Col span="6"><h3>忽略名单列表:</h3></Col>
+          <!-- <Col span="6">
+             <Input suffix="ios-search" placeholder="Enter text" />
+           </Col>-->
         </Row>
         <Row class="table-container">
-          <Table :columns="ignore" height="300" :data="ignoreList" :loading="loading" :show-header="false" stripe size="small">
+          <Table :columns="ignore" height="300" :data="ignoreList" :loading="loading" :show-header="false" stripe
+                 size="small">
             <template slot-scope="{ row }" slot="mac">
               <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
             </template>
@@ -194,16 +222,16 @@
         </Row>
         <Row type="flex" justify="space-between" class="opera">
           <Col>
-<!--
-            <Page :total="ignorePageInfo.totalCount" @on-change="ignorePageChange" prev-text="上一页" next-text="下一页" :page-size="ignorePageInfo.pageSize" />
--->
+            <!--
+                        <Page :total="ignorePageInfo.totalCount" @on-change="ignorePageChange" prev-text="上一页" next-text="下一页" :page-size="ignorePageInfo.pageSize" />
+            -->
           </Col>
           <Col class="btn-group">
             <span @click="addIgnoreModel = true">添加</span>
             <span @click="removeAll" v-if="ignoreList.length>0">清空列表</span>
           </Col>
         </Row>
-        <Modal v-model="addIgnoreModel" width="360" >
+        <Modal v-model="addIgnoreModel" width="360">
           <p slot="header" style="color:#333;text-align:center">
             <span>添加忽略名单</span>
           </p>
@@ -212,31 +240,33 @@
               <FormItem label="mac地址">
                 <Input v-model.trim="addIgnoreForm.macAdress" placeholder="请输入mac地址"></Input>
               </FormItem>
-              <FormItem label="ip地址" >
+              <FormItem label="ip地址">
                 <Input v-model.trim="addIgnoreForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
-               <FormItem label="导入表格">
-                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
-                   <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件</Button>
-                 </Upload>
-                 <Row>
-                   <div class="ivu-upload-list-file" v-if="file !== null">
-                     <Icon type="ios-stats"></Icon>
-                     {{ file.name }}
-                     <Icon v-show="showRemoveFile" type="ios-close" class="ivu-upload-list-remove" @click.native="handleRemove()"></Icon>
-                   </div>
-                 </Row>
-                 <Row>
-                   <transition name="fade">
-                     <Progress v-if="showProgress" :percent="progressPercent" :stroke-width="2">
-                       <div v-if="progressPercent == 100">
-                         <Icon type="ios-checkmark-circle"></Icon>
-                         <span>成功</span>
-                       </div>
-                     </Progress>
-                   </transition>
-                 </Row>
-               </FormItem>
+              <FormItem label="导入表格">
+                <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
+                  <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件
+                  </Button>
+                </Upload>
+                <Row>
+                  <div class="ivu-upload-list-file" v-if="file !== null">
+                    <Icon type="ios-stats"></Icon>
+                    {{ file.name }}
+                    <Icon v-show="showRemoveFile" type="ios-close" class="ivu-upload-list-remove"
+                          @click.native="handleRemove()"></Icon>
+                  </div>
+                </Row>
+                <Row>
+                  <transition name="fade">
+                    <Progress v-if="showProgress" :percent="progressPercent" :stroke-width="2">
+                      <div v-if="progressPercent == 100">
+                        <Icon type="ios-checkmark-circle"></Icon>
+                        <span>成功</span>
+                      </div>
+                    </Progress>
+                  </transition>
+                </Row>
+              </FormItem>
 
             </Form>
           </div>
@@ -250,17 +280,55 @@
 </template>
 <script>
 import { mapState, mapActions } from 'vuex'
-import { getNbConfig, changeNbConfig, updateNetWork, getNameList, deleteNbList, deleteNbLists, addIp } from '../../api/nbConfig'
+import {
+  getNbConfig,
+  changeNbConfig,
+  updateNetWork,
+  getNameList,
+  deleteNbList,
+  deleteNbLists,
+  addIp
+} from '../../api/nbConfig'
 import { uploadFile } from '../../api/upload'
 import { setSystemStatus, getNetworkInfo } from '../../api/chart'
 import config from '@/config'
-const baseUrl = process.env.NODE_ENV === 'development' ? config.baseUrl.dev : config.baseUrl.pro
 
 export default {
   name: 'config',
   data () {
+    const ipaddressRules = (rule, value, callback) => {
+      if (!value) callback()
+      let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+      if (!reg.test(value)) {
+        callback(new Error('请检查IP地址格式！'))
+      }
+      callback()
+    }
+    const dnsserRules = (rule, value, callback) => {
+      let reg = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$/
+      if (!reg.test(value)) {
+        callback(new Error('请检查DNS地址格式！'))
+      }
+      callback()
+    }
+    const ipsubnetRules = (rule, value, callback) => {
+      if (!value) callback()
+      let reg = /^(254|252|248|240|224|192|128|0)\.0\.0\.0|255\.(254|252|248|240|224|192|128|0)\.0\.0|255\.255\.(254|252|248|240|224|192|128|0)\.0|255\.255\.255\.(254|252|248|240|224|192|128|0)$/
+      if (!reg.test(value)) {
+        callback(new Error('请检查子网掩码格式！'))
+      }
+      callback()
+    }
+    const gatewayRules = (rule, value, callback) => {
+      if (!value) callback()
+      let reg = /^192\.168(\.(\d|([1-9]\d)|(1\d{2})|(2[0-4]\d)|(25[0-5]))){2}$/
+      if (!reg.test(value)) {
+        callback(new Error('请检查网关格式！'))
+      }
+      callback()
+    }
     return {
-      baseUrl: baseUrl,
+      baseUrl: '',
       activeNav: 0,
       navList: [
         '模式参数',
@@ -287,8 +355,7 @@ export default {
           align: 'center'
         }
       ],
-      whiteList: [
-      ],
+      whiteList: [],
       ignore: [
         {
           title: 'Mac地址',
@@ -331,13 +398,27 @@ export default {
         dnsser: '',
         ipsubnet: '',
         gateway: ''
+      },
+      netConfigRules: {
+        ipaddress: [
+          { validator: ipaddressRules, trigger: 'blur' }
+        ],
+        dnsser: [
+          { validator: dnsserRules, trigger: 'blur' }
+        ],
+        ipsubnet: [
+          { validator: ipsubnetRules, trigger: 'blur' }
+        ],
+        gateway: [
+          { validator: gatewayRules, trigger: 'blur' }
+        ]
       }
     }
   },
   computed: {
     ...mapState({
       activeNb: state => state.app.activeNb
-    })
+    }),
   },
   watch: {
     activeNb: {
@@ -603,12 +684,15 @@ export default {
       reader.onload = e => {
         this.$Message.info('文件读取成功')
         const data = e.target.result
-       // const { header, results } = excel.read(data, 'array')
+        // const { header, results } = excel.read(data, 'array')
         this.uploadLoading = false
         this.showRemoveFile = true
       }
     },
     /**/
+    handleInput (e, val) {
+      this.defaultConfig[e] = val.replace(/[^0-9]+/g, '')
+    }
 
   },
   mounted () {

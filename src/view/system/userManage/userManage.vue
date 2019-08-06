@@ -10,7 +10,8 @@
             {{ row.activation? '是' : '否' }}
           </template>
           <template slot-scope="{ row, index }" slot="action">
-            <Button type="primary" size="small" style="margin-right: 5px" @click="show(index, row)">修改</Button>
+            <Button type="primary" size="small" v-if="row.userNo !== userInfo.userNo" style="margin-right: 5px" @click="show(index, row)">修改</Button>
+            <Button type="warning" size="small" v-if="row.userNo === userInfo.userNo" :disabled="row.roleId === '1'" style="margin-right: 5px" @click="changeAccess">权限转让</Button>
           </template>
         </Table>
         <!-- <Table border :columns="columns7" :data="data6" max-height="500"></Table>-->
@@ -48,7 +49,7 @@
 
       </TabPane>-->
       <Input search v-model="searchText" placeholder="输入用户名查询" slot="extra" @on-search="selUserInfo(searchText)" v-if="tab === 'tab1'"/>
-      <!--对话框-->
+      <!--修改信息对话框-->
       <Modal
         v-model="modal"
         title="修改用户信息"
@@ -76,11 +77,28 @@
         </div>
 
       </Modal>
+      <!--权限转让对话框-->
+      <Modal
+        v-model="accessModal"
+        title="转让权限"
+        @on-ok="submitAccessChange">
+        <div style="padding: 20px">
+          <Form :model="accessForm" :label-width="80" ref="access" :rules="accessRules">
+            <FormItem label="选择用户" prop="user">
+              <Select v-model="accessForm.activeUserId" @on-change="userChange">
+                <Option :value="item.userId" v-if="userInfo.userId !== item.userId" v-for="(item, index) in userList">{{item.userName}}</Option>
+              </Select>
+            </FormItem>
+          </Form>
+        </div>
+
+      </Modal>
     </Tabs>
   </div>
 </template>
 <script>
 import { selUserInfo, updateUser, insUser, uptUserStatus } from '../../../api/userManage'
+import { roleTransfer } from '../../../api/login'
 import { selRoleInfo } from '../../../api/roleInfo'
 import { mapState } from 'vuex'
 
@@ -158,9 +176,15 @@ export default {
         ]
       },
       uptUserValidate: {
-        /*userName: [
-          { required: true, message: '用户名不能为空', trigger: 'blur' }
-        ]*/
+      },
+      accessModal: false,
+      accessForm: {
+        activeUserId: null
+      },
+      accessRules: {
+        user: [
+          { required: true, message: '用户不能为空！', trigger: 'change' }
+        ]
       }
     }
   },
@@ -178,7 +202,6 @@ export default {
       this.modal = true
       this.activeUserInfo = Object.assign(this.activeUserInfo, row)
       this.activeUserInfo.userName = row.userName
-      //console.log(this.activeUserInfo)
     },
     ok () {
       this.$refs['uptUser'].validate((valid) => {
@@ -192,7 +215,7 @@ export default {
     /* 获取用户列表 */
     async selUserInfo (userName) {
       this.tableLoad = true
-      let res = await selUserInfo({ userName: userName })
+      let res = await selUserInfo()
       this.tableLoad = false
       console.log(res)
       if (res.data.code === 'success') {
@@ -257,6 +280,33 @@ export default {
         this.$Message.success(res.data.result)
         this.selUserInfo()
       }
+    },
+    /* 请求转让 */
+    async roleTransfer () {
+      let res = await roleTransfer({ userId: this.accessForm.activeUserId })
+      console.log(res)
+    },
+    userChange (data) {
+      this.$Message.success(data)
+    },
+    /* 权限转让 */
+    changeAccess () {
+      this.$Modal.confirm({
+        title: '提示',
+        content: '</p>转让后将不能继续使用权限，确定要转让您的权限吗？</p>',
+        onOk: () => {
+          this.accessModal = true
+        },
+      })
+    },
+    submitAccessChange () {
+      this.$refs['access'].validate((valid) => {
+        if (valid) {
+          this.roleTransfer()
+        } else {
+          this.$Message.error('操作失败，请检查输入信息格式是否正确!')
+        }
+      })
     },
     /* */
     handleSubmit (name) {

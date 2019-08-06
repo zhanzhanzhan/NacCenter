@@ -85,3 +85,16 @@ export const wxUserLogin = (sid) => {
     method: 'get'
   })
 }
+/*
+*  企业管理员转让
+* */
+
+export const roleTransfer = ({ userId }) => {
+  return axios.request({
+    url: `/roleTransfer`,
+    method: 'post',
+    params: {
+      userId
+    }
+  })
+}

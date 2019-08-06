@@ -31,7 +31,7 @@
             白名单
           </div>
           <div class="body">
-            <div class="progress-num">{{whiteList}} <span>个</span></div>
+            <div class="progress-num">{{whiteList}} <span></span></div>
           </div>
         </div>
         <div class="content-item">
@@ -44,6 +44,7 @@
               <span> <i></i>在线 {{activeHost.live}}</span>
             </div>
             <div class="chart">
+           <!--   <chart-pie style="height: 150px;width: 150px;" :value="pieData" text="活跃主机"></chart-pie>-->
               <div class="round-1">
                 <div class="round-2" :style="{width: activePercent + '%', height:activePercent + '%' }"></div>
               </div>
@@ -55,7 +56,7 @@
             忽略名单
           </div>
           <div class="body">
-            <div class="progress-num">{{ignoreList}} <span>个</span></div>
+            <div class="progress-num">{{ignoreList}} <span></span></div>
           </div>
         </div>
         <div class="content-item">
@@ -72,9 +73,12 @@
 <script>
 import { getActiveHostCount, getOnLineTotal, getRosterSum, getBlockHostCount } from '../../api/home'
 import { getCurrentCount } from '../../api/chart'
-
+import { ChartPie } from '_c/charts'
 export default {
   name: 'home',
+  components: {
+    ChartPie
+  },
   data () {
     return {
       nbLive: {}, // nb在线
@@ -83,7 +87,11 @@ export default {
       whiteList: {}, // 白名单
       ignoreList: {}, // 忽略名单
       timer: null,
-      warning: ''
+      warning: '',
+      pieData: [
+        { value: 335, name: '活跃' },
+        { value: 310, name: '在线' },
+      ]
     }
   },
   computed: {
@@ -98,10 +106,15 @@ export default {
     }
   },
   methods: {
+    /* 活跃 */
     async getActiveHostCount () {
       let res = await getActiveHostCount()
       if (res.data.code === 'success') {
         this.activeHost = res.data.result
+        this.pieData = [
+          { value: this.activeHost.live, name: '活跃' + this.activeHost.live },
+          { value: this.activeHost.active, name: '不活跃' + this.activeHost.active },
+        ]
       }
     },
     async getOnLineTotal () {

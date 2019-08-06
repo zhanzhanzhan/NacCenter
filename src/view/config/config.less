@@ -16,7 +16,7 @@
   .nav-box{
     margin-top: 10px;
     background: #fff;
-    height: 570px;
+    min-height: 570px;
     .nav-bar{
       display: flex;
       background: #00e9bc;
@@ -86,6 +86,29 @@
           border-color: #00e9bc;
           background-color: #00e9bc;
         }
+      }
+      /deep/.ivu-input,/deep/.ivu-form-item-error .ivu-input{
+        border: none;
+        font-size: 14px;
+        &:hover{
+          border: none;
+        }
+        &:focus{
+          outline: none;
+          box-shadow: none;
+        }
+      }
+      /deep/.ivu-form .ivu-form-item-label{
+        font-size: 18px;
+        color: #333;
+        width: 130px;
+      }
+      /deep/.ivu-form-item{
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+      }
+      /deep/.ivu-form-item-error-tip{
+        top: 50px;
       }
     }
     .save{
