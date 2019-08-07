@@ -42,7 +42,7 @@ export const rewordPassword = ({ userNo, password }) => {
 /*
 *  查询用户信息
 * */
-export const selUserInfo = (userName) => {
+export const selUserInfo = ({ userName }) => {
   return axios.request({
     url: '/selUserInfo',
     params: {

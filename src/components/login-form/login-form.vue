@@ -36,7 +36,7 @@ export default {
       type: Array,
       default: () => {
         return [
-          /*{ required: true, validator: validatePhone, trigger: 'blur' }*/
+          { required: true, validator: validatePhone, trigger: 'blur' }
         ]
       }
     },
@@ -52,7 +52,7 @@ export default {
   data () {
     return {
       form: {
-        userName: 'administrator',
+        userName: '',
         password: ''
       }
     }

@@ -3,7 +3,7 @@
       <div class="content">
         <div class="content-item">
           <div class="title">
-            Nacbox在线
+            NacBOX在线
           </div>
           <div class="body">
             <div class="progress-num">{{nbPercent}}%</div>
@@ -20,9 +20,12 @@
               <span> <i></i>全部 {{online.sumCount}}</span>
             </div>
             <div class="chart">
-              <i-circle :percent="onlinePercent" stroke-color="#00e9bc" :size="150">
+              <!--<i-circle :percent="onlinePercent" stroke-color="#00e9bc" :size="150">
                 <span class="demo-Circle-inner" style="font-size:24px">{{onlinePercent}}%</span>
-              </i-circle>
+              </i-circle>-->
+              <div class="round-1">
+                <div class="round-2" :style="{width: onlinePercent + '%', height:onlinePercent + '%' }"></div>
+              </div>
           </div>
           </div>
         </div>
@@ -45,9 +48,9 @@
             </div>
             <div class="chart">
            <!--   <chart-pie style="height: 150px;width: 150px;" :value="pieData" text="活跃主机"></chart-pie>-->
-              <div class="round-1">
-                <div class="round-2" :style="{width: activePercent + '%', height:activePercent + '%' }"></div>
-              </div>
+              <i-circle :percent="activePercent" stroke-color="#00e9bc" :size="150">
+                <span class="demo-Circle-inner" style="font-size:24px">{{activePercent}}%</span>
+              </i-circle>
             </div>
           </div>
         </div>
@@ -64,7 +67,8 @@
             红色警报
           </div>
           <div class="body">
-            <div class="progress-num">{{warning}}</div>
+           <!-- <div class="progress-num">{{warning}}</div>-->
+            <div id="warningChart"  style="width: 200px;height: 200px;"></div>
           </div>
         </div>
       </div>
@@ -73,11 +77,17 @@
 <script>
 import { getActiveHostCount, getOnLineTotal, getRosterSum, getBlockHostCount } from '../../api/home'
 import { getCurrentCount } from '../../api/chart'
-import { ChartPie } from '_c/charts'
+import echarts from 'echarts'
+require('echarts/lib/chart/pie')
+// 引入提示框和图例组件
+require('echarts/lib/component/title')
+require('echarts/lib/component/tooltip')
+require('echarts/lib/component/legend')
+require('echarts/lib/component/legendScroll')
+
 export default {
   name: 'home',
   components: {
-    ChartPie
   },
   data () {
     return {
@@ -87,7 +97,7 @@ export default {
       whiteList: {}, // 白名单
       ignoreList: {}, // 忽略名单
       timer: null,
-      warning: '',
+      warning: null,
       pieData: [
         { value: 335, name: '活跃' },
         { value: 310, name: '在线' },
@@ -140,9 +150,9 @@ export default {
     /* 获取入侵主机 /报警 */
     async getBlockHostCount () {
       let res = await getBlockHostCount()
-      console.log(res)
       if (res.data.code === 'success') {
-        this.warning = res.data.result.blockHostCount || 0
+        this.warning = res.data.result ? res.data.result : []
+        this.pieChart()
       }
     },
     funhandle () {
@@ -152,6 +162,50 @@ export default {
       this.getRosterSum(5)
       this.getCurrentCount()
       this.getBlockHostCount()
+
+    },
+    // 饼图
+    pieChart () {
+      let myChart = echarts.init(document.getElementById('warningChart'))
+      let option = {
+        title: {
+          text: '', // 标题文本
+          left: 30,
+          top:10,
+          textStyle:{
+            fontSize:16,
+            fontWeight:400
+          }
+        },
+        tooltip : {
+          trigger: 'item',
+          // formatter: "{a} <br/> " + this.tooltipFormatter + ":{c} ({d}%)"
+          formatter: '{a}' + ':{c} ({d}%)'
+        },
+        series : [
+          {
+            name: '标题',  // 提示框标题
+            type: 'pie',
+            radius : '70%',
+            center: ['50%', '50%'],
+            selectedMode: 'single',
+            data: [...this.warning],
+            labelLine: {
+              show: false
+            },
+            itemStyle: {
+              emphasis: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            }
+          }
+        ],
+        color: ['#77A1E5', '#24CBE5', '#00e9bc', '#47B3FF', '#39E4C9']
+
+      }
+      myChart.setOption(option)
     }
 
   },

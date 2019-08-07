@@ -2,7 +2,7 @@ import { getAllNbList } from '../../api/config'
 
 export default {
   state: {
-    activeNb: {},
+    activeNb: null,
     asideList: []
   },
   getters: {
@@ -23,7 +23,7 @@ export default {
             commit('setAsideList', res.data.result)
             // 当前 nbCode不存在时 或者 refresh 为true 时 重置 activeNb
             if (!this.state.app.activeNb || refresh) {
-              commit('setActiveNb', res.data.result[0] || '')
+              commit('setActiveNb', res.data.result[0] || { nbCode: 'test' })
             }
             resolve(res)
           }

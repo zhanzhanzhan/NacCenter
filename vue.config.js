@@ -16,7 +16,7 @@ const BASE_URL = process.env.NODE_ENV === 'production'
   ? 'http://wingsbro.mynetgear.com:8081/NacCenter'
   : '/'
 /*const BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'http://nc.wingsbro.com:8081/NacCenter'
+  ? 'http://nc.wingsbro.com'
   : '/'*/
 module.exports = {
   // Project deployment base

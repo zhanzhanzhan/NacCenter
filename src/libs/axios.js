@@ -52,7 +52,7 @@ class HttpRequest {
         case 403:
           console.log('token已失效')
           removeToken()
-          window.location.href = config.path.location + '/login'
+          // window.location.href = config.path.location + '/login'
           if (typeof error.response.data.code !== 'undefined') {
             return error.response.data
           }

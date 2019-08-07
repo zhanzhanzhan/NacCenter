@@ -159,14 +159,14 @@
             <span>添加白名单</span>
           </p>
           <div style="text-align:center">
-            <Form :model="addWhiteForm" label-position="left">
-              <FormItem label="mac地址">
+            <Form :model="addWhiteForm" ref="whiteFormRules" label-position="left" :rules="whiteFormRules">
+              <FormItem label="mac地址" prop="mac">
                 <Input v-model.trim="addWhiteForm.macAdress" placeholder="请输入mac地址"></Input>
               </FormItem>
-              <FormItem label="ip地址">
+              <FormItem label="ip地址" prop="ip">
                 <Input v-model.trim="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
-              <FormItem label="导入表格">
+              <FormItem label="导入表格" >
                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
                   <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件
                   </Button>
@@ -194,7 +194,7 @@
             </Form>
           </div>
           <div slot="footer">
-            <Button type="info" size="large" long :loading="addWhiteLoading" @click="handleSubmit">确认添加</Button>
+            <Button type="info" size="large" long :loading="addWhiteLoading" @click="handleSubmit('whiteFormRules')">确认添加</Button>
           </div>
         </Modal>
       </div>
@@ -236,12 +236,12 @@
             <span>添加忽略名单</span>
           </p>
           <div style="text-align:center">
-            <Form :model="addWhiteForm" label-position="left">
+            <Form :model="addIgnoreModel" label-position="left" :rules="ignoreFormRules">
               <FormItem label="mac地址">
-                <Input v-model.trim="addIgnoreForm.macAdress" placeholder="请输入mac地址"></Input>
+                <Input v-model.trim="addIgnoreModel.macAdress" placeholder="请输入mac地址"></Input>
               </FormItem>
               <FormItem label="ip地址">
-                <Input v-model.trim="addIgnoreForm.ipAdress" placeholder="请输入ip地址"></Input>
+                <Input v-model.trim="addIgnoreModel.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
               <FormItem label="导入表格">
                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
@@ -271,7 +271,7 @@
             </Form>
           </div>
           <div slot="footer">
-            <Button type="info" size="large" long :loading="addIgnoreLoading" @click="handleSubmit">确认添加</Button>
+            <Button type="info" size="large" long :loading="addIgnoreLoading" @click="handleSubmit('ignoreFormRules')">确认添加</Button>
           </div>
         </Modal>
       </div>
@@ -305,7 +305,8 @@ export default {
       callback()
     }
     const dnsserRules = (rule, value, callback) => {
-      let reg = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$/
+      if (!value) callback()
+      let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
       if (!reg.test(value)) {
         callback(new Error('请检查DNS地址格式！'))
       }
@@ -326,6 +327,31 @@ export default {
         callback(new Error('请检查网关格式！'))
       }
       callback()
+    }
+    const macAddressRules = (rule, value, callback) => {
+      if (this.file) {
+        callback()
+      } else if (!value) {
+        callback(new Error('请填写MAC地址或者导入表格批量处理！'))
+      } else {
+        let reg = /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/
+        if (!reg.test(value)) {
+          callback(new Error('请检查MAC地址格式！'))
+        }
+      }
+    }
+    const ipAddress = (rule, value, callback) => {
+      if (this.file) {
+        callback()
+      } else if (!value) {
+        callback(new Error('请填写IP地址或者导入表格批量处理！'))
+      } else {
+        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+        if (!reg.test(value)) {
+          callback(new Error('请检查MAC地址格式！'))
+        }
+      }
+
     }
     return {
       baseUrl: '',
@@ -375,18 +401,40 @@ export default {
         }
       ],
       ignoreList: [],
-      defaultConfig: {},
+      defaultConfig: {
+        btime: '',
+        ctime: '',
+        ltime: '',
+        learning: false,
+        single: false
+      },
       addWhiteModel: false,
       addWhiteLoading: false,
       addWhiteForm: {
         macAdress: '',
         ipAdress: ''
       },
+      whiteFormRules: {
+        mac: [
+          { validator: macAddressRules, trigger: 'blur' }
+        ],
+        ip: [
+          { validator: ipAddress, trigger: 'blur' }
+        ]
+      },
       addIgnoreLoading: false,
       addIgnoreModel: false,
       addIgnoreForm: {
         macAdress: '',
         ipAdress: ''
+      },
+      ignoreFormRules: {
+        mac: [
+          { validator: macAddressRules, trigger: 'blur' }
+        ],
+        ip: [
+          { validator: ipAddress, trigger: 'blur' }
+        ]
       },
       uploadLoading: false,
       progressPercent: 0,
@@ -418,7 +466,7 @@ export default {
   computed: {
     ...mapState({
       activeNb: state => state.app.activeNb
-    }),
+    })
   },
   watch: {
     activeNb: {
@@ -436,7 +484,7 @@ export default {
       },
       // 深度观察监听
       deep: true
-    }
+    },
 
   },
   methods: {
@@ -462,8 +510,14 @@ export default {
     /* 获取模式参数 */
     async getDefaultConfig (nbCode) {
       let res = await getNbConfig({ nbCode: nbCode })
+      //console.log(res)
       if (res.data.code === 'success') {
-        this.defaultConfig = res.data.result[0]
+        let data = res.data.result[0]
+        this.defaultConfig = {
+          btime: data.btime || '',
+          ctime: data.ctime ? data.ctime : '',
+          ltime: data.ltime ? data.ltime : ''
+        }
         this.defaultConfig.learning = this.defaultConfig.learning !== 'off'
         this.defaultConfig.single = this.defaultConfig.single !== 'off'
       }
@@ -521,7 +575,14 @@ export default {
       }
     },
     handleSubmit (name) {
-      this.addIp()
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          this.addIp()
+        } else {
+          // this.$Message.error('Fail!')
+        }
+      })
+
     },
     async upload (type) {
       if (!this.fill) return

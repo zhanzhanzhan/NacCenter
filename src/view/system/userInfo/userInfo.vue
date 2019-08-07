@@ -86,6 +86,7 @@ export default {
     /* 获取用户信息 */
     async selUserInfo (userName) {
       let res = await selUserInfo({ userName: userName })
+      //console.log(res)
       if (res.data.code === 'success') {
         this.insUserForm = res.data.result[0]
         this.insUserForm.password = ''
@@ -93,14 +94,19 @@ export default {
     },
     /* 修改用户信息 */
     async updateUser () {
-      let res = await updateUser(this.insUserForm)
+      //console.log({ ...this.insUserForm })
+      let json = {
+        ...this.insUserForm
+      }
+      let res = await updateUser(json)
+      //console.log(res)
       if (res.data.code === 'success') {
         this.$Message.success('操作成功')
         this.handleLogin({ userNo: this.insUserForm.userNo, password: this.insUserForm.password }).then(res => {
           if (res.data.code === 'success') {
             this.selUserInfo(this.userInfo.userName)
           } else {
-            // this.$Message.error(res.data.msg)
+            this.$Message.error(res.data.msg)
           }
         })
       }

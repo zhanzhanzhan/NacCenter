@@ -158,7 +158,7 @@
             <div class="item-title">
               模式设置
             </div>
-            <div class="item-content" v-if="system">
+            <div class="item-content" v-if="system" >
               <div class="list-item" >
                 <span class="name">单向模式</span>：
                 <span class="value">{{system.single}}</span>
@@ -180,7 +180,7 @@
                 <span class="value">{{system.ltime}}</span>
               </div>
             </div>
-            <div style="text-align: center" class="item-content" v-if="!modeSet">暂无数据</div>
+            <div class="item-content" v-if="!system" style="text-align: center">暂无数据</div>
           </div>
         </Col>
       </Row>
@@ -214,33 +214,20 @@ export default {
     /* 网络信息*/
     async getNetworkInfo (nbCode) {
       let res = await getNetworkInfo({ nbCode: nbCode })
+      //  console.log(res)
       if (res.data.code === 'success') {
         this.networkInfo = res.data.result
       }
     },
     /*模式设置*/
-    async getStudyMode (nbCode) {
+    /*async getStudyMode (nbCode) {
       let res = await getStudyMode({ nbCode: nbCode })
       if (res.data.code === 'success') {
         this.modeSet = res.data.result
       } else {
         this.modeSet = null
       }
-    },
-    // /* 名单列表 */
-    // async nbGetNameList (nbCode, type) {
-    //   let res = await nbGetNameList({ nbCode: nbCode, type: type })
-    //
-    //   if (res.data.code === 'success') {
-    //
-    //     if (type === 4) {
-    //       this.whiteList = res.data.result
-    //     } else if (type === 5) {
-    //       console.log(res)
-    //       this.ignoreList = res.data.result
-    //     }
-    //   }
-    // },
+    },*/
     /* 主机列表*/
     async getMasterInfo (nbCode, type) {
       let res = await getMasterInfo({ nbCode: nbCode, type: type })
@@ -314,7 +301,6 @@ export default {
     },
     funHandle () {
       this.getNetworkInfo(this.activeNb.nbCode)
-      this.getStudyMode(this.activeNb.nbCode)
       this.getMasterInfo(this.activeNb.nbCode, 1)
       this.getMasterInfo(this.activeNb.nbCode, 2)
       this.getMasterInfo(this.activeNb.nbCode, 3)
@@ -340,6 +326,7 @@ export default {
 
   },
   mounted () {
+    //console.log(this.activeNb.nbCode)
     this.funHandle()
     this.timer = setInterval(() => {
       this.funHandle()

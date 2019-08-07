@@ -6,7 +6,7 @@
     <div class="info-list">
       <Row  style="text-align: right">
         <ButtonGroup>
-          <Button @click="getManage">拉取数据</Button>
+          <Button @click="getManage" style="color: #00e9bc">拉取数据</Button>
           <Button type="warning" @click="deleteManage">清除数据</Button>
         </ButtonGroup>
         <Button icon="md-download" :loading="exportLoading" @click="exportExcel" style="margin: 20px;" type="info">导出excel表格</Button>
@@ -166,9 +166,9 @@ export default {
       this.loading = true
       let res = await getManagement({ nbCode: this.activeNb.nbCode })
       this.loading = false
-      console.log(res)
+       console.log(res)
       if (res.data.code === 'success') {
-        this.managementList = res.data.result
+        this.managementList = res.data.result ? res.data.result : []
       }
       this.pageInfo.total = res.data.totalCount
     },

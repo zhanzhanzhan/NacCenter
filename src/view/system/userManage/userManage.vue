@@ -215,7 +215,7 @@ export default {
     /* 获取用户列表 */
     async selUserInfo (userName) {
       this.tableLoad = true
-      let res = await selUserInfo()
+      let res = await selUserInfo({ userName: userName })
       this.tableLoad = false
       console.log(res)
       if (res.data.code === 'success') {

@@ -120,6 +120,8 @@ export default {
       console.log(res)
       if (res.data.code === 'success') {
         this.applyList = res.data.result
+      } else {
+        console.log(res)
       }
     },
     /* 提交审核结果 */
@@ -135,6 +137,7 @@ export default {
       this.changeApplySateModal = false
       if (res.data.code === 'success') {
         this.$Message.success('审核提交成功！')
+        this.getAllUserFlow()
       } else {
         this.$Message.error(res.data.msg)
       }

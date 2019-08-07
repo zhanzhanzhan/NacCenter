@@ -35,3 +35,13 @@ export const getAllUserFlow = () => {
     method: 'get'
   })
 }
+
+/*
+*  待办事项
+* */
+export const selNewMessage = () => {
+  return axios.request({
+    url: '/flow/selNewMessage',
+    method: 'get'
+  })
+}
