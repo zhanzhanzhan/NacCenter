@@ -219,15 +219,6 @@ export default {
         this.networkInfo = res.data.result
       }
     },
-    /*模式设置*/
-    /*async getStudyMode (nbCode) {
-      let res = await getStudyMode({ nbCode: nbCode })
-      if (res.data.code === 'success') {
-        this.modeSet = res.data.result
-      } else {
-        this.modeSet = null
-      }
-    },*/
     /* 主机列表*/
     async getMasterInfo (nbCode, type) {
       let res = await getMasterInfo({ nbCode: nbCode, type: type })
@@ -253,39 +244,30 @@ export default {
       }
     },
     forMateDate (date) {
-      if (!date) return 0
+      if (!date || date === '0') return 0
+      date = date.toString()
       let day, hour, minute, second
-      if (date.split('-')[1]) {
-        day = date.split('-')[0] + '天'
-        hour = date.split('-')[0].split(':')[0] + '时'
-        minute = date.split('-')[0].split(':')[1] + '分'
-        second = date.split('-')[0].split(':')[2] + '秒'
-      } else if (date.split('-')[0].split(':').length === 3) {
-        day = ''
-        hour = date.split('-')[0].split(':')[0] + '时'
-        minute = date.split('-')[0].split(':')[1] + '分'
-        second = date.split('-')[0].split(':')[2] + '秒'
-      } else if (date.split('-')[0].split(':').length === 2) {
-        day = ''
-        hour = ''
-        minute = date.split('-')[0].split(':')[0] + '分'
-        second = date.split('-')[0].split(':')[1] + '秒'
-      } else if (date.split('-')[0].split(':').length === 1) {
-        day = ''
-        hour = ''
-        minute = ''
-        second = date.split('-')[0].split(':')[0] + '秒'
-      } else {
-
+      let arr1 = date.split('-')
+      let arr2 = date.split(':')
+      if (arr1.length === 2) {
+        day = arr1[0] + '天'
+        hour = arr1[1].split(':')[0] + '时'
+        minute = arr1[1].split(':')[1] + '分'
+        second = arr1[1].split(':')[2] + '秒'
+        return day + hour + minute + second
+      } else if (arr2.length === 3) {
+        hour = arr2[0] + '时'
+        minute = arr2[1] + '分'
+        second = arr2[2] + '秒'
+        return hour + minute + second
+      } else if (arr2.length === 2) {
+        minute = arr2[0] + '分'
+        second = arr2[1] + '秒'
+        return minute + second
+      } else if (arr2.length === 1) {
+        second = arr2[0] + '秒'
+        return second
       }
-
-      let time = {
-        day: day,
-        hour: hour,
-        minute: minute,
-        second: second
-      }
-      return `${time.day}${time.hour}${time.minute}${time.second}`
     },
     /* 系统现状 */
     async getSystemStatus (nbCode) {
@@ -326,7 +308,6 @@ export default {
 
   },
   mounted () {
-    //console.log(this.activeNb.nbCode)
     this.funHandle()
     this.timer = setInterval(() => {
       this.funHandle()

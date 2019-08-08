@@ -9,19 +9,44 @@
     </div>
 
     <div class="aside-list">
-      <div class="aside-item" :class="item.nbCode === activeNb.nbCode  ? 'active' : ''" v-for="(item,index) in asideList"
-           @click="changeActive(index,item)"
-            :key="item.id">
-        <div class="title">
-        <!--  <span class="online" v-if="item.onLineStatus"></span>
-          <span class="offline" v-if="!item.onLineStatus"></span>-->
-          <Icon type="md-power" size="20" color="#ccc" v-if="!item.onLineStatus"/>
-          <Icon type="md-power" size="20" color="#00e9bc" title="点击重启" @click="changeStatus(item.nbCode,2)" v-if="item.onLineStatus"/>
-          {{item.nbName}}
+      <p v-if="!asideList.length">暂无数据，请添加机器</p>
+      <Collapse v-model="activeGroup" v-if="asideList.length">
+        <Panel v-for="(item, index) in asideList" :key="index" :name="item.groupName">
+          {{item.groupName}}
+          <div slot="content">
+            <div class="aside-item" :class="i.nbCode === activeNb.nbCode  ? 'active' : ''" v-for="(i,index) in item.nbInfoList"
+                 @click="changeActive(index,i)"
+                 :key="i.id">
+              <div class="title">
+                <!--  <span class="online" v-if="item.onLineStatus"></span>
+                  <span class="offline" v-if="!item.onLineStatus"></span>-->
+                <Icon type="md-power" size="20" color="#ccc" v-if="!i.onLineStatus"/>
+                <Icon type="md-power" size="20" color="#00e9bc" title="点击重启" @click="changeStatus(i.nbCode,2)" v-if="i.onLineStatus"/>
+                {{i.nbName}}
+              </div>
+              <div class="info">{{i.nbCode}}</div>
+              <Icon type="ios-close-circle" title="删除此项" class="delete" size="18" color="#555" @click="removeNb(i.nbCode)"/>
+            </div>
+          </div>
+        </Panel>
+      </Collapse>
+     <!-- <div v-for="(item, index) in asideList">
+        <div>{{item.groupName}}</div>
+        <div class="aside-item" :class="i.nbCode === activeNb.nbCode  ? 'active' : ''" v-for="(i,index) in item.nbInfoList"
+             @click="changeActive(index,i)"
+             :key="i.id">
+          <div class="title">
+            &lt;!&ndash;  <span class="online" v-if="item.onLineStatus"></span>
+              <span class="offline" v-if="!item.onLineStatus"></span>&ndash;&gt;
+            <Icon type="md-power" size="20" color="#ccc" v-if="!i.onLineStatus"/>
+            <Icon type="md-power" size="20" color="#00e9bc" title="点击重启" @click="changeStatus(i.nbCode,2)" v-if="i.onLineStatus"/>
+            {{i.nbName}}
+          </div>
+          <div class="info">{{i.nbCode}}</div>
+          <Icon type="ios-close-circle" title="删除此项" class="delete" size="18" color="#555" @click="removeNb(i.nbCode)"/>
         </div>
-        <div class="info">{{item.nbCode}}</div>
-        <Icon type="ios-close-circle" title="删除此项" class="delete" size="18" color="#555" @click="removeNb(item.nbCode)"/>
-      </div>
+      </div>-->
+
       <div style="text-align: center" v-if="asideList.length === 0">暂无数据</div>
     </div>
 
@@ -69,7 +94,7 @@
 <script>
 import { addNb, findNb, delNb } from '../../../../api/config'
 import { userApplyBind } from '../../../../api/userBind'
-import { changeStatus } from '../../../../api/chart'
+import { uptHostManageReload } from '../../../../api/chart'
 import { mapMutations, mapState, mapActions } from 'vuex'
 export default {
   name: 'MyAside',
@@ -102,6 +127,7 @@ export default {
           { required: true, message: 'nbCode不能为空', trigger: 'blur' }
         ],
       },
+      activeGroup: ''
     }
   },
   computed: {
@@ -155,7 +181,7 @@ export default {
               this.$Message.success('申请成功')
               this.applyForm = {}
             } else {
-              this.$Message.error(res.data.msg)
+              this.$Message.error(res.data.result)
             }
           })
         } else {
@@ -180,7 +206,7 @@ export default {
         this.addNbModel = false
         this.$Modal.confirm({
           title: '提示',
-          content: `<p>${res.data.msg}</p>`,
+          content: `<p>${res.data.result}</p>`,
           onOk: () => {
             this.applyModel = true
           },
@@ -222,13 +248,13 @@ export default {
       }
     },
     /* 重启nb */
-    async changeStatus (nbCode, type) {
+    async changeStatus (nbCode) {
       this.$Modal.confirm({
         title: '提示',
         content: '<p>确定要重启这个Nb吗？</p>',
         loading: true,
         onOk: async () => {
-          let res = await changeStatus({ nbCode: nbCode, type: type })
+          let res = await uptHostManageReload({ nbCode: nbCode })
           console.log(res)
           if (res.data.code === 'success') {
             this.$Modal.remove()
@@ -243,6 +269,7 @@ export default {
   },
   mounted () {
     this.getAllNbList(true)
+    this.activeGroup = this.asideList[0].groupName
     this.timer = setInterval(() => {
       this.getAllNbList()
     }, 1000 * 60)

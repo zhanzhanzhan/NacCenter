@@ -139,7 +139,7 @@ export default {
         this.$Message.success('审核提交成功！')
         this.getAllUserFlow()
       } else {
-        this.$Message.error(res.data.msg)
+        this.$Message.error(res.data.result)
       }
     },
     show (row) {

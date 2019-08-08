@@ -159,11 +159,11 @@
             <span>添加白名单</span>
           </p>
           <div style="text-align:center">
-            <Form :model="addWhiteForm" ref="whiteFormRules" label-position="left" :rules="whiteFormRules">
-              <FormItem label="mac地址" prop="mac">
+            <Form :model="addWhiteForm"  label-position="left" >
+              <FormItem label="mac地址" prop="macAddress">
                 <Input v-model.trim="addWhiteForm.macAdress" placeholder="请输入mac地址"></Input>
               </FormItem>
-              <FormItem label="ip地址" prop="ip">
+              <FormItem label="ip地址" prop="ipAddress">
                 <Input v-model.trim="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
               <FormItem label="导入表格" >
@@ -194,7 +194,7 @@
             </Form>
           </div>
           <div slot="footer">
-            <Button type="info" size="large" long :loading="addWhiteLoading" @click="handleSubmit('whiteFormRules')">确认添加</Button>
+            <Button type="info" size="large" long :loading="addWhiteLoading" @click="handleSubmit('whiteFormValidate')">确认添加</Button>
           </div>
         </Modal>
       </div>
@@ -222,9 +222,7 @@
         </Row>
         <Row type="flex" justify="space-between" class="opera">
           <Col>
-            <!--
-                        <Page :total="ignorePageInfo.totalCount" @on-change="ignorePageChange" prev-text="上一页" next-text="下一页" :page-size="ignorePageInfo.pageSize" />
-            -->
+
           </Col>
           <Col class="btn-group">
             <span @click="addIgnoreModel = true">添加</span>
@@ -236,12 +234,12 @@
             <span>添加忽略名单</span>
           </p>
           <div style="text-align:center">
-            <Form :model="addIgnoreModel" label-position="left" :rules="ignoreFormRules">
-              <FormItem label="mac地址">
-                <Input v-model.trim="addIgnoreModel.macAdress" placeholder="请输入mac地址"></Input>
+            <Form :model="addIgnoreForm" label-position="left" >
+              <FormItem label="mac地址" prop="mac">
+                <Input v-model.trim="addIgnoreForm.macAdress" placeholder="请输入mac地址"></Input>
               </FormItem>
-              <FormItem label="ip地址">
-                <Input v-model.trim="addIgnoreModel.ipAdress" placeholder="请输入ip地址"></Input>
+              <FormItem label="ip地址" prop="ip">
+                <Input v-model.trim="addIgnoreForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
               <FormItem label="导入表格">
                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
@@ -290,13 +288,12 @@ import {
   addIp
 } from '../../api/nbConfig'
 import { uploadFile } from '../../api/upload'
-import { setSystemStatus, getNetworkInfo } from '../../api/chart'
-import config from '@/config'
 
 export default {
   name: 'config',
   data () {
     const ipaddressRules = (rule, value, callback) => {
+      console.log(value)
       if (!value) callback()
       let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
       if (!reg.test(value)) {
@@ -329,6 +326,7 @@ export default {
       callback()
     }
     const macAddressRules = (rule, value, callback) => {
+      console.log(value)
       if (this.file) {
         callback()
       } else if (!value) {
@@ -339,6 +337,7 @@ export default {
           callback(new Error('请检查MAC地址格式！'))
         }
       }
+      callback()
     }
     const ipAddress = (rule, value, callback) => {
       if (this.file) {
@@ -351,7 +350,7 @@ export default {
           callback(new Error('请检查MAC地址格式！'))
         }
       }
-
+      callback()
     }
     return {
       baseUrl: '',
@@ -415,10 +414,10 @@ export default {
         ipAdress: ''
       },
       whiteFormRules: {
-        mac: [
+        macAddress: [
           { validator: macAddressRules, trigger: 'blur' }
         ],
-        ip: [
+        ipAddress: [
           { validator: ipAddress, trigger: 'blur' }
         ]
       },
@@ -493,7 +492,6 @@ export default {
     ]),
     /* 切换tab */
     changeNav (index) {
-      console.log(index)
       this.activeNav = index
       switch (index) {
         case 1:
@@ -510,7 +508,6 @@ export default {
     /* 获取模式参数 */
     async getDefaultConfig (nbCode) {
       let res = await getNbConfig({ nbCode: nbCode })
-      //console.log(res)
       if (res.data.code === 'success') {
         let data = res.data.result[0]
         this.defaultConfig = {
@@ -530,6 +527,8 @@ export default {
       let res = await changeNbConfig({ ...args })
       if (res.data.code === 'success') {
         this.$Message.success('保存成功')
+      } else {
+        this.$Message.error(res.data.result)
       }
     },
     /* 获取网络配置 */
@@ -558,7 +557,7 @@ export default {
         this.$Message.success('保存成功')
         this.getNetInfo()
       } else {
-        this.$Message.error(`保存失败${res.data.msg}`)
+        this.$Message.error(`保存失败${res.data.result}`)
       }
     },
     /* 获取名单 */
@@ -575,17 +574,17 @@ export default {
       }
     },
     handleSubmit (name) {
-      this.$refs[name].validate((valid) => {
+      this.addIp()
+     /* this.$refs[name].validate((valid) => {
         if (valid) {
           this.addIp()
         } else {
-          // this.$Message.error('Fail!')
+          this.$Message.error('请输入名单信息或者上传文件!')
         }
-      })
-
+      })*/
     },
     async upload (type) {
-      if (!this.fill) return
+      if (!this.file) return
       let fileFormData = new FormData()
       fileFormData.append('file', this.file)
       let res = await uploadFile({ file: fileFormData, nbCode: this.activeNb.nbCode })
@@ -595,9 +594,10 @@ export default {
         this.addIgnoreModel = false
       }
       if (res.data.code === 'success') {
+        this.$Message.success('上传成功！')
         this.getNameList(type)
       } else {
-        // this.$Message.error('添加失败')
+        this.$Message.error('上传失败！')
       }
     },
     async addIp () {
@@ -687,7 +687,6 @@ export default {
         loading: true,
         onOk: async () => {
           let res = await deleteNbLists({ nbCode: this.activeNb.nbCode, type: type })
-          console.log(res)
           if (res.data.code === 'success') {
             this.$Modal.remove()
             this.$Message.info('删除成功')

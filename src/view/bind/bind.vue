@@ -36,7 +36,7 @@ export default {
         this.setToken(res.data.result.token)
         this.$router.push({ name: 'home' })
       } else {
-        this.$Message.error(res.data.msg)
+        this.$Message.error(res.data.result)
       }
     },
     async getCode (data) {

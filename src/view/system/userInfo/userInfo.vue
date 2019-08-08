@@ -106,7 +106,7 @@ export default {
           if (res.data.code === 'success') {
             this.selUserInfo(this.userInfo.userName)
           } else {
-            this.$Message.error(res.data.msg)
+            this.$Message.error(res.data.result)
           }
         })
       }

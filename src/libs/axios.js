@@ -48,11 +48,13 @@ class HttpRequest {
       switch (error.response.status) {
         case 401:
           /** 无权限访问 **/
+          console.log()
+          window.location.href = '/401'
           break
         case 403:
           console.log('token已失效')
           removeToken()
-          // window.location.href = config.path.location + '/login'
+          window.location.href = '/login'
           if (typeof error.response.data.code !== 'undefined') {
             return error.response.data
           }

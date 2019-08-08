@@ -25,19 +25,19 @@
                 v-model="addModal"
                 title="新增分组"
                 :loading="loading"
-                @on-ok="add('addRoleForm')">
-                <Form ref="addRoleForm" :model="addRoleForm" :rules="addRoleRule" :label-width="80">
+                @on-ok="add('addGroupForm')">
+                <Form ref="addGroupForm" :model="addGroupForm" :rules="addGroupRule" :label-width="80">
                   <FormItem label="分组名" prop="groupName">
-                    <Input v-model="addRoleForm.groupName" placeholder="请输入分组名"></Input>
+                    <Input v-model="addGroupForm.groupName" placeholder="请输入分组名"></Input>
                   </FormItem>
                   <FormItem label="备注">
-                    <Input v-model="addRoleForm.remarks" placeholder="请输入分组名"></Input>
+                    <Input v-model="addGroupForm.remarks" placeholder="请输入分组名"></Input>
                   </FormItem>
                 </Form>
               </Modal>
             </div>
             <div class="menu-list">
-              <Tabs  value="supTab1" name="sub-tab">
+              <Tabs  v-model="activeNav" name="sub-tab" @on-click="changeNav"  :animated="false">
                 <TabPane label="机器列表" name="supTab1" tab="sub-tab">
                   <div style="padding:10px;margin-bottom:6px;">
                     <Checkbox
@@ -48,7 +48,7 @@
                   </div>
                   <Card :bordered="false" style="min-height: 300px">
                     <CheckboxGroup v-model="checkAllGroup" @on-change="checkAllGroupChange" class="box-group">
-                      <Checkbox :label="item.nbName" v-for="(item, index) in nbList" class="box-item">
+                      <Checkbox :label="item.nbCode" v-for="(item, index) in nbList" class="box-item">
                         <span>{{item.nbName}}</span>
                       </Checkbox>
                     </CheckboxGroup>
@@ -57,7 +57,147 @@
                     <Button @click="save">保存</Button>
                   </div>
                 </TabPane>
-                <TabPane label="组配置" name="supTab2" tab="sub-tab">标签二的内容</TabPane>
+                <TabPane label="模式参数" name="supTab2" tab="sub-tab">
+                  <div class="nav-content">
+                    <div class="form-group">
+                      <Row :gutter="30">
+                        <Col span="12">
+                          <div class="form-item">
+                            <label for="" class="my-label">btime:</label>
+                            <input type="number" class="my-input" @input="handleInput('btime',defaultConfig.btime)"
+                                   v-model.trim="defaultConfig.btime" placeholder="请输入正整数，单位秒">
+                            <!--<span>请输入正整数，单位秒</span>-->
+                          </div>
+                        </Col>
+                        <Col span="12">
+                          <div class="form-item">
+                            <label for="" class="my-label">ctime:</label>
+                            <input type="number" class="my-input" @input="handleInput('ctime',defaultConfig.ctime)"
+                                   v-model.trim="defaultConfig.ctime" placeholder="请输入正整数，单位秒">
+                            <!-- <span>请输入正整数，单位秒</span>-->
+                          </div>
+                        </Col>
+
+                      </Row>
+                      <Row :gutter="30">
+                        <Col span="12">
+                          <div class="form-item">
+                            <label for="" class="my-label">ltime:</label>
+                            <input type="number" class="my-input" @input="handleInput('ltime',defaultConfig.ltime)"
+                                   v-model.trim="defaultConfig.ltime" placeholder="请输入正整数，单位秒">
+                            <!-- <span>请输入正整数，单位秒</span>-->
+                          </div>
+                        </Col>
+                      </Row>
+                      <Row :gutter="30">
+                        <Col span="12">
+                          <div class="form-item">
+                            <label for="" class="my-label">学习模式:</label>
+                            <i-switch v-model="defaultConfig.learning"/>
+                          </div>
+                        </Col>
+                        <Col span="12">
+                          <div class="form-item">
+                            <label for="" class="my-label">单向模式:</label>
+                            <i-switch v-model="defaultConfig.single"/>
+                          </div>
+                        </Col>
+                      </Row>
+                    </div>
+                    <div class="save"><span @click="uptGroupParam(defaultConfig)">保存</span></div>
+                  </div>
+                </TabPane>
+                <TabPane label="白名单" name="supTab3" tab="sub-tab">
+                  <!--白名单-->
+                  <div class="nav-content2" >
+                    <Row class="table-container">
+                      <Table :columns="white" :data="whiteList" :loading="loading"  height="300" :show-header="false" stripe
+                             size="small">
+                        <template slot-scope="{ row }" slot="macAddress">
+                          <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
+                        </template>
+                        <template slot-scope="{ row }" slot="ipAddress">
+                          <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.ipAddress }}</span></span>
+                        </template>
+                        <template slot-scope="{ row, index }" slot="action">
+                          <Icon type="ios-trash" size="24" color="#00e9bc" @click="removeList(row.id, index)"/>
+                        </template>
+                      </Table>
+                    </Row>
+                    <Row type="flex" justify="space-between" class="opera">
+                      <Col>
+                      </Col>
+                      <Col class="btn-group">
+                        <span @click="addWhiteModel = true">添加</span>
+                        <span @click="removeAll" v-if="whiteList.length>0">清空列表</span>
+                      </Col>
+                    </Row>
+                    <Modal v-model="addWhiteModel" width="360">
+                      <p slot="header" style="color:#333;text-align:center">
+                        <span>添加白名单</span>
+                      </p>
+                      <div style="text-align:center">
+                        <Form :model="addWhiteForm"  label-position="left">
+                          <FormItem label="mac地址" prop="mac">
+                            <Input v-model.trim="addWhiteForm.macAdress" placeholder="请输入mac地址"></Input>
+                          </FormItem>
+                          <FormItem label="ip地址" prop="ip">
+                            <Input v-model.trim="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
+                          </FormItem>
+                        </Form>
+                      </div>
+                      <div slot="footer">
+                        <Button type="info" size="large" long :loading="addWhiteLoading" @click="handleSubmit('whiteFormRules')">确认添加</Button>
+                      </div>
+                    </Modal>
+                  </div>
+                </TabPane>
+                <TabPane label="忽略名单" name="supTab4" tab="sub-tab">
+                  <div class="nav-content2" >
+                    <Row class="table-container">
+                      <Table :columns="ignore" height="300" :data="ignoreList" :loading="loading" :show-header="false" stripe
+                             size="small">
+                        <template slot-scope="{ row }" slot="mac">
+                          <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
+                        </template>
+                        <template slot-scope="{ row }" slot="ip">
+                          <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.ipAddress }}</span></span>
+                        </template>
+                        <template slot-scope="{ row, index }" slot="action">
+                          <Icon type="ios-trash" size="24" color="#00e9bc" @click="removeList(row.id, index)"/>
+                        </template>
+                      </Table>
+                    </Row>
+                    <Row type="flex" justify="space-between" class="opera">
+                      <Col>
+
+                      </Col>
+                      <Col class="btn-group">
+                        <span @click="addIgnoreModel = true">添加</span>
+                        <span @click="removeAll" v-if="ignoreList.length>0">清空列表</span>
+                      </Col>
+                    </Row>
+                    <Modal v-model="addIgnoreModel" width="360">
+                      <p slot="header" style="color:#333;text-align:center">
+                        <span>添加忽略名单</span>
+                      </p>
+                      <div style="text-align:center">
+                        <Form :model="addIgnoreForm" label-position="left">
+                          <FormItem label="mac地址" prop="mac">
+                            <Input v-model.trim="addIgnoreForm.macAdress" placeholder="请输入mac地址"></Input>
+                          </FormItem>
+                          <FormItem label="ip地址" prop="ip">
+                            <Input v-model.trim="addIgnoreForm.ipAdress" placeholder="请输入ip地址"></Input>
+                          </FormItem>
+                        </Form>
+                      </div>
+                      <div slot="footer">
+                        <Button type="info" size="large" long :loading="addIgnoreLoading" @click="handleSubmit('ignoreFormRules')">确认添加</Button>
+                      </div>
+                    </Modal>
+                  </div>
+                </TabPane>
+
               </Tabs>
             </div>
           </div>
@@ -71,8 +211,8 @@
             <span class="item-text">
                {{item.groupName}}
             </span>
-                <Button type="primary" ghost size="small" @click="modifyModal = true" style="margin-right: 10px">修改</Button>
-                <Button type="error" ghost size="small" @click="remove(item.roleId)">删除</Button>
+                <Button type="primary" ghost size="small" @click="modify(item.groupId)" style="margin-right: 10px">修改</Button>
+                <Button type="error" ghost size="small" @click="remove(item.groupId)">删除</Button>
               </div>
             </div>
           </Col>
@@ -80,11 +220,11 @@
         <Modal
           v-model="modifyModal"
           title="修改分组"
-          :loading="loading"
-          @on-ok="modify('addRoleForm')">
-          <Form ref="addRoleForm" :model="addRoleForm" :rules="addRoleRule" :label-width="80">
+          :loading="groupLoading"
+          @on-ok="modifyHandler('addGroupForm')">
+          <Form ref="addGroupForm" :model="addGroupForm" :rules="addGroupRule" :label-width="80">
             <FormItem label="分组名" prop="groupName">
-              <Input v-model="addRoleForm.groupName" placeholder="请输入分组名"></Input>
+              <Input v-model="addGroupForm.groupName" placeholder="请输入分组名"></Input>
             </FormItem>
           </Form>
         </Modal>
@@ -101,11 +241,12 @@ import {
   getGroupRoster,
   insGroupRoster,
   getAllGroup,
+  selNbByGroupId,
   getNbCodeInfoByGroupId,
   updateNbGroup,
   uptGroupParam
 } from '../../../api/group.js'
-import { selectnbList } from '../../../api/menuManage'
+
 import { mapState } from 'vuex'
 
 export default {
@@ -115,13 +256,23 @@ export default {
       if (!value) {
         return callback(new Error('请输入分组名！'))
       }
-      /*selgroupName({ groupName: value, parentId: this.userInfo.parentId }).then((res) => {
-        if (res.data.result === '分组名已存在！') {
-          callback(new Error('该分组名已存在！'))
-        } else {
-          callback()
+      callback()
+    }
+    const macAddressRules = (rule, value, callback) => {
+      console.log(value)
+    }
+    const ipAddress = (rule, value, callback) => {
+      console.log(value)
+      if (this.file) {
+        callback()
+      } else if (!value) {
+        callback(new Error('请填写IP地址或者导入表格批量处理！'))
+      } else {
+        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+        if (!reg.test(value)) {
+          callback(new Error('请检查MAC地址格式！'))
         }
-      })*/
+      }
       callback()
     }
     return {
@@ -129,15 +280,90 @@ export default {
       activeGroupId: '',
       indeterminate: true,
       checkAll: false,
+      nbList: [],
       checkAllGroup: [],
       groupList: [],
-      loading: false,
+      groupLoading: false,
       addModal: false,
       modifyModal: false,
-      addRoleForm: {},
-      addRoleRule: {
+      addGroupForm: {},
+      addGroupRule: {
         groupName: [
           { required: true, validator: validategroupName, trigger: 'blur' }
+        ]
+      },
+      activeModifyGroupId: null,
+      activeNav: 'supTab1',
+      loading: false,
+      white: [
+        {
+          title: 'Mac地址',
+          slot: 'macAddress',
+        },
+        {
+          title: 'Ip地址',
+          slot: 'ipAddress'
+        },
+
+        {
+          title: 'Action',
+          slot: 'action',
+          width: 150,
+          align: 'center'
+        }
+      ],
+      whiteList: [],
+      ignore: [
+        {
+          title: 'Mac地址',
+          slot: 'mac',
+        },
+        {
+          title: 'Ip地址',
+          slot: 'ip'
+        },
+
+        {
+          title: 'Action',
+          slot: 'action',
+          width: 150,
+          align: 'center'
+        }
+      ],
+      ignoreList: [],
+      defaultConfig: {
+        btime: '',
+        ctime: '',
+        ltime: '',
+        learning: false,
+        single: false
+      },
+      addWhiteModel: false,
+      addWhiteLoading: false,
+      addWhiteForm: {
+        macAdress: null,
+        ipAdress: null
+      },
+      whiteFormRules: {
+        mac: [
+          { required: true, validator: macAddressRules, trigger: 'blur' }
+        ],
+        ip: [
+          { required: true, validator: ipAddress, trigger: 'blur' }
+        ]
+      },
+      addIgnoreLoading: false,
+      addIgnoreModel: false,
+      addIgnoreForm: {
+        macAdress: null,
+        ipAdress: null
+      },
+      ignoreFormRules: {
+        mac: [
+          { required: true, validator: macAddressRules, trigger: 'blur' }
+        ],
+        ip: [
+          { required: true, validator: ipAddress, trigger: 'blur' }
         ]
       }
     }
@@ -145,19 +371,21 @@ export default {
   computed: {
     ...mapState({
       userInfo: state => state.login.userInfo,
-      nbList: state => state.app.asideList
+      //nbList: state => state.app.asideList
     })
   },
   methods: {
     /* 获取所有分组 */
     async getAllGroup () {
       let res = await getAllGroup()
-      // console.log(res)
+     // console.log(res)
       if (res.data.code === 'success') {
         this.groupList = res.data.result
-        this.changeGroup(this.groupList[0].roleId, 0)
+        if (this.groupList[0] !== []) {
+          this.changeGroup(this.groupList[0].groupId || '', 0)
+        }
       } else {
-       // console.log(res.data.msg)
+       // console.log(res.data.result)
       }
     },
     /* 根据id获取菜单 */
@@ -168,7 +396,7 @@ export default {
       if (res.data.code === 'success') {
         if (!res.data.result) return
         res.data.result.map((item, index) => {
-          this.checkAllGroup.push(item.nbName)
+          this.checkAllGroup.push(item.nbCode)
         })
       }
       // console.log(this.checkAllGroup)
@@ -176,39 +404,94 @@ export default {
     /* 新增分组信息 */
     async addGroup () {
       this.loading = true
-      let res = await addGroup({ ...this.addRoleForm })
+      let res = await addGroup({ ...this.addGroupForm })
       if (res.data.code === 'success') {
         this.$Message.success('新增分组成功')
         this.loading = false
-        this.addRoleForm = {}
+        this.addGroupForm = {}
         this.getAllGroup()
       } else {
-        this.$Message.error(res.data.msg)
+        this.$Message.error(res.data.result)
       }
     },
     /* 修改分组信息 */
-    async uptRoleInfo (groupName) {
+    async uptGroupInfo (groupName, groupId) {
       this.loading = true
-      let res = await uptRoleInfo({ groupName: groupName, parentId: this.userInfo.parentId })
-      console.log(res)
+      let res = await updateNbGroup({ groupId: groupId, groupName: groupName, parentId: this.userInfo.parentId })
+      // console.log(res)
       if (res.data.code === 'success') {
         this.loading = false
         this.$Message.success('修改分组成功')
         this.getAllGroup()
       } else {
-        this.$Message.error(res.data.msg)
+        this.$Message.error(res.data.result)
       }
     },
-    /* 根据分组Id绑定菜单 */
-    async bindTreeInfoByRoleId () {
-      let res = await bindTreeInfoByRoleId({ roleId: this.activeGroupId, list: this.checkAllGroup })
+    /* 删除分组 */
+    async delGroup (groupId) {
+      let res = await delGroup(groupId)
       console.log(res)
+      this.$Modal.remove()
+      if (res.data.code === 'success') {
+        this.getAllGroup()
+        this.$Message.success('删除成功！')
+      } else {
+        this.$Message.error(res.data.result)
+      }
+    },
+    /* 添加机器到分组 */
+    async addNbToGroup () {
+      let res = await addNbToGroup({ groupId: this.activeGroupId }, this.checkAllGroup)
+      console.log(this.activeGroupId)
+      if (res.data.code === 'success') {
+        this.$Message.success('保存成功！')
+      } else {
+        this.$Message.error(res.data.result)
+      }
+    },
+    /* 根据分组查找nb */
+    async selNbByGroupId (groupId) {
+      let res = await selNbByGroupId(groupId)
+      console.log(res)
+      if (res.data.code === 'success') {
+        this.nbList = res.data.result
+      }
+    },
+    /* 保存模式设置 */
+    async uptGroupParam (arr) {
+      let args = Object.assign({}, arr)
+      args.groupId = this.activeGroupId
+      args.learning = arr.learning ? 'on' : 'off'
+      args.single = arr.single ? 'on' : 'off'
+      let res = await uptGroupParam({ ...args })
       if (res.data.code === 'success') {
         this.$Message.success('保存成功')
       } else {
-        this.$Message.error('保存失败')
+        this.$Message.error(res.data.result)
       }
     },
+    /* 获取名单 */
+    async getList () {
+      console.log(this.activeGroupId)
+      let res = await getGroupRoster({ groupId: this.activeGroupId })
+      console.log(res)
+      if (res.data.code === 'success') {
+        if (res.data.result.length) {
+          let arrWhite = []
+          let arrIgnore = []
+          res.data.result.map((item, index) => {
+            if (item.type === 4) {
+              arrWhite.push(item)
+            } else {
+              arrIgnore.push(item)
+            }
+          })
+          this.whiteList = arrWhite
+          this.ignoreList = arrIgnore
+        }
+      }
+    },
+
     handleCheckAll () {
       if (this.indeterminate) {
         this.checkAll = false
@@ -216,13 +499,13 @@ export default {
         this.checkAll = !this.checkAll
       }
       this.indeterminate = false
-
       if (this.checkAll) {
         let arr = []
         this.nbList.map((item, index) => {
-          arr.push(item.nbName)
+          arr.push(item.nbCode)
         })
         this.checkAllGroup = arr
+        console.log(this.checkAllGroup)
       } else {
         this.checkAllGroup = []
       }
@@ -240,9 +523,13 @@ export default {
       }
     },
     changeGroup (groupId, index) {
+      console.log(groupId)
+      console.log( this.activeNav)
       this.active = index
       this.activeGroupId = groupId
       this.getNbCodeInfoByGroupId(groupId)
+      this.selNbByGroupId(groupId)
+      this.activeNav = 'supTab1'
     },
     add (name) {
       this.$refs[name].validate((valid) => {
@@ -254,34 +541,129 @@ export default {
       })
     },
     save () {
-      this.bindTreeInfoByRoleId()
+      this.addNbToGroup()
     },
-    modify (name) {
+    modify (groupId) {
+      this.modifyModal = true
+      this.activeModifyGroupId = groupId
+    },
+    modifyHandler (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          this.uptRoleInfo(this.addRoleForm.groupName)
+          this.uptGroupInfo(this.addGroupForm.groupName, this.activeModifyGroupId)
         } else {
           this.$Message.error('操作失败，请检查输入信息格式是否正确!')
         }
       })
     },
-    remove (roleId) {
+    remove (id) {
       this.$Modal.confirm({
         title: '提示',
         content: '<p>确定删除此条分组吗？</p>',
         loading: true,
         onOk: () => {
-          delRoleInfo({ roleId: roleId }).then((res) => {
-            //console.log(res)
-            if (res.data.code === 'success') {
-              this.$Modal.remove()
-              this.getAllGroup()
-            }
-          }).catch((res) => {
-            //console.log(res)
-          })
+          this.delGroup(id)
         }
       })
+    },
+    removeList (id) {
+      this.$Modal.confirm({
+        title: '提示',
+        content: '<p>确定删除这条名单吗？</p>',
+        loading: true,
+        onOk: () => {
+          this.delGroupRoster(id)
+        }
+      })
+    },
+    removeAll () {
+      this.$Modal.confirm({
+        title: '提示',
+        content: '<p>确定要清空名单吗？</p>',
+        loading: true,
+        onOk: () => {
+          this.delGroupRoster(null, this.activeGroupId)
+        }
+      })
+    },
+    async delGroupRoster (id, groupId) {
+      let res = await delGroupRoster({ id: id, groupId: groupId })
+      if (res.data.code === 'success') {
+        this.getList()
+      } else {
+        this.$Message.error(res.data.result)
+      }
+      console.log(res)
+    },
+    // 切换tab
+    changeNav (data) {
+      console.log(data)
+      this.activeNav = data
+      if (data === 'supTab3') {
+        this.getList()
+      }
+    },
+    handleSubmit (name) {
+      console.log(name)
+      this.addIp()
+     /* this.$refs[name].validate((valid) => {
+        if (valid) {
+          this.addIp()
+        } else {
+          this.$Message.error('请输入名单信息或者上传文件!')
+        }
+      })*/
+    },
+
+    async addIp () {
+      let type = ''
+      /* 白名单 */
+      if (this.activeNav === 'supTab3') {
+        type = 4
+        this.addWhiteLoading = true
+        let json = {
+          groupId: this.activeGroupId,
+          type: type,
+          ipAddress: this.addWhiteForm.ipAdress,
+          macAddress: this.addWhiteForm.macAdress
+        }
+        console.log(json)
+        let res = await insGroupRoster(json)
+        console.log(res)
+        this.addWhiteLoading = false
+        this.addWhiteModel = false
+        if (res.data.code === 'success') {
+          this.$Message.success('添加成功')
+          this.getList()
+        } else {
+          this.$Message.error(res.data.result)
+        }
+      }
+      /* 忽略名单 */
+      else if (this.activeNav === 'supTab4') {
+        type = 5
+        this.addIgnoreLoading = true
+        let json = {
+          groupId: this.activeGroupId,
+          type: type,
+          ipAddress: this.addIgnoreForm.ipAdress,
+          macAddress: this.addIgnoreForm.macAdress
+        }
+        let res = await insGroupRoster(json)
+        this.addIgnoreModel = false
+        this.addIgnoreLoading = false
+        if (res.data.code === 'success') {
+          this.$Message.success('添加成功')
+          this.getList()
+        } else {
+          this.$Message.error(res.data.result)
+        }
+      }
+    },
+
+    // 只能输入数字
+    handleInput (e, val) {
+      this.defaultConfig[e] = val.replace(/[^0-9]+/g, '')
     }
   },
   mounted () {

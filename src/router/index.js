@@ -12,16 +12,12 @@ Vue.use(Router)
 const router = new Router({
   routes: routers,
   mode: 'history',
-  base: '/NacCenter/'
+  // base: '/NacCenter/'
 })
 const LOGIN_PAGE_NAME = 'login'
 
 router.beforeEach((to, from, next) => {
   iView.LoadingBar.start()
-  /*if (isEmptyObject(store.state.login.userInfo)) {
-    console.log('无')
-    removeToken()
-  }*/
   const TOKEN = getToken()
   if (!TOKEN) {
     // 未登录且要跳转的页面不是登录页 也不是注册页 也不是用户绑定页面

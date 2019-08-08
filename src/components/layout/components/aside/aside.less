@@ -27,6 +27,9 @@
       .title{
         font-size: 18px;
         color: #999;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
         span{
           display: inline-block;
           width: 12px;
@@ -46,6 +49,7 @@
         padding-left: 25px;
       }
       &:hover{
+        background: #f5f5f5;
         .delete{
           display: block;
         }
@@ -63,6 +67,7 @@
       }
       &.active{
         border-bottom: 6px solid #00e9bc;
+        background: #f5f5f5;
       }
     }
   }

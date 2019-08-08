@@ -91,7 +91,7 @@ export default {
             name: this.$config.homeName
           })
         } else {
-          this.$Message.error(res.data.msg)
+          this.$Message.error(res.data.result)
         }
       })
     },

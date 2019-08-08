@@ -79,4 +79,112 @@
       }
     }
   }
+
+  .nav-content{
+    padding: 0 80px;
+    box-sizing: border-box;
+    .form-group{
+      margin-top: 50px;
+      margin-bottom: 150px;
+      .form-item{
+        padding: 20px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        .my-label{
+          font-size: 18px;
+          color: #333;
+          width: 130px;
+        }
+        .my-input{
+          flex: 1;
+          margin-left: 10px;
+          font-size: 14px;
+          padding: 0 10px;
+          border: none;
+          &:focus{
+            outline:none;
+            box-shadow: none
+          }
+
+        }
+        span{
+          color: #999;
+        }
+        /deep/.ivu-switch-checked{
+          border-color: #00e9bc;
+          background-color: #00e9bc;
+        }
+      }
+      /deep/.ivu-input,/deep/.ivu-form-item-error .ivu-input{
+        border: none;
+        font-size: 14px;
+        &:hover{
+          border: none;
+        }
+        &:focus{
+          outline: none;
+          box-shadow: none;
+        }
+      }
+      /deep/.ivu-form .ivu-form-item-label{
+        font-size: 18px;
+        color: #333;
+        width: 130px;
+      }
+      /deep/.ivu-form-item{
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+      }
+      /deep/.ivu-form-item-error-tip{
+        top: 50px;
+      }
+    }
+    .save{
+      display: flex;
+      justify-content: flex-end;
+      padding-bottom: 30px;
+      span{
+        display: inline-block;
+        background: #00e9bc;
+        font-size: 16px;
+        color: #fff;
+        padding: 5px 25px;
+        cursor: pointer;
+      }
+    }
+
+  }
+  .nav-content2{
+    padding: 20px;
+    /deep/.ivu-input{
+      border-radius: 16px;
+    }
+    .table-container{
+      margin-top: 20px;
+      /deep/.ivu-table:before,/deep/.ivu-table:after{
+        display: none;
+      }
+      /deep/.ivu-table-wrapper{
+        border: none;
+      }
+      /deep/.ivu-table td{
+        border-bottom: none;
+      }
+    }
+    .opera{
+      margin-top: 50px;
+    }
+    .btn-group{
+      span{
+        display: inline-block;
+        background: #00e9bc;
+        font-size: 14px;
+        color: #fff;
+        padding: 5px 25px;
+        cursor: pointer;
+        margin-left: 20px;
+      }
+    }
+  }
 }

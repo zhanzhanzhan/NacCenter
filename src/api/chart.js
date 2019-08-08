@@ -158,20 +158,33 @@ export const getManagement = ({ nbCode }) => {
 }
 
 /*
-*  根据nbCode修改机器资产管理状态
-*  type: 1 资产拉取 ， 2重启
+*  拉取资产数据
+*
 * */
 
-export const changeStatus = ({ nbCode, type }) => {
+export const changeStatus = ({ nbCode }) => {
   return axios.request({
     url: '/uptHostManageStaus',
     method: 'get',
     params: {
-      nbCode, type
+      nbCode
     }
   })
 }
+/*
+*  重启
+*
+* */
 
+export const uptHostManageReload = ({ nbCode }) => {
+  return axios.request({
+    url: '/uptHostManageReload',
+    method: 'get',
+    params: {
+      nbCode
+    }
+  })
+}
 /*
 *  删除机器资产
 * */

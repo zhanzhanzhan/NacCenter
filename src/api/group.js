@@ -16,13 +16,14 @@ export const addGroup = ({ groupName, remarks }) => {
 /*
 *  添加NB机器到分组
 * */
-export const addNbToGroup = ({ groupId, nbCode }) => {
+export const addNbToGroup = ({ groupId }, nbCodes) => {
   return axios.request({
     url: `/groups/addNbToGroups`,
     method: 'post',
     params: {
-      groupId, nbCode
-    }
+      groupId
+    },
+    data: nbCodes
 
   })
 }
@@ -82,13 +83,12 @@ export const getNbCodeInfoByGroupId = ({ groupId }) => {
 /*
 *  名单管理分组新增
 * */
-export const insGroupRoster = ({ groupRoster }) => {
+export const insGroupRoster = ( groupRoster ) => {
   return axios.request({
     url: `/groups/insGroupRoster`,
     method: 'post',
-    data: {
-      groupRoster
-    }
+    data: groupRoster
+
 
   })
 }
@@ -97,6 +97,15 @@ export const insGroupRoster = ({ groupRoster }) => {
 export const getAllGroup = () => {
   return axios.request({
     url: `/groups/sel`,
+    method: 'get'
+  })
+}
+
+/* 查询当前分组下的NB以及不在分组下的NB接口 */
+
+export const selNbByGroupId = (groupId) => {
+  return axios.request({
+    url: `/groups/selNbByGroupId/${groupId}`,
     method: 'get'
   })
 }
@@ -118,7 +127,7 @@ export const updateNbGroup = ({ groupId, groupName, parentId, remarks }) => {
 export const uptGroupParam = ({ id, groupId, single, learning, ctime, btime, ltime }) => {
   return axios.request({
     url: `/groups/uptGroupParam`,
-    method: 'get',
+    method: 'post',
     params: {
       id, groupId, single, learning, ctime, btime, ltime
     }

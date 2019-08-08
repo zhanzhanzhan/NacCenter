@@ -3,8 +3,15 @@
     <div class="title">
       {{activeNb.nbName}} <span>{{activeNb.nbCode}}</span>
     </div>
-    <div class="info-list">
-      <Row class="table-container" style="width: 100%;overflow: auto">
+    <div class="info-list" style="padding: 20px">
+      <Row>
+        <span style="font-size: 14px;font-weight: bold;color: #333" >请选择时间段：</span>
+        <Select v-model="timeSelect" style="width:200px" prefix="md-alarm"  @on-change="timeChange">
+          <Option v-for="item in timeList" :value="item" :key="item">{{ item }} 分钟内</Option>
+        </Select>
+      </Row>
+
+      <Row class="table-container" style="width: 100%;overflow: auto;margin-top: 30px;">
         <Col span="24">
           <Table border :columns="tableColumns" :data="warningList" :loading="tableLoad">
             <template slot-scope="{ row }" slot="applyUserName">
@@ -48,7 +55,11 @@ export default {
           key: 'auditUserName'
         }
       ],
-      warningList: []
+      warningList: [],
+      timeSelect: 5,
+      timeList: [
+        5, 10, 30
+      ]
     }
   },
   methods: {
@@ -58,12 +69,15 @@ export default {
     ...mapActions([
       'getAsideList'
     ]),
-    async getBlockRosterList () {
-      let res = await getBlockRosterList({ nbCode: this.activeNb.nbCode })
+    async getBlockRosterList (data) {
+      let res = await getBlockRosterList({ nbCode: this.activeNb.nbCode, time: data ||  this.timeSelect })
       console.log(res)
       if (res.data.code === 'success') {
         this.warningList = res.data.result ? res.data.result : []
       }
+    },
+    timeChange (data) {
+      this.getBlockRosterList(data)
     }
 
   },

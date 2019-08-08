@@ -6,7 +6,7 @@
     <div class="info-list">
       <Row  style="text-align: right">
         <ButtonGroup>
-          <Button @click="getManage" style="color: #00e9bc">拉取数据</Button>
+          <Button @click="getManage" style="background: #00e9bc; color: #fff">拉取数据</Button>
           <Button type="warning" @click="deleteManage">清除数据</Button>
         </ButtonGroup>
         <Button icon="md-download" :loading="exportLoading" @click="exportExcel" style="margin: 20px;" type="info">导出excel表格</Button>
@@ -166,7 +166,6 @@ export default {
       this.loading = true
       let res = await getManagement({ nbCode: this.activeNb.nbCode })
       this.loading = false
-       console.log(res)
       if (res.data.code === 'success') {
         this.managementList = res.data.result ? res.data.result : []
       }
@@ -187,7 +186,7 @@ export default {
             this.managementList = []
           } else {
             this.$Modal.remove()
-            this.$Message.error('删除失败')
+            this.$Message.error(res.data.result)
           }
         }
       })
@@ -195,13 +194,13 @@ export default {
     /* 拉取数据 */
     async getManage () {
       this.loading = true
-      let res = await changeStatus({ nbCode: this.activeNb.nbCode, type: 1 })
+      let res = await changeStatus({ nbCode: this.activeNb.nbCode })
       this.loading = false
-      console.log(res)
+      //console.log(res)
       if (res.data.code === 'success') {
         this.$Message.success('拉取数据中，请稍后刷新！')
       } else {
-        this.$Message.error('拉取失败！')
+        this.$Message.error(res.data.result)
       }
     },
     exportExcel () {
