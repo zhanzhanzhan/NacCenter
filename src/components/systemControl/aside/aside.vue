@@ -1,7 +1,7 @@
 <template>
   <div class="aside-wrap">
     <div class="aside-list">
-      <div class="aside-item " v-for="(item, index) in menu" :class="path === item.path ? 'active' : ''"  @click="changeItem(item.path)">
+      <div class="aside-item " v-if="checkAccess(item.meta.access)" v-for="(item, index) in menu" :class="path === item.path ? 'active' : ''"  @click="changeItem(item.path)">
         <div class="title">
           <Icon :type="item.meta.icon" class="icon"/>
           {{ item.meta.title }}
@@ -14,6 +14,7 @@
 <script>
 import { systemChild } from '../../../router/routers'
 import { selNewMessage } from '../../../api/userBind'
+import { mapState } from 'vuex'
 
 export default {
   name: 'controlerAside',
@@ -24,22 +25,31 @@ export default {
       count: 0,
     }
   },
+  computed: {
+    ...mapState({
+      userInfo: state => state.login.userInfo
+    })
+  },
   methods: {
     changeItem (path) {
       this.$router.push({ path: path })
       this.path = path
     },
     async selNewMessage () {
-    let res = await selNewMessage()
-     if (res.data.code === 'success') {
-       this.count = res.data.result
-     }
+      let res = await selNewMessage()
+      if (res.data.code === 'success') {
+        this.count = res.data.result
+      }
+    },
+    checkAccess (access) {
+      if (!access) return true
     }
   },
   mounted () {
     this.path = this.$route.path
     this.selNewMessage()
-    console.log(this.path)
+    console.log(this.userInfo)
+    console.log(this.menu)
   }
 }
 </script>

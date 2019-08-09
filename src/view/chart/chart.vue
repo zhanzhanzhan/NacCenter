@@ -272,7 +272,7 @@ export default {
     /* 系统现状 */
     async getSystemStatus (nbCode) {
       let res = await getSystemStatus({ nbCode: nbCode })
-      console.log(res)
+      // console.log(res)
       if (res.data.code === 'success') {
         this.system = res.data.result
         if (!res.data.result) return

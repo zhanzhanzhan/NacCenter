@@ -16,17 +16,15 @@
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">btime:</label>
-                <input type="number" class="my-input" @input="handleInput('btime',defaultConfig.btime)"
+                <input type="text" class="my-input" @input="handleInput('btime',defaultConfig.btime)"
                        v-model.trim="defaultConfig.btime" placeholder="请输入正整数，单位秒">
-                <!--<span>请输入正整数，单位秒</span>-->
               </div>
             </Col>
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">ctime:</label>
-                <input type="number" class="my-input" @input="handleInput('ctime',defaultConfig.ctime)"
+                <input type="text" class="my-input" @input="handleInput('ctime',defaultConfig.ctime)"
                        v-model.trim="defaultConfig.ctime" placeholder="请输入正整数，单位秒">
-                <!-- <span>请输入正整数，单位秒</span>-->
               </div>
             </Col>
 
@@ -35,9 +33,8 @@
             <Col span="12">
               <div class="form-item">
                 <label for="" class="my-label">ltime:</label>
-                <input type="number" class="my-input" @input="handleInput('ltime',defaultConfig.ltime)"
+                <input type="text" class="my-input" @input="handleInput('ltime',defaultConfig.ltime)"
                        v-model.trim="defaultConfig.ltime" placeholder="请输入正整数，单位秒">
-                <!-- <span>请输入正整数，单位秒</span>-->
               </div>
             </Col>
           </Row>
@@ -159,11 +156,11 @@
             <span>添加白名单</span>
           </p>
           <div style="text-align:center">
-            <Form :model="addWhiteForm"  label-position="left" >
-              <FormItem label="mac地址" prop="macAddress">
+            <Form :model="addWhiteForm"  label-position="left" ref="whiteFormValidate" :rules="whiteFormRules">
+              <FormItem label="mac地址" prop="macAdress">
                 <Input v-model.trim="addWhiteForm.macAdress" placeholder="请输入mac地址"></Input>
               </FormItem>
-              <FormItem label="ip地址" prop="ipAddress">
+              <FormItem label="ip地址" prop="ipAdress">
                 <Input v-model.trim="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
               <FormItem label="导入表格" >
@@ -234,13 +231,13 @@
             <span>添加忽略名单</span>
           </p>
           <div style="text-align:center">
-            <Form :model="addIgnoreForm" label-position="left" >
-              <FormItem label="mac地址" prop="mac">
+            <Form :model="addIgnoreForm" label-position="left" ref="ignoreFormRules" :rules="ignoreFormRules">
+              <FormItem label="mac地址" prop="macAdress">
                 <Input v-model.trim="addIgnoreForm.macAdress" placeholder="请输入mac地址"></Input>
               </FormItem>
-              <FormItem label="ip地址" prop="ip">
+            <!--  <FormItem label="ip地址" prop="ipAdress">
                 <Input v-model.trim="addIgnoreForm.ipAdress" placeholder="请输入ip地址"></Input>
-              </FormItem>
+              </FormItem>-->
               <FormItem label="导入表格">
                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
                   <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件
@@ -257,7 +254,7 @@
                 <Row>
                   <transition name="fade">
                     <Progress v-if="showProgress" :percent="progressPercent" :stroke-width="2">
-                      <div v-if="progressPercent == 100">
+                      <div v-if="progressPercent === 100">
                         <Icon type="ios-checkmark-circle"></Icon>
                         <span>成功</span>
                       </div>
@@ -293,7 +290,6 @@ export default {
   name: 'config',
   data () {
     const ipaddressRules = (rule, value, callback) => {
-      console.log(value)
       if (!value) callback()
       let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
       if (!reg.test(value)) {
@@ -326,31 +322,36 @@ export default {
       callback()
     }
     const macAddressRules = (rule, value, callback) => {
-      console.log(value)
-      if (this.file) {
-        callback()
-      } else if (!value) {
-        callback(new Error('请填写MAC地址或者导入表格批量处理！'))
-      } else {
-        let reg = /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/
+      if (value) {
+        let reg = /^[a-fA-F0-9]{2}([:-][a-fA-F0-9]{2}){5}$/
         if (!reg.test(value)) {
           callback(new Error('请检查MAC地址格式！'))
+        } else {
+          callback()
         }
       }
-      callback()
+      if (!this.file && !value) {
+        callback(new Error('请填写MAC地址或者导入excel表格批量处理！'))
+      }
+      else if (this.file && !value) {
+        callback()
+      }
     }
     const ipAddress = (rule, value, callback) => {
-      if (this.file) {
-        callback()
-      } else if (!value) {
-        callback(new Error('请填写IP地址或者导入表格批量处理！'))
-      } else {
+      if (value) {
         let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
         if (!reg.test(value)) {
-          callback(new Error('请检查MAC地址格式！'))
+          callback(new Error('请检查IP地址格式！'))
+        } else {
+          callback()
         }
       }
-      callback()
+      if (!this.file && !value) {
+        callback(new Error('请填写MAC地址或者导入excel表格批量处理！'))
+      }
+      else if (this.file && !value) {
+        callback()
+      }
     }
     return {
       baseUrl: '',
@@ -414,10 +415,10 @@ export default {
         ipAdress: ''
       },
       whiteFormRules: {
-        macAddress: [
+        macAdress: [
           { validator: macAddressRules, trigger: 'blur' }
         ],
-        ipAddress: [
+        ipAdress: [
           { validator: ipAddress, trigger: 'blur' }
         ]
       },
@@ -425,15 +426,15 @@ export default {
       addIgnoreModel: false,
       addIgnoreForm: {
         macAdress: '',
-        ipAdress: ''
+        /*ipAdress: ''*/
       },
       ignoreFormRules: {
-        mac: [
+        macAdress: [
           { validator: macAddressRules, trigger: 'blur' }
         ],
-        ip: [
+       /* ipAdress: [
           { validator: ipAddress, trigger: 'blur' }
-        ]
+        ]*/
       },
       uploadLoading: false,
       progressPercent: 0,
@@ -515,8 +516,8 @@ export default {
           ctime: data.ctime ? data.ctime : '',
           ltime: data.ltime ? data.ltime : ''
         }
-        this.defaultConfig.learning = this.defaultConfig.learning !== 'off'
-        this.defaultConfig.single = this.defaultConfig.single !== 'off'
+        this.defaultConfig.learning = data.learning !== 'off'
+        this.defaultConfig.single = data.single !== 'off'
       }
     },
     /* 保存模式设置 */
@@ -524,6 +525,7 @@ export default {
       let args = Object.assign({}, arr)
       args.learning = arr.learning ? 'on' : 'off'
       args.single = arr.single ? 'on' : 'off'
+      args.nbCode = this.activeNb.nbCode
       let res = await changeNbConfig({ ...args })
       if (res.data.code === 'success') {
         this.$Message.success('保存成功')
@@ -574,14 +576,13 @@ export default {
       }
     },
     handleSubmit (name) {
-      this.addIp()
-     /* this.$refs[name].validate((valid) => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           this.addIp()
         } else {
-          this.$Message.error('请输入名单信息或者上传文件!')
+          //this.$Message.error('请输入名单信息或者上传文件!')
         }
-      })*/
+      })
     },
     async upload (type) {
       if (!this.file) return
@@ -665,7 +666,7 @@ export default {
           let res = await deleteNbList({ id: id })
           if (res.data.code === 'success') {
             this.$Modal.remove()
-            this.$Message.info('删除成功')
+            this.$Message.info(res.data.result)
             if (this.activeNav === 2) {
               this.whiteList.splice(index, 1)
             } else if (this.activeNav === 3) {
@@ -673,7 +674,7 @@ export default {
             }
           } else {
             this.$Modal.remove()
-            this.$Message.error('删除失败')
+            this.$Message.error(res.data.result)
           }
         }
       })

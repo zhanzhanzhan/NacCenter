@@ -94,12 +94,12 @@ export const selRoleName = ({ roleName, parentId }) => {
 /*
 *  修改角色信息
 * */
-export const uptRoleInfo = ({ roleName, parentId }) => {
+export const uptRoleInfo = ({ roleName, roleId }) => {
   return axios.request({
     url: '/uptRoleInfo',
     method: 'post',
     params: {
-      roleName, parentId
+      roleName, roleId
     }
   })
 }

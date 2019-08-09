@@ -9,13 +9,13 @@
                 <Input v-model="insUserForm.userNo" placeholder="请输入用户账号" disabled v-if=""></Input>
               </FormItem>
               <FormItem label="用户名" prop="userName">
-                <Input v-model="insUserForm.userName" placeholder="请输入用户名"></Input>
+                <Input v-model="insUserForm.userName" autocomplete ="new-password" placeholder="请输入用户名"></Input>
               </FormItem>
               <FormItem label="密码" prop="password">
-                <Input v-model="insUserForm.password" placeholder="请输入密码" type="password"></Input>
+                <Input v-model="insUserForm.password" autocomplete ="new-password" placeholder="请输入密码" type="password"></Input>
               </FormItem>
               <FormItem label="确认密码" prop="ensurePassword">
-                <Input v-model="insUserForm.ensurePassword" placeholder="请确认密码" type="password"></Input>
+                <Input v-model="insUserForm.ensurePassword" autocomplete ="new-password" placeholder="请确认密码" type="password"></Input>
               </FormItem>
               <FormItem label="角色名称">
                 <Select v-model="insUserForm.roleName" disabled>

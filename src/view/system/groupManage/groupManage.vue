@@ -9,7 +9,7 @@
                 分组列表
               </div>
               <div class="role-item-wrap">
-                <div style="text-align: center" v-if="!groupList">暂无分组信息</div>
+                <div style="text-align: center;font-size: 12px; color: #999" v-if="!groupList.length">暂无分组</div>
                 <div class="role-item"
                      v-for="(item, index) in groupList"
                      @click="changeGroup(item.groupId, index)"
@@ -113,10 +113,10 @@
                     <Row class="table-container">
                       <Table :columns="white" :data="whiteList" :loading="loading"  height="300" :show-header="false" stripe
                              size="small">
-                        <template slot-scope="{ row }" slot="macAddress">
+                        <template slot-scope="{ row }" slot="macAdress">
                           <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
                         </template>
-                        <template slot-scope="{ row }" slot="ipAddress">
+                        <template slot-scope="{ row }" slot="ipAdress">
                           <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.ipAddress }}</span></span>
                         </template>
                         <template slot-scope="{ row, index }" slot="action">
@@ -132,16 +132,16 @@
                         <span @click="removeAll" v-if="whiteList.length>0">清空列表</span>
                       </Col>
                     </Row>
-                    <Modal v-model="addWhiteModel" width="360">
+                    <Modal v-model="addWhiteModel" width="360"  >
                       <p slot="header" style="color:#333;text-align:center">
                         <span>添加白名单</span>
                       </p>
                       <div style="text-align:center">
-                        <Form :model="addWhiteForm"  label-position="left">
-                          <FormItem label="mac地址" prop="mac">
+                        <Form :model="addWhiteForm"  label-position="left" ref="whiteFormRules" :rules="whiteFormRules">
+                          <FormItem label="mac地址" prop="macAdress">
                             <Input v-model.trim="addWhiteForm.macAdress" placeholder="请输入mac地址"></Input>
                           </FormItem>
-                          <FormItem label="ip地址" prop="ip">
+                          <FormItem label="ip地址" prop="ipAdress">
                             <Input v-model.trim="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
                           </FormItem>
                         </Form>
@@ -182,11 +182,11 @@
                         <span>添加忽略名单</span>
                       </p>
                       <div style="text-align:center">
-                        <Form :model="addIgnoreForm" label-position="left">
-                          <FormItem label="mac地址" prop="mac">
+                        <Form :model="addIgnoreForm" label-position="left" ref="ignoreFormRules" :rules="ignoreFormRules">
+                          <FormItem label="mac地址" prop="macAdress">
                             <Input v-model.trim="addIgnoreForm.macAdress" placeholder="请输入mac地址"></Input>
                           </FormItem>
-                          <FormItem label="ip地址" prop="ip">
+                          <FormItem label="ip地址" prop="ipAdress">
                             <Input v-model.trim="addIgnoreForm.ipAdress" placeholder="请输入ip地址"></Input>
                           </FormItem>
                         </Form>
@@ -207,10 +207,11 @@
         <Row type="flex" justify="center">
           <Col span="24">
             <div class="modify">
+              <div v-if="!groupList.length">暂无分组</div>
               <div class="role-item" v-for="(item) in groupList" :key="item.roleId">
-            <span class="item-text">
-               {{item.groupName}}
-            </span>
+                <span class="item-text">
+                   {{item.groupName}}
+                </span>
                 <Button type="primary" ghost size="small" @click="modify(item.groupId)" style="margin-right: 10px">修改</Button>
                 <Button type="error" ghost size="small" @click="remove(item.groupId)">删除</Button>
               </div>
@@ -259,18 +260,23 @@ export default {
       callback()
     }
     const macAddressRules = (rule, value, callback) => {
-      console.log(value)
+      if (!value) {
+        callback(new Error('请输入MAC地址'))
+      } else {
+        let reg = /[A-F\d]{2}[:-][A-F\d]{2}[:-][A-F\d]{2}[:-][A-F\d]{2}[:-][A-F\d]{2}[:-][A-F\d]{2}/
+        if (!reg.test(value)) {
+          callback(new Error('请检查IP地址格式！'))
+        }
+      }
+      callback()
     }
     const ipAddress = (rule, value, callback) => {
-      console.log(value)
-      if (this.file) {
-        callback()
-      } else if (!value) {
-        callback(new Error('请填写IP地址或者导入表格批量处理！'))
+      if (!value) {
+        callback(new Error('请输入IP地址'))
       } else {
         let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
         if (!reg.test(value)) {
-          callback(new Error('请检查MAC地址格式！'))
+          callback(new Error('请检查IP地址格式！'))
         }
       }
       callback()
@@ -345,10 +351,10 @@ export default {
         ipAdress: null
       },
       whiteFormRules: {
-        mac: [
+        macAdress: [
           { required: true, validator: macAddressRules, trigger: 'blur' }
         ],
-        ip: [
+        ipAdress: [
           { required: true, validator: ipAddress, trigger: 'blur' }
         ]
       },
@@ -359,10 +365,10 @@ export default {
         ipAdress: null
       },
       ignoreFormRules: {
-        mac: [
+        macAdress: [
           { required: true, validator: macAddressRules, trigger: 'blur' }
         ],
-        ip: [
+        ipAdress: [
           { required: true, validator: ipAddress, trigger: 'blur' }
         ]
       }
@@ -430,7 +436,6 @@ export default {
     /* 删除分组 */
     async delGroup (groupId) {
       let res = await delGroup(groupId)
-      console.log(res)
       this.$Modal.remove()
       if (res.data.code === 'success') {
         this.getAllGroup()
@@ -442,7 +447,6 @@ export default {
     /* 添加机器到分组 */
     async addNbToGroup () {
       let res = await addNbToGroup({ groupId: this.activeGroupId }, this.checkAllGroup)
-      console.log(this.activeGroupId)
       if (res.data.code === 'success') {
         this.$Message.success('保存成功！')
       } else {
@@ -452,7 +456,6 @@ export default {
     /* 根据分组查找nb */
     async selNbByGroupId (groupId) {
       let res = await selNbByGroupId(groupId)
-      console.log(res)
       if (res.data.code === 'success') {
         this.nbList = res.data.result
       }
@@ -472,9 +475,7 @@ export default {
     },
     /* 获取名单 */
     async getList () {
-      console.log(this.activeGroupId)
       let res = await getGroupRoster({ groupId: this.activeGroupId })
-      console.log(res)
       if (res.data.code === 'success') {
         if (res.data.result.length) {
           let arrWhite = []
@@ -505,7 +506,6 @@ export default {
           arr.push(item.nbCode)
         })
         this.checkAllGroup = arr
-        console.log(this.checkAllGroup)
       } else {
         this.checkAllGroup = []
       }
@@ -523,8 +523,6 @@ export default {
       }
     },
     changeGroup (groupId, index) {
-      console.log(groupId)
-      console.log( this.activeNav)
       this.active = index
       this.activeGroupId = groupId
       this.getNbCodeInfoByGroupId(groupId)
@@ -593,26 +591,22 @@ export default {
       } else {
         this.$Message.error(res.data.result)
       }
-      console.log(res)
     },
     // 切换tab
     changeNav (data) {
-      console.log(data)
       this.activeNav = data
       if (data === 'supTab3') {
         this.getList()
       }
     },
     handleSubmit (name) {
-      console.log(name)
-      this.addIp()
-     /* this.$refs[name].validate((valid) => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           this.addIp()
         } else {
           this.$Message.error('请输入名单信息或者上传文件!')
         }
-      })*/
+      })
     },
 
     async addIp () {
@@ -627,9 +621,7 @@ export default {
           ipAddress: this.addWhiteForm.ipAdress,
           macAddress: this.addWhiteForm.macAdress
         }
-        console.log(json)
         let res = await insGroupRoster(json)
-        console.log(res)
         this.addWhiteLoading = false
         this.addWhiteModel = false
         if (res.data.code === 'success') {

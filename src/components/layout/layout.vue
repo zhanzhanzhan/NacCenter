@@ -16,9 +16,24 @@
 <script>
 import HeaderBar from '../my-home/components/header/header'
 import MyAside from './components/aside/aside'
+import { mapState, mapActions } from 'vuex'
 export default {
   name: 'my-layout',
-  components: { HeaderBar, MyAside }
+  components: { HeaderBar, MyAside },
+  computed: {
+    ...mapState({
+      activeNb: state => state.app.activeNb,
+      asideList: state => state.app.asideList
+    })
+  },
+  methods: {
+    ...mapActions([
+      'getAsideList'
+    ])
+  },
+  beforeRouteEnter (to, from, next) {
+    next()
+  },
 }
 </script>
 <style lang="less" scoped>

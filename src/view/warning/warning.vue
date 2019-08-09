@@ -13,15 +13,12 @@
 
       <Row class="table-container" style="width: 100%;overflow: auto;margin-top: 30px;">
         <Col span="24">
-          <Table border :columns="tableColumns" :data="warningList" :loading="tableLoad">
-            <template slot-scope="{ row }" slot="applyUserName">
-              <strong>{{ row.applyUserName }}</strong>
+          <Table border :columns="tableColumns" :data="warningList" :loading="tableLoad" stripe :height="500">
+            <template slot-scope="{ row }" slot="ipAddress">
+              <strong>{{ row.ipAddress }}</strong>
             </template>
-            <template slot-scope="{ row }" slot="flowState">
-              {{ row.flowState? '是' : '否' }}
-            </template>
-            <template slot-scope="{ row, index }" slot="action">
-              <Button type="primary" size="small" style="margin-right: 5px" @click="show(index, row)">修改</Button>
+            <template slot-scope="{ row }" slot="createTime">
+              {{ row.createTime }}
             </template>
           </Table>
         </Col>
@@ -47,12 +44,13 @@ export default {
         },
         {
           title: 'ip地址',
-          key: 'applyUserName',
-          slot: 'applyUserName'
+          key: 'ipAddress',
+          slot: 'ipAddress'
         },
         {
           title: '入侵时间',
-          key: 'auditUserName'
+          key: 'createTime',
+          slot: 'createTime'
         }
       ],
       warningList: [],
@@ -70,7 +68,7 @@ export default {
       'getAsideList'
     ]),
     async getBlockRosterList (data) {
-      let res = await getBlockRosterList({ nbCode: this.activeNb.nbCode, time: data ||  this.timeSelect })
+      let res = await getBlockRosterList({ nbCode: this.activeNb.nbCode, time: data || this.timeSelect })
       console.log(res)
       if (res.data.code === 'success') {
         this.warningList = res.data.result ? res.data.result : []

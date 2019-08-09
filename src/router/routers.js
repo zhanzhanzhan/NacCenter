@@ -130,6 +130,7 @@ export const systemChild = [
     path: '/system/userManage',
     name: 'userManage',
     meta: {
+      access: 1,
       icon: 'ios-settings',
       title: '用户管理'
     },
@@ -139,6 +140,7 @@ export const systemChild = [
     path: '/system/roleManage',
     name: 'roleManage',
     meta: {
+      access: 1,
       icon: 'ios-contact',
       title: '角色管理'
     },

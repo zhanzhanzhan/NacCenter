@@ -1,6 +1,6 @@
 <template>
   <div class="aside-wrap">
-    <Input suffix="ios-search" placeholder="输入nbCode搜索" v-model="searchText" clearable @on-clear="clear" @keyup.enter.native="search(searchText)"/>
+    <Input suffix="ios-search" placeholder="输入nb机器名称搜索" v-model="searchText" clearable @on-clear="clear" @on-change="change(searchText)" @keyup.enter.native="search(searchText)"/>
     <div style="display: flex; justify-content: center">
       <div class="add-list" @click="addNbModel = true">
         <!--      <span>添加</span>-->
@@ -9,17 +9,14 @@
     </div>
 
     <div class="aside-list">
-      <p v-if="!asideList.length">暂无数据，请添加机器</p>
-      <Collapse v-model="activeGroup" v-if="asideList.length">
-        <Panel v-for="(item, index) in asideList" :key="index" :name="item.groupName">
-          {{item.groupName}}
+      <!--<Collapse v-model="activeGroup" v-if="asideList.length">
+        <Panel v-for="(item, index) in asideList" :key="index" :name="item.groupName" style="font-size: 14px;color: #333;">
+          {{item.groupName === 'default' ? '未分组':''}}
           <div slot="content">
             <div class="aside-item" :class="i.nbCode === activeNb.nbCode  ? 'active' : ''" v-for="(i,index) in item.nbInfoList"
                  @click="changeActive(index,i)"
-                 :key="i.id">
+                 >
               <div class="title">
-                <!--  <span class="online" v-if="item.onLineStatus"></span>
-                  <span class="offline" v-if="!item.onLineStatus"></span>-->
                 <Icon type="md-power" size="20" color="#ccc" v-if="!i.onLineStatus"/>
                 <Icon type="md-power" size="20" color="#00e9bc" title="点击重启" @click="changeStatus(i.nbCode,2)" v-if="i.onLineStatus"/>
                 {{i.nbName}}
@@ -29,24 +26,19 @@
             </div>
           </div>
         </Panel>
-      </Collapse>
-     <!-- <div v-for="(item, index) in asideList">
-        <div>{{item.groupName}}</div>
-        <div class="aside-item" :class="i.nbCode === activeNb.nbCode  ? 'active' : ''" v-for="(i,index) in item.nbInfoList"
-             @click="changeActive(index,i)"
-             :key="i.id">
-          <div class="title">
-            &lt;!&ndash;  <span class="online" v-if="item.onLineStatus"></span>
-              <span class="offline" v-if="!item.onLineStatus"></span>&ndash;&gt;
-            <Icon type="md-power" size="20" color="#ccc" v-if="!i.onLineStatus"/>
-            <Icon type="md-power" size="20" color="#00e9bc" title="点击重启" @click="changeStatus(i.nbCode,2)" v-if="i.onLineStatus"/>
-            {{i.nbName}}
-          </div>
-          <div class="info">{{i.nbCode}}</div>
-          <Icon type="ios-close-circle" title="删除此项" class="delete" size="18" color="#555" @click="removeNb(i.nbCode)"/>
+      </Collapse>-->
+      <div class="aside-item" :class="i.nbCode === activeNb.nbCode  ? 'active' : ''" v-for="(i,index) in asideList"
+           @click="changeActive(index,i)">
+        <div class="title">
+          <!--  <span class="online" v-if="item.onLineStatus"></span>
+            <span class="offline" v-if="!item.onLineStatus"></span>-->
+          <Icon type="md-power" size="20" color="#ccc" v-if="!i.onLineStatus"/>
+          <Icon type="md-power" size="20" color="#00e9bc" title="点击重启" @click="changeStatus(i.nbCode,2)" v-if="i.onLineStatus"/>
+          {{i.nbName}}
         </div>
-      </div>-->
-
+        <div class="info">{{i.nbCode}}</div>
+        <Icon type="ios-close-circle" title="删除此项" class="delete" size="18" color="#555" @click="removeNb(i.nbCode)"/>
+      </div>
       <div style="text-align: center" v-if="asideList.length === 0">暂无数据</div>
     </div>
 
@@ -137,17 +129,18 @@ export default {
     })
   },
   methods: {
-    ...mapMutations({
-      'setActiveNb': 'setActiveNb',
-    }),
+    ...mapMutations([
+      'setAsideList',
+      'setActiveNb'
+    ]),
     ...mapActions([
       'getAsideList'
     ]),
     clear () {
-      this.getAllNbList()
+      this.getAllNbList(true)
     },
     changeActive (index, item) {
-      this.isActive = index
+      this.isActive = index || 0
       this.setActiveNb(item)
       if (this.$route.name === 'chartChild') {
         this.$router.push({ path: `/chart`, query: { nbCode: this.activeNb.nbCode } })
@@ -174,9 +167,7 @@ export default {
         if (valid) {
           this.applyModel = false
           userApplyBind({ nbCode: this.applyForm.nbCode, applyReason: this.applyForm.applyReason }).then((res) => {
-
             this.applyModel = false
-
             if (res.data.code === 'success') {
               this.$Message.success('申请成功')
               this.applyForm = {}
@@ -236,13 +227,33 @@ export default {
         }
       })
     },
-    async search (nbCode) {
-      let res = await findNb(nbCode)
+    async search (nbName) {
+      console.log(nbName)
+      let res = await findNb(nbName)
       console.log(res)
-      if (res.data.code === 'success' && res.data.result !== null) {
+      if (res.data.code === 'success' && res.data.result.length) {
+        // 分组
+       /*
         let arr = []
-        arr.push(res.data.result)
+       if (!res.data.result.groupId) {
+          arr = [{
+            groupName: 'default',
+            nbInfoList: res.data.result
+          }]
+        }
+          arr.push(res.data.result)
+          this.setAsideList(arr)
+        */
+        // 不分组
+
+        let arr = []
+        res.data.result.map((item, index) => {
+          arr.push(...item.nbInfoList)
+        })
         this.setAsideList(arr)
+        this.changeActive(null, arr[0])
+
+        console.log(this.asideList)
       } else {
         this.$Message.error('没有找到，请检查输入的nbCode是否正确')
       }
@@ -255,7 +266,7 @@ export default {
         loading: true,
         onOk: async () => {
           let res = await uptHostManageReload({ nbCode: nbCode })
-          console.log(res)
+          //console.log(res)
           if (res.data.code === 'success') {
             this.$Modal.remove()
             this.$Message.info('重启成功')
@@ -269,7 +280,7 @@ export default {
   },
   mounted () {
     this.getAllNbList(true)
-    this.activeGroup = this.asideList[0].groupName
+    //this.activeGroup = this.asideList[0].groupName
     this.timer = setInterval(() => {
       this.getAllNbList()
     }, 1000 * 60)

@@ -9,7 +9,9 @@
                 角色列表
               </div>
               <div class="role-item-wrap">
+                <div style="text-align: center; font-size: 12px;color: #999" v-if="!roleList.length">暂无角色</div>
                 <div class="role-item"
+                     v-if="roleList.length"
                      v-for="(item, index) in roleList"
                      @click="changeRole(item.roleId,index)"
                      :class = "active === index ? 'active': ''">
@@ -58,11 +60,12 @@
       </TabPane>
       <TabPane label="修改角色" name="tab2">
         <div class="modify">
+          <div v-if="!roleList.length" style="text-align: center; font-size: 12px">暂无角色</div>
           <div class="role-item" v-for="(item) in roleList" :key="item.roleId">
             <span class="item-text">
                {{item.roleName}}
             </span>
-            <Button type="primary" ghost size="small" @click="modifyModal = true" style="margin-right: 10px">修改</Button>
+            <Button type="primary" ghost size="small" @click="modifyRole(item.roleId)" style="margin-right: 10px">修改</Button>
             <Button type="error" ghost size="small" @click="remove(item.roleId)">删除</Button>
           </div>
         </div>
@@ -109,6 +112,7 @@ export default {
     return {
       active: 0,
       activeRoleId: '',
+      modifyRoleId: '',
       indeterminate: true,
       checkAll: false,
       checkAllGroup: [],
@@ -120,7 +124,7 @@ export default {
       addRoleForm: {},
       addRoleRule: {
         roleName: [
-          { required: true, validator: validateRoleName, trigger: 'blur' }
+          { required: true, validator: validateRoleName, trigger: 'change' }
         ]
       }
     }
@@ -135,8 +139,10 @@ export default {
     async selRoleInfo () {
       let res = await selRoleInfo()
       if (res.data.code === 'success') {
-        this.roleList = res.data.result
-        this.changeRole(this.roleList[0].roleId, 0)
+        this.roleList = res.data.result || []
+        if (this.roleList.length) {
+          this.changeRole(this.roleList[0].roleId, 0)
+        }
       } else {
         console.log(res)
       }
@@ -174,7 +180,7 @@ export default {
     /* 修改角色信息 */
     async uptRoleInfo (roleName) {
       this.loading = true
-      let res = await uptRoleInfo({ roleName: roleName, parentId: this.userInfo.parentId })
+      let res = await uptRoleInfo({ roleName: roleName, roleId: this.modifyRoleId })
       console.log(res)
       if (res.data.code === 'success') {
         this.loading = false
@@ -244,9 +250,13 @@ export default {
         if (valid) {
           this.uptRoleInfo(this.addRoleForm.roleName)
         } else {
-          this.$Message.error('操作失败，请检查输入信息格式是否正确!')
+          this.$Message.error('操作失败，请检查输入信息格式是否正确！')
         }
       })
+    },
+    modifyRole (roleId) {
+      this.modifyModal = true
+      this.modifyRoleId = roleId
     },
     remove (roleId) {
       this.$Modal.confirm({

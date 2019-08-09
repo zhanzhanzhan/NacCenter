@@ -64,11 +64,13 @@
         </div>
         <div class="content-item">
           <div class="title">
-            红色警报
+            警报
           </div>
           <div class="body">
-           <!-- <div class="progress-num">{{warning}}</div>-->
-            <div id="warningChart"  style="width: 200px;height: 200px;"></div>
+            <div class="progress-num" v-if="!warning.length">0</div>
+            <div v-if="warning.length">
+              <div id="warningChart"  style="width: 200px;height: 200px;" ></div>
+            </div>
           </div>
         </div>
       </div>
@@ -77,6 +79,7 @@
 <script>
 import { getActiveHostCount, getOnLineTotal, getRosterSum, getBlockHostCount } from '../../api/home'
 import { getCurrentCount } from '../../api/chart'
+import { mapActions } from 'vuex'
 import echarts from 'echarts'
 require('echarts/lib/chart/pie')
 // 引入提示框和图例组件
@@ -97,7 +100,12 @@ export default {
       whiteList: {}, // 白名单
       ignoreList: {}, // 忽略名单
       timer: null,
-      warning: null,
+      warning: [
+        {
+          name: '123',
+          value: 123
+        }
+      ],
       pieData: [
         { value: 335, name: '活跃' },
         { value: 310, name: '在线' },
@@ -109,13 +117,16 @@ export default {
       return Math.round(this.nbLive.totalOnline / this.nbLive.totalNB * 10000) / 100.00
     },
     onlinePercent () {
-      return Math.round(this.online.currentCount / this.online.sumCount * 10000) / 100.00
+      return (Math.round(this.online.currentCount / this.online.sumCount * 10000) / 100 > 100) ? 100 : Math.round(this.online.currentCount / this.online.sumCount * 10000) / 100
     },
     activePercent () {
       return Math.round(this.activeHost.active / this.activeHost.live * 10000) / 100.00
     }
   },
   methods: {
+    ...mapActions([
+      'getAsideList'
+    ]),
     /* 活跃 */
     async getActiveHostCount () {
       let res = await getActiveHostCount()
@@ -180,7 +191,7 @@ export default {
         tooltip : {
           trigger: 'item',
           // formatter: "{a} <br/> " + this.tooltipFormatter + ":{c} ({d}%)"
-          formatter: '{a}' + ':{c} ({d}%)'
+          formatter: '{b}' + ':{c} ({d}%)'
         },
         series : [
           {
@@ -193,16 +204,14 @@ export default {
             labelLine: {
               show: false
             },
-            itemStyle: {
-              emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
+            label: {
+              normal: {
+                show: false
               }
             }
           }
         ],
-        color: ['#77A1E5', '#24CBE5', '#00e9bc', '#47B3FF', '#39E4C9']
+        color: ['#4ea5ff', '#7fe3ae', '#52e5d0', '#c079e9', '#ff42a1', '#ffcaca', '#cafff5', '#f97e78']
 
       }
       myChart.setOption(option)
@@ -218,6 +227,7 @@ export default {
         this.funhandle()
       }, 1000 * 60)
     }
+    this.getAsideList(true)
   },
   beforeDestroy () {
     clearInterval(this.timer)

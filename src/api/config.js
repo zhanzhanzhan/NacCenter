@@ -36,9 +36,9 @@ export const delNb = (nbCode) => {
 /*
 * 通过NB序列号查询NB信息接口
 * */
-export const findNb = (nbCode) => {
+export const findNb = (nbName) => {
   return axios.request({
-    url: `/nb/sel/${nbCode}`,
+    url: `/nb/selByName/${nbName}`,
     method: 'get'
   })
 }
