@@ -69,7 +69,6 @@ export default {
     ]),
     async getBlockRosterList (data) {
       let res = await getBlockRosterList({ nbCode: this.activeNb.nbCode, time: data || this.timeSelect })
-      console.log(res)
       if (res.data.code === 'success') {
         this.warningList = res.data.result ? res.data.result : []
       }

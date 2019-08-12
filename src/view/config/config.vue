@@ -119,7 +119,7 @@
             </Row>
           </Form>
         </div>
-        <div class="save"><span @click="saveNetInfo">保存</span></div>
+        <div class="save"><span @click="saveNetInfoHandle">保存</span></div>
       </div>
       <!--白名单-->
       <div class="nav-content2" v-show="activeNav === 2">
@@ -561,6 +561,15 @@ export default {
       } else {
         this.$Message.error(`保存失败${res.data.result}`)
       }
+    },
+    saveNetInfoHandle () {
+      this.$refs['netConfigForm'].validate((valid) => {
+        if (valid) {
+          this.saveNetInfo()
+        } else {
+          this.$Message.error('请检查输入格式是否正确!')
+        }
+      })
     },
     /* 获取名单 */
     async getNameList (type) {

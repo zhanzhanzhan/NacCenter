@@ -8,6 +8,9 @@
       <Card icon="log-in" title="欢迎登录" :bordered="false">
         <div class="form-con">
           <login-form @on-success-valid="handleSubmit"></login-form>
+          <div class="forget">
+            <router-link to="/forgotPassword">忘记密码?</router-link>
+          </div>
           <div class="other">
             <div>
               <span>其他登录方式：</span>
@@ -67,7 +70,7 @@ import QRCode from 'qrcodejs2'
 export default {
   data () {
     return {
-      path: 'ws://192.168.1.126://websocket/',
+      path: 'ws://app.wingsbro.com:8070/websocket/',
       qrCodeModal: false,
       bindModel: false,
       openid: ''
@@ -99,7 +102,7 @@ export default {
       this.qrCodeModal = true
       let sid = +new Date()
       let res = await wxUserLogin(sid)
-      console.log(res)
+      // console.log(res)
       if (res.data.code === 'success') {
         this.creatQrCode(res.data.result)
         this.init(this.path + sid)
@@ -120,7 +123,7 @@ export default {
         height: 200,
         colorDark: '#000000',
         colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.H
+        correctLevel: 3
       })
     },
     init (url) {

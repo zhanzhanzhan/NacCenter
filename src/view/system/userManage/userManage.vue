@@ -217,7 +217,6 @@ export default {
       this.tableLoad = true
       let res = await selUserInfo({ userName: userName })
       this.tableLoad = false
-      console.log(res)
       if (res.data.code === 'success') {
         this.userList = res.data.result
       }
@@ -262,7 +261,6 @@ export default {
         userId: this.insUserForm.userId
       }
       let res = await updateUser(json)
-      console.log(res)
       if (res.data.code === 'success') {
         this.$Message.success('操作成功')
         this.selUserInfo()
@@ -284,7 +282,7 @@ export default {
     /* 请求转让 */
     async roleTransfer () {
       let res = await roleTransfer({ userId: this.accessForm.activeUserId })
-      console.log(res)
+     // console.log(res)
     },
     userChange (data) {
       this.$Message.success(data)
@@ -322,8 +320,6 @@ export default {
   mounted () {
     this.selUserInfo()
     this.selRoleInfo()
-    console.log(this.userInfo)
-    //console.log(this.roleNameList)
   }
 }
 </script>

@@ -19,8 +19,7 @@
     <Modal
       v-model="changeApplySateModal"
       :loading = "changeApplyStateLoading"
-      title="审核"
-      @on-ok="ok">
+      title="审核">
       <div style="padding: 20px">
         <Form :model="activeApplyInfo" :label-width="80" ref="uptApply" :rules="uptApplyValidate">
           <FormItem label="状态" prop="state">
@@ -33,7 +32,10 @@
           </FormItem>
         </Form>
       </div>
-
+      <div slot="footer">
+        <Button type="text" size="large" @click="changeApplySateModal = false">取消</Button>
+        <Button type="info"  @click="ok">确定</Button>
+      </div>
     </Modal>
   </div>
 </template>
@@ -79,19 +81,19 @@ export default {
       ],
       applyList: [],
       stateList: [
-        { state: true, stateName: '通过' },
-        { state: false, stateName: '拒绝' }
+        { state: 1, stateName: '通过' },
+        { state: 0, stateName: '拒绝' }
       ],
       flowId: null,
       changeApplyStateLoading: false,
       changeApplySateModal: false,
       activeApplyInfo: {
-        state: true,
+        state: 1,
         reason: ''
       },
       uptApplyValidate: {
         state: [
-          { required: true, message: '审核状态不能为空！', trigger: 'change' }
+          { required: true, message: '审核状态不能为空！', type: 'number', trigger: 'change' }
         ]
       }
     }
@@ -117,17 +119,17 @@ export default {
     /* 查询所有流程 */
     async getAllUserFlow () {
       let res = await getAllUserFlow()
-      console.log(res)
+    //  console.log(res)
       if (res.data.code === 'success') {
         this.applyList = res.data.result
       } else {
-        console.log(res)
+       // console.log(res)
       }
     },
     /* 提交审核结果 */
     async checkUserApplyBind () {
       let json = {
-        state: this.activeApplyInfo.state,
+        state: this.activeApplyInfo.state === 1,
         auditReason: this.activeApplyInfo.reason,
         flowId: this.flowId
       }
@@ -147,7 +149,13 @@ export default {
       this.flowId = row.flowId
     },
     ok () {
-      this.checkUserApplyBind()
+      this.$refs['uptApply'].validate((valid) => {
+        if (valid) {
+          this.checkUserApplyBind()
+        } else {
+          this.$Message.error('操作失败，请检查输入信息格式是否正确!')
+        }
+      })
     }
   },
   mounted () {

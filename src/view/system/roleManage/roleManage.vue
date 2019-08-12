@@ -144,13 +144,13 @@ export default {
           this.changeRole(this.roleList[0].roleId, 0)
         }
       } else {
-        console.log(res)
+        //console.log(res)
       }
     },
     /* 根据id获取菜单 */
     async getTreeByRoleId (roleId) {
       let res = await getTreeByRoleId({ roleId: roleId })
-      console.log(res)
+      //console.log(res)
       this.checkAllGroup = []
       if (res.data.code === 'success') {
         res.data.result.map((item, index) => {
@@ -181,7 +181,7 @@ export default {
     async uptRoleInfo (roleName) {
       this.loading = true
       let res = await uptRoleInfo({ roleName: roleName, roleId: this.modifyRoleId })
-      console.log(res)
+      //console.log(res)
       if (res.data.code === 'success') {
         this.loading = false
         this.$Message.success('修改角色成功')
@@ -191,7 +191,7 @@ export default {
     /* 根据角色Id绑定菜单 */
     async bindTreeInfoByRoleId () {
       let res = await bindTreeInfoByRoleId({ roleId: this.activeRoleId, list: this.checkAllGroup })
-      console.log(res)
+      //console.log(res)
       if (res.data.code === 'success') {
         this.$Message.success('保存成功')
       } else {
@@ -265,13 +265,13 @@ export default {
         loading: true,
         onOk: () => {
           delRoleInfo({ roleId: roleId }).then((res) => {
-            console.log(res)
+            // console.log(res)
             if (res.data.code === 'success') {
               this.$Modal.remove()
               this.selRoleInfo()
             }
           }).catch((res) => {
-            console.log(res)
+           // console.log(res)
           })
         }
       })

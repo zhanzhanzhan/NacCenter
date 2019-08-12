@@ -98,3 +98,17 @@ export const roleTransfer = ({ userId }) => {
     }
   })
 }
+
+/*
+*  重置密码
+* */
+
+export const getBackPassWord = ({ phoneNumber, codeMsg, password }) => {
+  return axios.request({
+    url: `/user/getBackPassWord`,
+    method: 'post',
+    params: {
+      phoneNumber, codeMsg, password
+    }
+  })
+}

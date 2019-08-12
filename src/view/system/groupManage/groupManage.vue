@@ -384,10 +384,10 @@ export default {
     /* 获取所有分组 */
     async getAllGroup () {
       let res = await getAllGroup()
-     // console.log(res)
+      //console.log(res)
       if (res.data.code === 'success') {
         this.groupList = res.data.result
-        if (this.groupList[0] !== []) {
+        if (this.groupList[0] !== undefined) {
           this.changeGroup(this.groupList[0].groupId || '', 0)
         }
       } else {

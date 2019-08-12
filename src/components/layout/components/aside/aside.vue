@@ -228,9 +228,9 @@ export default {
       })
     },
     async search (nbName) {
-      console.log(nbName)
+     // console.log(nbName)
       let res = await findNb(nbName)
-      console.log(res)
+    //  console.log(res)
       if (res.data.code === 'success' && res.data.result.length) {
         // 分组
        /*

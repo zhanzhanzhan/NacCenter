@@ -42,7 +42,7 @@ export default {
     getAsideList ({ commit }, refresh) {
       return new Promise((resolve, reject) => {
         getAllNbList().then(res => {
-          console.log(res)
+          //console.log(res)
           if (res.data.code === 'success') {
             let arr = []
             res.data.result.map((item, index) => {

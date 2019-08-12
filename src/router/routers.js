@@ -45,6 +45,14 @@ let appRouters = [
     component: () => import('@/view/bind/bind.vue')
   },
   {
+    path: '/forgotPassword',
+    name: 'forgotPassword',
+    meta: {
+      title: '重置密码'
+    },
+    component: () => import('@/view/forgot-password/forgot-password.vue')
+  },
+  {
     path: '/',
     name: '_myHome',
     redirect: '/home',
@@ -183,7 +191,7 @@ let accessRouters = [
       title: '设置'
     },
     component: Controler,
-    redirect: '/system/userManage',
+    //redirect: '/system/userManage',
     children: [...systemChild]
   }
 ]

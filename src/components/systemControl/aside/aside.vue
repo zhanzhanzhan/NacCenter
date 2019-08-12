@@ -1,7 +1,7 @@
 <template>
   <div class="aside-wrap">
     <div class="aside-list">
-      <div class="aside-item " v-if="checkAccess(item.meta.access)" v-for="(item, index) in menu" :class="path === item.path ? 'active' : ''"  @click="changeItem(item.path)">
+      <div class="aside-item " v-for="(item, index) in menu" :class="path === item.path ? 'active' : ''"  @click="changeItem(item.path)">
         <div class="title">
           <Icon :type="item.meta.icon" class="icon"/>
           {{ item.meta.title }}
@@ -21,7 +21,7 @@ export default {
   data () {
     return {
       path: '',
-      menu: systemChild,
+      menu: [],
       count: 0,
     }
   },
@@ -29,6 +29,15 @@ export default {
     ...mapState({
       userInfo: state => state.login.userInfo
     })
+  },
+  watch: {
+    $route: {
+      handler (newVal, old) {
+        //console.log(newVal)
+        this.path = newVal.path
+      },
+      deep: true
+    }
   },
   methods: {
     changeItem (path) {
@@ -41,15 +50,25 @@ export default {
         this.count = res.data.result
       }
     },
-    checkAccess (access) {
-      if (!access) return true
+    getMenu: function () {
+      if (this.userInfo.roleId === 2 || this.userInfo.roleId === 1) {
+        this.menu = systemChild
+      } else {
+        let arr = []
+        systemChild.map((item) => {
+          if (!item.meta.access) {
+            arr.push(item)
+          }
+        })
+        this.menu = arr
+      }
     }
   },
   mounted () {
+    this.getMenu()
+    this.$router.push({ path: this.menu[0].path })
     this.path = this.$route.path
     this.selNewMessage()
-    console.log(this.userInfo)
-    console.log(this.menu)
   }
 }
 </script>
