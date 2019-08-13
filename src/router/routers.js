@@ -53,6 +53,14 @@ let appRouters = [
     component: () => import('@/view/forgot-password/forgot-password.vue')
   },
   {
+    path: '/visitorLogin',
+    name: 'visitorLogin',
+    meta: {
+      title: '访客登录'
+    },
+    component: () => import('@/view/visitor-login/visitor-login.vue')
+  },
+  {
     path: '/',
     name: '_myHome',
     redirect: '/home',

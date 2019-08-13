@@ -30,12 +30,12 @@
     </FormItem>
     <FormItem prop="smsCode">
       <div style="display: flex; align-items: center;justify-content: center">
-        <Input v-model="form.smsCode" placeholder="请输入验证码">
+        <Input v-model="form.smsCode" placeholder="请输入验证码" style="width: 50%;">
         <span slot="prepend">
           <Icon :size="16" type="ios-send"></Icon>
         </span>
         </Input>
-        <Button style="flex: 1;margin-left: 20px" @click="getCode">{{this.content}}</Button>
+        <Button style="flex: 1;margin-left: 20px;" @click="getCode">{{this.content}}</Button>
       </div>
     </FormItem>
     <FormItem>

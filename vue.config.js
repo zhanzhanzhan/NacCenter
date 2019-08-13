@@ -1,5 +1,5 @@
 const path = require('path')
-
+const CompressionPlugin = require('compression-webpack-plugin')
 const resolve = dir => {
   return path.join(__dirname, dir)
 }
@@ -12,11 +12,9 @@ const resolve = dir => {
 // 例如：https://www.foobar.com/my-app/
 // 需要将它改为'/my-app/'
 // iview-admin线上演示打包路径： https://file.iviewui.com/admin-dist/
-/*
-const BASE_URL = process.env.NODE_ENV === 'production'
+const TEST_URL = process.env.NODE_ENV === 'production'
   ? 'http://wingsbro.mynetgear.com:8081/NacCenter'
   : '/'
-*/
 const BASE_URL = process.env.NODE_ENV === 'production'
   ? 'http://nc.wingsbro.com'
   : '/'
@@ -28,7 +26,7 @@ module.exports = {
   // sub-path here. For example, if your app is deployed at
   // https://www.foobar.com/my-app/
   // then change this to '/my-app/'
-  baseUrl: BASE_URL,
+  baseUrl: TEST_URL,
   // tweak internal webpack configuration.
   // see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
   // 如果你不需要使用eslint，把lintOnSave设为false即可
@@ -59,4 +57,16 @@ module.exports = {
     'iview',
     'axios'
   ],
+  // gzip压缩
+  configureWebpack: config => {
+    if (process.env.NODE_ENV === 'production') {
+      return {
+        plugins: [new CompressionPlugin({
+          test: /\.js$|\.html$|\.css/,
+          threshold: 10240, // 对超过10kb的数据压缩
+          deleteOriginalAssets: false //是否删除原文件
+        })]
+      }
+    }
+  }
 }
