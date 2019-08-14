@@ -13,21 +13,20 @@
 </template>
 <script>
 import { systemChild } from '../../../router/routers'
-import { selNewMessage } from '../../../api/userBind'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'controlerAside',
   data () {
     return {
       path: '',
-      menu: [],
-      count: 0,
+      menu: []
     }
   },
   computed: {
     ...mapState({
-      userInfo: state => state.login.userInfo
+      userInfo: state => state.login.userInfo,
+      count: state => state.app.applyCount
     })
   },
   watch: {
@@ -40,16 +39,17 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['getApplyCount']),
     changeItem (path) {
       this.$router.push({ path: path })
       this.path = path
     },
-    async selNewMessage () {
+    /*async selNewMessage () {
       let res = await selNewMessage()
       if (res.data.code === 'success') {
         this.count = res.data.result
       }
-    },
+    },*/
     getMenu: function () {
       if (this.userInfo.roleId === 2 || this.userInfo.roleId === 1) {
         this.menu = systemChild
@@ -68,7 +68,7 @@ export default {
     this.getMenu()
     this.$router.push({ path: this.menu[0].path })
     this.path = this.$route.path
-    this.selNewMessage()
+    this.getApplyCount()
   }
 }
 </script>

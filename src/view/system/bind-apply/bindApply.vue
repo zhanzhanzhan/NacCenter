@@ -41,7 +41,7 @@
 </template>
 <script>
 import { getAllUserFlow, checkUserApplyBind } from '../../../api/userBind'
-import { mapState } from 'vuex'
+import { mapState, mapActions, mapMutations } from 'vuex'
 export default {
   name: 'bindApply',
   data () {
@@ -116,6 +116,8 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['setApplyCount']),
+    ...mapActions(['getApplyCount']),
     /* 查询所有流程 */
     async getAllUserFlow () {
       let res = await getAllUserFlow()
@@ -143,6 +145,7 @@ export default {
       } else {
         this.$Message.error(res.data.result)
       }
+      this.getApplyCount()
     },
     show (row) {
       this.changeApplySateModal = true

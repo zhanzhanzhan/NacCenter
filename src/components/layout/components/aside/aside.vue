@@ -203,7 +203,7 @@ export default {
           },
         })
       } else {
-        this.$Message.error('添加失败')
+        this.$Message.error(res.data.result)
         this.addNbModel = false
       }
     },
@@ -222,7 +222,7 @@ export default {
             this.$router.push({ path: this.$route.path, query: { nbCode: this.asideList[0].nbCode } })
           } else {
             this.$Modal.remove()
-            this.$Message.error('删除失败')
+            this.$Message.error(res.data.result)
           }
         }
       })
@@ -272,7 +272,7 @@ export default {
             this.$Message.info('重启成功')
           } else {
             this.$Modal.remove()
-            this.$Message.error('重启失败')
+            this.$Message.error(res.data.result)
           }
         }
       })

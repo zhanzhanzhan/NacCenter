@@ -1,9 +1,10 @@
 import { getAllNbList } from '../../api/config'
-
+import { selNewMessage } from '../../api/userBind'
 export default {
   state: {
     activeNb: null,
-    asideList: []
+    asideList: [],
+    applyCount: 0,
   },
   getters: {},
   mutations: {
@@ -12,6 +13,9 @@ export default {
     },
     setAsideList (state, list) {
       state.asideList = list
+    },
+    setApplyCount (state, count) {
+      state.applyCount = count
     }
   },
   actions: {
@@ -55,6 +59,18 @@ export default {
             }
             resolve(res)
           }
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+    getApplyCount ({ commit }) {
+      return new Promise((resolve, reject) => {
+        selNewMessage().then((res) => {
+          if (res.data.code === 'success') {
+            commit('setApplyCount', res.data.result)
+          }
+          resolve(res)
         }).catch(err => {
           reject(err)
         })

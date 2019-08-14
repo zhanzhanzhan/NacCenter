@@ -9,17 +9,20 @@
         <router-link :to="{path: `/chart`}">图表</router-link>
         <router-link :to="{path: `/config`}" >配置</router-link>
         <router-link :to="{path: `/management`}">资产视图</router-link>
-        <router-link :to="{path: `/system`}">系统管理</router-link>
+      <!--  <router-link :to="{path: `/system`}">系统管理</router-link>-->
         <router-link :to="{path: `/warning`}">报警</router-link>
       </div>
       <div class="profile">
-        <Dropdown style="margin-left: 20px" placement="bottom-end" trigger="click"  @on-click="loginOut">
+        <Dropdown style="margin-left: 20px" placement="bottom-end" trigger="click"  @on-click="dropEvent">
           <a href="javascript:void(0)"  class="trigger">
             {{userInfo.userName}}
             <Icon type="ios-arrow-down"></Icon>
           </a>
           <DropdownMenu slot="list">
-            <DropdownItem>退出</DropdownItem>
+            <DropdownItem name="sysControl">
+              <router-link :to="{path: `/system`}" style="color: #333">系统管理</router-link>
+            </DropdownItem>
+            <DropdownItem name="logout">退出</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       </div>
@@ -54,6 +57,13 @@ export default {
           this.$router.push('/login')
         }
       })
+    },
+    dropEvent (data) {
+      switch (data) {
+        case 'logout':
+          this.loginOut()
+          break
+      }
     }
   }
 }
