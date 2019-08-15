@@ -21,7 +21,7 @@
               </div>
               <div class="list-item">
                 <span class="name">网关</span>：
-                <span class="value">{{networkInfo.geteway}}</span>
+                <span class="value">{{networkInfo.gateway}}</span>
               </div>
               <div class="list-item">
                 <span class="name">DNS服务器</span>：

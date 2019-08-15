@@ -11,10 +11,10 @@
     <div class="con">
       <Card :bordered="false" dis-hover style="width: 400px;height: 80%">
         <div class="login-wrap">
-          <div class="tab tab1" v-show="tab === 'tab1'">
+          <div class="tab tab1" v-if="tab === 'tab1'">
             <div class="title">
               <span>雇员登录</span>
-              <span @click="tab= 'tab2'">访客登录</span>
+              <span @click="visitorLogin">访客登录</span>
             </div>
             <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" class="form">
               <FormItem label="" prop="name">
@@ -28,7 +28,7 @@
               </FormItem>
             </Form>
           </div>
-          <div class=" tab tab2" v-show="tab === 'tab2'">
+          <div class=" tab tab2" v-if="tab === 'tab2'">
             <div class="title">
               <span>访客登录</span>
               <span @click="tab = 'tab1'">雇员登录</span>
@@ -47,12 +47,12 @@
 </template>
 <script>
 import QRCode from 'qrcodejs2'
-
+import { wxUserLogin } from '../../api/login'
 export default {
   data () {
     return {
       tab: 'tab1',
-      path: 'ws://app.wingsbro.com:8070/websocket/',
+      path: process.env.NODE_ENV === 'development' ? 'ws://192.168.1.249/websocket/' : 'ws://app.wingsbro.com:8070/websocket/',
       formValidate: {
         name: '',
         password: ''
@@ -77,10 +77,33 @@ export default {
         }
       })
     },
+    // 访客登录
+    visitorLogin () {
+      this.tab = 'tab2'
+      this.weChatLogin()
+    },
+    async weChatLogin () {
+      let sid = +new Date()
+      let json = {
+        ...this.$route.query
+      }
+      let res = await wxUserLogin(sid, json)
+      // console.log(res)
+      if (res.data.code === 'success') {
+        this.creatQrCode(res.data.result)
+        this.init(this.path + sid)
+        // 三分钟后关闭连接
+        setTimeout(() => {
+          this.wsClose()
+        }, 1000 * 60 * 3)
+      } else {
+        this.$Message.error(`登录错误：${res.data.result}`)
+      }
+    },
     /* 生成二维码 */
-    creatQrCode () {
+    creatQrCode (url) {
       let qrcode = new QRCode(this.$refs.qrCodeUrl, {
-        text: this.$route.query.url,
+        text: url,
         width: 200,
         height: 200,
         colorDark: '#000000',
@@ -110,32 +133,32 @@ export default {
       //console.log('连接错误')
     },
     getMessage (msg) {
-      console.log(msg)
-      let data, res
+      //console.log(msg)
+      let data
       if (msg.data === '连接成功') {
         return
       } else {
         data = JSON.parse(msg.data)
+       // console.log(data)
       }
       if (data.code === 'success') {
-        res = JSON.parse(data.result)
-        this.setUserInfo(res)
-        this.setToken(res.token)
-        this.$router.push({ name: 'home' })
+        this.$Message.success(data.result)
+        this.wsClose()
       } else {
-        this.bindModel = true
-        this.openid = data.result
+        this.$Message.error(data.result)
       }
     },
     send () {
       this.socket.send('')
     },
     wsClose () {
-      // console.log('socket已经关闭')
+       console.log('socket已经关闭')
     },
   },
   mounted () {
-    this.creatQrCode()
+    if (!this.$route.query.nbCode) {
+      this.$router.push({ path: '/404' })
+    }
   },
   destroyed () {
     this.wsClose()

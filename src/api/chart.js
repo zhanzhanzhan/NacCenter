@@ -198,3 +198,17 @@ export const delHostManage = ({ nbCode }) => {
     }
   })
 }
+
+/*
+*  修改入侵名单信息
+* */
+
+export const uptBlockRoster = ({ nbCode }) => {
+  return axios.request({
+    url: '/uptBlockRoster',
+    method: 'post',
+    params: {
+      nbCode
+    }
+  })
+}

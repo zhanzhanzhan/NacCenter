@@ -39,7 +39,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getApplyCount']),
+   // ...mapActions(['getApplyCount']),
     changeItem (path) {
       this.$router.push({ path: path })
       this.path = path
@@ -68,7 +68,7 @@ export default {
     this.getMenu()
     this.$router.push({ path: this.menu[0].path })
     this.path = this.$route.path
-    this.getApplyCount()
+    //this.getApplyCount()
   }
 }
 </script>

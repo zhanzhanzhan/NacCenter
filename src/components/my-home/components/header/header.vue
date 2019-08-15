@@ -16,11 +16,12 @@
         <Dropdown style="margin-left: 20px" placement="bottom-end" trigger="click"  @on-click="dropEvent">
           <a href="javascript:void(0)"  class="trigger">
             {{userInfo.userName}}
+            <Badge :count="applyCount"></Badge>
             <Icon type="ios-arrow-down"></Icon>
           </a>
           <DropdownMenu slot="list">
             <DropdownItem name="sysControl">
-              <router-link :to="{path: `/system`}" style="color: #333">系统管理</router-link>
+              <router-link :to="{path: `/system`}" style="color: #333">系统管理  <Badge :count="applyCount"></Badge></router-link>
             </DropdownItem>
             <DropdownItem name="logout">退出</DropdownItem>
           </DropdownMenu>
@@ -40,16 +41,17 @@ export default {
     ...mapState({
       userInfo: state => state.login.userInfo,
       activeNb: state => state.app.activeNb,
-      asideList: state => state.app.asideList
+      asideList: state => state.app.asideList,
+      applyCount: state => state.app.applyCount
     })
   },
   methods: {
     ...mapActions([
-      'handleLoginOut', 'getAsideList'
+      'handleLoginOut', 'getAsideList', 'getApplyCount'
     ]),
-    ...mapMutations({
-      'setActiveNb': 'setActiveNb'
-    }),
+    ...mapMutations([
+      'setActiveNb', 'setApplyCount'
+    ]),
     loginOut () {
       this.handleLoginOut().then(res => {
         if (res.data.code === 'success') {
@@ -65,6 +67,9 @@ export default {
           break
       }
     }
+  },
+  mounted () {
+    this.getApplyCount()
   }
 }
 </script>

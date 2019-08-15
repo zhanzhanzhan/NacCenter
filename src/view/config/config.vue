@@ -94,14 +94,14 @@
            </Row>-->
           <Form ref="netConfigForm" :model="netConfig" :rules="netConfigRules" :label-width="130" label-position="left">
             <Row :gutter="30">
-              <Col :span="12">
-                <FormItem label="网关：" prop="gateway">
-                  <Input type="text" v-model.trim="netConfig.gateway" placeholder="请输入网关数据"></Input>
-                </FormItem>
-              </Col>
               <Col span="12">
                 <FormItem label="IP地址：" prop="ipaddress">
                   <Input type="text" v-model.trim="netConfig.ipaddress" placeholder="请输入IP地址"></Input>
+                </FormItem>
+              </Col>
+              <Col :span="12">
+                <FormItem label="网关：" prop="gateway">
+                  <Input type="text" v-model.trim="netConfig.gateway" placeholder="请输入网关数据"></Input>
                 </FormItem>
               </Col>
             </Row>
@@ -270,6 +270,37 @@
           </div>
         </Modal>
       </div>
+      <!--入侵名单-->
+      <div class="nav-content2" v-show="activeNav === 4">
+        <Row class="list-head" type="flex" justify="space-between" align="top">
+          <Col span="6"><h3>入侵名单列表:</h3></Col>
+          <!-- <Col span="6">
+             <Input suffix="ios-search" placeholder="Enter text" />
+           </Col>-->
+        </Row>
+        <Row class="table-container">
+          <Table :columns="block" height="300" :data="blockList" :loading="loading" :show-header="false" stripe
+                 size="small">
+            <template slot-scope="{ row }" slot="mac">
+              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
+            </template>
+            <template slot-scope="{ row }" slot="ip">
+              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.ipAddress }}</span></span>
+            </template>
+            <template slot-scope="{ row, index }" slot="action">
+              <Icon type="md-add-circle" size="24" style="cursor: pointer" color="#00e9bc" @click="changeBlockToWhite(row)"/>
+            </template>
+          </Table>
+        </Row>
+        <Row type="flex" justify="space-between" class="opera">
+          <Col>
+
+          </Col>
+          <Col class="btn-group">
+            <span v-if="blockList.length" @click="uptBlockRoster">全部添加</span>
+          </Col>
+        </Row>
+      </div>
     </div>
   </div>
 </template>
@@ -284,6 +315,7 @@ import {
   deleteNbLists,
   addIp
 } from '../../api/nbConfig'
+import { getMasterInfo, uptBlockRoster } from '../../api/chart'
 import { uploadFile } from '../../api/upload'
 
 export default {
@@ -360,7 +392,8 @@ export default {
         '模式参数',
         '网络配置',
         '白名单',
-        '忽略名单'
+        '忽略名单',
+        '入侵名单'
       ],
       loading: false,
       white: [
@@ -460,7 +493,26 @@ export default {
         gateway: [
           { validator: gatewayRules, trigger: 'blur' }
         ]
-      }
+      },
+      block: [
+        {
+          title: 'Mac地址',
+          slot: 'mac',
+          width: 350
+        },
+        {
+          title: 'Ip地址',
+          slot: 'ip'
+        },
+
+        {
+          title: 'Action',
+          slot: 'action',
+          width: 150,
+          align: 'center'
+        }
+      ],
+      blockList: []
     }
   },
   computed: {
@@ -503,6 +555,9 @@ export default {
           break
         case 3:
           this.getNameList(5)
+          break
+        case 4:
+          this.getMasterInfo()
           break
       }
     },
@@ -578,11 +633,70 @@ export default {
       this.loading = false
       if (res.data.code === 'success') {
         if (type === 4) {
-          this.whiteList = res.data.result
+          this.whiteList = res.data.result || []
         } else if (type === 5) {
-          this.ignoreList = res.data.result
+          this.ignoreList = res.data.result || []
         }
       }
+    },
+    // 入侵名单
+    async getMasterInfo () {
+      this.loading = true
+      let res = await getMasterInfo({ nbCode: this.activeNb.nbCode, type: 3 })
+      this.loading = false
+     // console.log(res)
+      if (res.data.code === 'success') {
+        this.blockList = res.data.result || []
+      }
+    },
+    // 添加入侵名单到白名单
+    changeBlockToWhite (data) {
+      this.$Modal.confirm({
+        title: '提示',
+        content: '<p>确定要将这条入侵名单添加到白名单吗？</p>',
+        loading: true,
+        onOk: () => {
+          let json = {
+            nbCode: this.activeNb.nbCode,
+            type: 4,
+            macAddress: data.macAddress,
+            ipAddress: data.ipAddress
+          }
+          addIp(json).then((res) => {
+            this.$Modal.remove()
+            if (res.data.code === 'success') {
+              this.$Message.success('操作成功！')
+            } else {
+              this.$Message.error(res.data.result)
+            }
+          }).catch(err => {
+            this.$Modal.remove()
+            this.$Message.error(err)
+          })
+        }
+      })
+    },
+    // 一键添加全部入侵名单到白名单
+    uptBlockRoster () {
+      this.$Modal.confirm({
+        title: '提示',
+        content: '<p>确定要将所有入侵名单添加到白名单吗？</p>',
+        loading: true,
+        onOk: () => {
+          uptBlockRoster({ nbCode: this.activeNb.nbCode }).then(res => {
+            //console.log(res)
+            this.$Modal.remove()
+            if (res.data.code === 'success') {
+              this.$Message.success('操作成功！')
+            } else {
+              this.$Message.error(res.data.result)
+            }
+          }).catch(err => {
+            this.$Message.error(err)
+            this.$Modal.remove()
+          })
+        }
+      })
     },
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
@@ -610,6 +724,7 @@ export default {
         this.$Message.error('上传失败！')
       }
     },
+    /* 添加名单 */
     async addIp () {
       let type = ''
       /* 白名单 */
