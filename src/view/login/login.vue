@@ -4,6 +4,7 @@
 
 <template>
   <div class="login">
+    <div class="login-bg"></div>
     <div class="login-con">
       <Card icon="log-in" title="欢迎登录" :bordered="false">
         <div class="form-con">
@@ -58,6 +59,7 @@
       </Row>
 
     </Modal>
+    <Particles/>
   </div>
 </template>
 
@@ -66,18 +68,19 @@ import LoginForm from '_c/login-form'
 import { wxUserLogin } from '../../api/login'
 import { mapActions, mapMutations } from 'vuex'
 import Icons from '_c/icons'
+import Particles from '_c/particles'
 import QRCode from 'qrcodejs2'
 export default {
   data () {
     return {
-      path: 'ws://app.wingsbro.com:8070/websocket/',
+      path: process.env.NODE_ENV === 'development' ? 'ws://192.168.1.110/websocket/' : 'ws://app.wingsbro.com:8070/websocket/',
       qrCodeModal: false,
       bindModel: false,
       openid: ''
     }
   },
   components: {
-    LoginForm, Icons
+    LoginForm, Icons, Particles
   },
   methods: {
     ...mapActions([

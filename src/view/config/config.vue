@@ -13,14 +13,14 @@
       <div class="nav-content" v-show="activeNav === 0">
         <div class="form-group">
           <Row :gutter="30">
-            <Col span="12">
+            <Col span="16" :xl="12">
               <div class="form-item">
                 <label for="" class="my-label">btime:</label>
                 <input type="text" class="my-input" @input="handleInput('btime',defaultConfig.btime)"
                        v-model.trim="defaultConfig.btime" placeholder="请输入正整数，单位秒">
               </div>
             </Col>
-            <Col span="12">
+            <Col span="16" :xl="12">
               <div class="form-item">
                 <label for="" class="my-label">ctime:</label>
                 <input type="text" class="my-input" @input="handleInput('ctime',defaultConfig.ctime)"
@@ -30,7 +30,7 @@
 
           </Row>
           <Row :gutter="30">
-            <Col span="12">
+            <Col span="16" :xl="12">
               <div class="form-item">
                 <label for="" class="my-label">ltime:</label>
                 <input type="text" class="my-input" @input="handleInput('ltime',defaultConfig.ltime)"
@@ -39,18 +39,43 @@
             </Col>
           </Row>
           <Row :gutter="30">
-            <Col span="12">
+            <Col span="16" :xl="12">
               <div class="form-item">
                 <label for="" class="my-label">学习模式:</label>
                 <i-switch v-model="defaultConfig.learning"/>
               </div>
             </Col>
-            <Col span="12">
+            <Col span="16" :xl="12">
               <div class="form-item">
                 <label for="" class="my-label">单向模式:</label>
                 <i-switch v-model="defaultConfig.single"/>
               </div>
             </Col>
+          </Row>
+          <Row :gutter="30">
+            <Col span="16" :xl="12">
+              <div class="form-item">
+                <label for="" class="my-label">访客模式:</label>
+                <i-switch v-model="defaultConfig.visitor"/>
+              </div>
+            </Col>
+          </Row>
+          <Row :gutter="30">
+            <Col span="16" :xl="12">
+              <div class="form-item">
+                <label for="" class="my-label">访问次数:</label>
+                <input type="text" class="my-input" @input="handleInput('visitCount',defaultConfig.visitCount)"
+                       v-model.trim="defaultConfig.visitCount" placeholder="请输入正整数，单位次">
+              </div>
+            </Col>
+            <Col span="16" :xl="12">
+              <div class="form-item">
+                <label for="" class="my-label">访问时间:</label>
+                <input type="text" class="my-input" @input="handleInput('visitDuration',defaultConfig.visitDuration)"
+                       v-model.trim="defaultConfig.visitDuration" placeholder="请输入正整数，单位时间">
+              </div>
+            </Col>
+
           </Row>
         </div>
         <div class="save"><span @click="save(defaultConfig)">保存</span></div>
@@ -439,7 +464,10 @@ export default {
         ctime: '',
         ltime: '',
         learning: false,
-        single: false
+        single: false,
+        visitor: true,
+        visitCount: '',
+        visitDuration: ''
       },
       addWhiteModel: false,
       addWhiteLoading: false,
@@ -564,22 +592,22 @@ export default {
     /* 获取模式参数 */
     async getDefaultConfig (nbCode) {
       let res = await getNbConfig({ nbCode: nbCode })
+      console.log(res)
       if (res.data.code === 'success') {
         let data = res.data.result[0]
-        this.defaultConfig = {
-          btime: data.btime || '',
-          ctime: data.ctime ? data.ctime : '',
-          ltime: data.ltime ? data.ltime : ''
-        }
+        this.defaultConfig = Object.assign(this.defaultConfig, data)
         this.defaultConfig.learning = data.learning !== 'off'
         this.defaultConfig.single = data.single !== 'off'
+        this.defaultConfig.visitor = data.single !== 'off'
       }
     },
     /* 保存模式设置 */
     async save (arr) {
+      console.log(arr)
       let args = Object.assign({}, arr)
       args.learning = arr.learning ? 'on' : 'off'
       args.single = arr.single ? 'on' : 'off'
+      args.visitor = arr.visitor ? 'on' : 'off'
       args.nbCode = this.activeNb.nbCode
       let res = await changeNbConfig({ ...args })
       if (res.data.code === 'success') {

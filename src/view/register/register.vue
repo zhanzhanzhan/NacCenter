@@ -4,6 +4,7 @@
 
 <template>
   <div class="login">
+    <div class="login-bg"></div>
     <div class="login-con">
       <Card icon="log-in" title="欢迎注册" :bordered="false">
         <div class="form-con">

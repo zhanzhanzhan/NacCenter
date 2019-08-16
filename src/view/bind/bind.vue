@@ -1,9 +1,10 @@
 <style lang="less" scoped>
-  @import 'bind.less';
+  @import '../register/register';
 </style>
 
 <template>
   <div class="login">
+    <div class="login-bg"></div>
     <div class="login-con">
       <Card icon="log-in" title="绑定已有账号" :bordered="false">
         <div class="form-con">

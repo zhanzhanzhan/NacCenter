@@ -16,7 +16,8 @@ class HttpRequest {
       baseURL: this.baseUrl,
       headers: {
         //'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        AUTHORIZATION: getToken()
+        AUTHORIZATION: getToken(),
+        'Accept-Encoding': gzip
       }
     }
     return config

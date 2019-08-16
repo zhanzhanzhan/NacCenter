@@ -1,7 +1,9 @@
 <template>
     <Row class="header">
       <div class="logo">
-        <div class="img"></div>
+        <div class="img">
+          <img :src="logo" alt="">
+        </div>
         <div class="text">NacCenter</div>
       </div>
       <div class="tags-nav">
@@ -9,7 +11,7 @@
         <router-link :to="{path: `/chart`}">图表</router-link>
         <router-link :to="{path: `/config`}" >配置</router-link>
         <router-link :to="{path: `/management`}">资产视图</router-link>
-      <!--  <router-link :to="{path: `/system`}">系统管理</router-link>-->
+        <!--  <router-link :to="{path: `/system`}">系统管理</router-link>-->
         <router-link :to="{path: `/warning`}">报警</router-link>
       </div>
       <div class="profile">
@@ -32,10 +34,13 @@
 </template>
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex'
+import logo from '@/assets/images/logo.svg'
 export default {
   name: 'my-header',
   data () {
-    return {}
+    return {
+      logo: logo
+    }
   },
   computed: {
     ...mapState({
@@ -89,8 +94,10 @@ export default {
       .img{
         height: 50px;
         width: 50px;
-        background: url(../../../../assets/images/logo.png) no-repeat;
-        background-size: 80%;
+        img{
+          width: 80%;
+          height: 80%;
+        }
       }
       .text{
         font-size: 30px;

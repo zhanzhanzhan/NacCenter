@@ -1,9 +1,10 @@
 <style lang="less" scoped>
-  @import 'forgot-password.less';
+  @import '../../view/register/register.less';
 </style>
 
 <template>
   <div class="login">
+    <div class="login-bg"></div>
     <div class="login-con">
       <Card icon="log-in" title="重置密码" :bordered="false">
         <div class="form-con">

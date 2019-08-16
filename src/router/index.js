@@ -12,10 +12,9 @@ Vue.use(Router)
 const router = new Router({
   routes: routers,
   mode: 'history',
-  base: '/NacCenter/'
+  //base: '/NacCenter/'
 })
 const LOGIN_PAGE_NAME = 'login'
-
 router.beforeEach((to, from, next) => {
   iView.LoadingBar.start()
   const TOKEN = getToken()

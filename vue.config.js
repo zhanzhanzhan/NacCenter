@@ -13,7 +13,7 @@ const resolve = dir => {
 // 需要将它改为'/my-app/'
 // iview-admin线上演示打包路径： https://file.iviewui.com/admin-dist/
 const TEST_URL = process.env.NODE_ENV === 'production'
-  ? 'http://wingsbro.mynetgear.com:8081/NacCenter'
+  ? 'http://wingsbro.mynetgear.com:8081'
   : '/'
 const BASE_URL = process.env.NODE_ENV === 'production'
   ? 'http://nc.wingsbro.com'
@@ -26,11 +26,11 @@ module.exports = {
   // sub-path here. For example, if your app is deployed at
   // https://www.foobar.com/my-app/
   // then change this to '/my-app/'
-  baseUrl: TEST_URL,
+  publicPath: TEST_URL,
   // tweak internal webpack configuration.
   // see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
   // 如果你不需要使用eslint，把lintOnSave设为false即可
-  lintOnSave: true,
+  lintOnSave: false,
   chainWebpack: config => {
     config.resolve.alias
       .set('@', resolve('src')) // key,value自行定义，比如.set('@@', resolve('src/components'))
@@ -61,6 +61,17 @@ module.exports = {
   configureWebpack: config => {
     if (process.env.NODE_ENV === 'production') {
       return {
+        performance: {
+          hints:'warning',
+          //入口起点的最大体积 整数类型（以字节为单位）
+          maxEntrypointSize: 50000000,
+          //生成文件的最大体积 整数类型（以字节为单位 300k）
+          maxAssetSize: 30000000,
+          //只给出 js 文件的性能提示
+          assetFilter: function(assetFilename) {
+            return assetFilename.endsWith('.js');
+          }
+        },
         plugins: [new CompressionPlugin({
           test: /\.js$|\.html$|\.css/,
           threshold: 10240, // 对超过10kb的数据压缩

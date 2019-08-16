@@ -52,7 +52,7 @@ export default {
   data () {
     return {
       tab: 'tab1',
-      path: process.env.NODE_ENV === 'development' ? 'ws://192.168.1.249/websocket/' : 'ws://app.wingsbro.com:8070/websocket/',
+      path: process.env.NODE_ENV === 'development' ? 'ws://192.168.1.110/websocket/' : 'ws://app.wingsbro.com:8070/websocket/',
       formValidate: {
         name: '',
         password: ''
@@ -142,10 +142,18 @@ export default {
        // console.log(data)
       }
       if (data.code === 'success') {
-        this.$Message.success(data.result)
+        this.$Notice.success({
+          title: '提示',
+          desc: data.result,
+          duration: 0
+        });
         this.wsClose()
       } else {
-        this.$Message.error(data.result)
+        this.$Notice.error({
+          title: '提示',
+          desc: data.result,
+          duration: 0
+        });
       }
     },
     send () {

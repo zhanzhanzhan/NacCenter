@@ -76,13 +76,11 @@ export const getNbType = ({ nbCode, type }) => {
 /*
 * 用户修改NB运行参数
 * */
-export const changeNbConfig = ({ nbCode, single, learning, ctime, btime, ltime }) => {
+export const changeNbConfig = (data) => {
   return axios.request({
     url: `/nb/run/update`,
     method: 'put',
-    params: {
-      nbCode, single, learning, ctime, btime, ltime
-    }
+    params: data
   })
 }
 
