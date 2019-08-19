@@ -17,7 +17,7 @@ class HttpRequest {
       headers: {
         //'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
         AUTHORIZATION: getToken(),
-        'Accept-Encoding': gzip
+       // 'Accept-Encoding': 'gzip'
       }
     }
     return config

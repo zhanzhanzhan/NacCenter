@@ -139,6 +139,21 @@ let appRouters = [
         component: () => import('@/view/warning/warning.vue')
       }
     ]
+  },
+  {
+    path: '/ipManage',
+    component: Layout,
+    children: [
+      {
+        meta: {
+          title: 'ip管理',
+          notCache: true
+        },
+        path: '',
+        name: 'ipManageChild',
+        component: () => import('@/view/ip-manage/ip-manage.vue')
+      }
+    ]
   }
 ]
 export const systemChild = [

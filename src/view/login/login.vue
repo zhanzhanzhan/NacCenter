@@ -26,10 +26,11 @@
       v-model="qrCodeModal"
       title="请使用微信扫码登录！"
       class-name="vertical-center-modal"
-      footer-hide width="300">
-      <div class="qrcode" ref="qrCodeUrl" v-if="qrCodeModal" ></div>
+      footer-hide width="350">
+     <!-- <div class="qrcode" ref="qrCodeUrl" v-if="qrCodeModal" ></div>-->
+      <div id="qrcode"></div>
     </Modal>
-    <Modal v-model="bindModel" footer-hide fullscreen title="" class-name="bind-modal">
+   <!-- <Modal v-model="bindModel" footer-hide fullscreen title="" class-name="bind-modal">
       <Row type="flex" justify="center" >
         <div class="select-box">
           <div class="select-panel">
@@ -58,7 +59,7 @@
         </div>
       </Row>
 
-    </Modal>
+    </Modal>-->
     <Particles/>
   </div>
 </template>
@@ -73,7 +74,7 @@ import QRCode from 'qrcodejs2'
 export default {
   data () {
     return {
-      path: process.env.NODE_ENV === 'development' ? 'ws://192.168.1.110/websocket/' : 'ws://app.wingsbro.com:8070/websocket/',
+      path: process.env.NODE_ENV === 'development' ? 'ws://192.168.1.249/websocket/' : 'ws://app.wingsbro.com:8070/websocket/',
       qrCodeModal: false,
       bindModel: false,
       openid: ''
@@ -105,9 +106,10 @@ export default {
       this.qrCodeModal = true
       let sid = +new Date()
       let res = await wxUserLogin(sid)
-      // console.log(res)
+      console.log(res)
       if (res.data.code === 'success') {
-        this.creatQrCode(res.data.result)
+        //this.creatQrCode(res.data.result)
+        this.createWxQrcode()
         this.init(this.path + sid)
         // 三分钟后关闭连接
         setTimeout(() => {
@@ -127,6 +129,19 @@ export default {
         colorDark: '#000000',
         colorLight: '#ffffff',
         correctLevel: 3
+      })
+    },
+    /* weixin */
+    createWxQrcode () {
+      var obj=new WxLogin({
+        self_redirect:false,
+        id:'qrcode',
+        appid:'wx243ad0422689c414',
+        scope:'snsapi_login',
+        redirect_uri: 'http://nc.win',
+        state:'1211111',
+        style:'black',
+        href:'',
       })
     },
     init (url) {
@@ -174,6 +189,9 @@ export default {
     wsClose () {
       // console.log('socket已经关闭')
     },
+  },
+  mounted() {
+
   },
   destroyed () {
     this.wsClose()

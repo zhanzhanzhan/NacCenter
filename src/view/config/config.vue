@@ -60,7 +60,7 @@
               </div>
             </Col>
           </Row>
-          <Row :gutter="30">
+          <Row :gutter="30" v-if="defaultConfig.visitor">
             <Col span="16" :xl="12">
               <div class="form-item">
                 <label for="" class="my-label">访问次数:</label>
