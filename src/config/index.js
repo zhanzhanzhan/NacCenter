@@ -14,8 +14,8 @@ export default {
     dev: 'http://192.168.1.249',
     // dev: 'http://app.wingsbro.com:8070',
     // dev: 'http://wingsbro.mynetgear.com:8070',
-    pro: 'http://wingsbro.mynetgear.com:8070',
-    // pro: 'http://app.wingsbro.com:8070'
+    // pro: 'http://wingsbro.mynetgear.com:8070',
+    pro: 'http://app.wingsbro.com:8070'
   },
   /**
    * @description 默认打开的首页的路由name值，默认为home
@@ -25,15 +25,5 @@ export default {
    * @description 需要加载的插件
    */
   plugin: {
-  },
-  wxConfig: {
-    self_redirect:false,
-    id:'qrcode',
-    appid:'wx243ad0422689c414',
-    scope:'snsapi_login',
-    redirect_uri: 'http://wingsbro.mynetgear.com:8081/login?code=CODE&state=STATE',
-    state:'1211111',
-    style:'black',
-    href:'',
   }
 }

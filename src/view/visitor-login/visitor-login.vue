@@ -93,7 +93,7 @@ export default {
         id:'qrcode',
         appid:'wx243ad0422689c414',
         scope:'snsapi_login',
-        redirect_uri: 'http://wingsbro.mynetgear.com:8081/visitorLogin?code=CODE&state=STATE&nbCode=123',
+        redirect_uri: 'http://nc.wingsbro.com/visitorLogin?code=CODE&state=STATE&nbCode=123',
         state: encodeURI(json),
         style:'black',
         href:'',
