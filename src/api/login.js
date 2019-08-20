@@ -79,11 +79,11 @@ export const wxUserBinding = ({ userNo, openid, smsCode }) => {
 *  微信登录入口
 * */
 
-export const wxUserLogin = (sid, data) => {
+export const wxUserLogin = ({ code, nbCode, ip, mac }) => {
   return axios.request({
-    url: `/wxLogin/${sid}`,
-    method: 'get',
-    params: data
+    url: `/wxLogin`,
+    method: 'post',
+    params: { code, nbCode, ip, mac }
   })
 }
 /*

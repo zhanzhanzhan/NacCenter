@@ -22,8 +22,12 @@
 </template>
 <script>
   import { mapState, mapActions } from 'vuex'
+  import IP from './component/ip.vue'
   export default {
     name: 'ipManage',
+    components: {
+      IP
+    },
     data () {
       return {
         activeNav: 0,

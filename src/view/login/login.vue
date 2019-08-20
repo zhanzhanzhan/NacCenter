@@ -30,7 +30,7 @@
      <!-- <div class="qrcode" ref="qrCodeUrl" v-if="qrCodeModal" ></div>-->
       <div id="qrcode"></div>
     </Modal>
-   <!-- <Modal v-model="bindModel" footer-hide fullscreen title="" class-name="bind-modal">
+    <Modal v-model="bindModel" footer-hide fullscreen title="" class-name="bind-modal">
       <Row type="flex" justify="center" >
         <div class="select-box">
           <div class="select-panel">
@@ -59,7 +59,7 @@
         </div>
       </Row>
 
-    </Modal>-->
+    </Modal>
     <Particles/>
   </div>
 </template>
@@ -70,11 +70,9 @@ import { wxUserLogin } from '../../api/login'
 import { mapActions, mapMutations } from 'vuex'
 import Icons from '_c/icons'
 import Particles from '_c/particles'
-import QRCode from 'qrcodejs2'
 export default {
   data () {
     return {
-      path: process.env.NODE_ENV === 'development' ? 'ws://192.168.1.249/websocket/' : 'ws://app.wingsbro.com:8070/websocket/',
       qrCodeModal: false,
       bindModel: false,
       openid: ''
@@ -104,32 +102,7 @@ export default {
     },
     async weChatLogin () {
       this.qrCodeModal = true
-      let sid = +new Date()
-      let res = await wxUserLogin(sid)
-      console.log(res)
-      if (res.data.code === 'success') {
-        //this.creatQrCode(res.data.result)
-        this.createWxQrcode()
-        this.init(this.path + sid)
-        // 三分钟后关闭连接
-        setTimeout(() => {
-          this.wsClose()
-          this.qrCodeModal = false
-        }, 1000 * 60 * 3)
-      } else {
-        this.$Message.error(`登录错误：${res.data.result}`)
-      }
-    },
-    /* 生成二维码 */
-    creatQrCode (url) {
-      let qrcode = new QRCode(this.$refs.qrCodeUrl, {
-        text: url,
-        width: 200,
-        height: 200,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
-        correctLevel: 3
-      })
+      this.createWxQrcode()
     },
     /* weixin */
     createWxQrcode () {
@@ -138,63 +111,41 @@ export default {
         id:'qrcode',
         appid:'wx243ad0422689c414',
         scope:'snsapi_login',
-        redirect_uri: 'http://nc.win',
+        redirect_uri: 'http://wingsbro.mynetgear.com:8081/login?code=CODE&state=STATE',
         state:'1211111',
         style:'black',
         href:'',
       })
     },
-    init (url) {
-      if (typeof (WebSocket) === 'undefined') {
-        alert('您的浏览器不支持socket,请升级浏览器或更换浏览器')
-      } else {
-        // 实例化socket
-        this.socket = new WebSocket(url)
-        // 监听socket连接
-        this.socket.onopen = this.open
-        // 监听socket错误信息
-        this.socket.onerror = this.error
-        // 监听socket消息
-        this.socket.onmessage = this.getMessage
-        this.socket.onclose = this.wsClose
+    // 验证是否扫码登录
+    async checkWxLogin () {
+      if (this.$route.query.code) {
+       // console.log('已扫码')
+        let json = {
+          code: this.$route.query.code[1]
+        }
+        let res = await wxUserLogin(json)
+        // console.log(res)
+        if (res.data.code === 'success') {
+          this.setUserInfo(res.data.result)
+          this.setToken(res.data.result.token)
+          this.$router.push({ name: 'home' })
+        } else {
+          if (res.data.result) {
+            this.bindModel = true
+            this.openid = res.data.result
+          } else {
+            this.$Message.error('请重新扫码')
+          }
+        }
       }
-    },
-    open () {
-      //console.log('socket连接成功')
-    },
-    error () {
-      //console.log('连接错误')
-    },
-    getMessage (msg) {
-      console.log(msg)
-      let data, res
-      if (msg.data === '连接成功') {
-        return
-      } else {
-        data = JSON.parse(msg.data)
-      }
-      if (data.code === 'success') {
-        res = JSON.parse(data.result)
-        this.setUserInfo(res)
-        this.setToken(res.token)
-        this.$router.push({ name: 'home' })
-      } else {
-        this.bindModel = true
-        this.openid = data.result
-      }
-    },
-    send () {
-      this.socket.send('')
-    },
-    wsClose () {
-      // console.log('socket已经关闭')
-    },
+    }
   },
   mounted() {
-
+    // console.log(this.$route.query.code)
+    this.checkWxLogin()
   },
   destroyed () {
-    this.wsClose()
   }
 }
 </script>

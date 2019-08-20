@@ -25,5 +25,15 @@ export default {
    * @description 需要加载的插件
    */
   plugin: {
+  },
+  wxConfig: {
+    self_redirect:false,
+    id:'qrcode',
+    appid:'wx243ad0422689c414',
+    scope:'snsapi_login',
+    redirect_uri: 'http://wingsbro.mynetgear.com:8081/login?code=CODE&state=STATE',
+    state:'1211111',
+    style:'black',
+    href:'',
   }
 }

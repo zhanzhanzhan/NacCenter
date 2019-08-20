@@ -11,7 +11,7 @@
     <div class="con">
       <Card :bordered="false" dis-hover style="width: 400px;height: 80%">
         <div class="login-wrap">
-          <div class="tab tab1" v-if="tab === 'tab1'">
+          <div class="tab tab1" v-show="tab === 'tab1'">
             <div class="title">
               <span>雇员登录</span>
               <span @click="visitorLogin">访客登录</span>
@@ -28,12 +28,12 @@
               </FormItem>
             </Form>
           </div>
-          <div class=" tab tab2" v-if="tab === 'tab2'">
+          <div class=" tab tab2" v-show="tab === 'tab2'">
             <div class="title">
               <span>访客登录</span>
               <span @click="tab = 'tab1'">雇员登录</span>
             </div>
-            <div class="qrcode" ref="qrCodeUrl" ></div>
+            <div id="qrcode"></div>
           </div>
         </div>
 
@@ -46,13 +46,12 @@
   </div>
 </template>
 <script>
-import QRCode from 'qrcodejs2'
 import { wxUserLogin } from '../../api/login'
+import qs from 'qs'
 export default {
   data () {
     return {
       tab: 'tab1',
-      path: process.env.NODE_ENV === 'development' ? 'ws://192.168.1.110/websocket/' : 'ws://app.wingsbro.com:8070/websocket/',
       formValidate: {
         name: '',
         password: ''
@@ -83,93 +82,57 @@ export default {
       this.weChatLogin()
     },
     async weChatLogin () {
-      let sid = +new Date()
-      let json = {
-        ...this.$route.query
-      }
-      let res = await wxUserLogin(sid, json)
-      // console.log(res)
-      if (res.data.code === 'success') {
-        this.creatQrCode(res.data.result)
-        this.init(this.path + sid)
-        // 三分钟后关闭连接
-        setTimeout(() => {
-          this.wsClose()
-        }, 1000 * 60 * 3)
-      } else {
-        this.$Message.error(`登录错误：${res.data.result}`)
-      }
+      this.createWxQrcode()
     },
-    /* 生成二维码 */
-    creatQrCode (url) {
-      let qrcode = new QRCode(this.$refs.qrCodeUrl, {
-        text: url,
-        width: 200,
-        height: 200,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
-        correctLevel: 3
+    /* weixin */
+    createWxQrcode () {
+      let json = this.$route.query
+      console.log(json)
+      var obj=new WxLogin({
+        self_redirect:false,
+        id:'qrcode',
+        appid:'wx243ad0422689c414',
+        scope:'snsapi_login',
+        redirect_uri: 'http://wingsbro.mynetgear.com:8081/visitorLogin?code=CODE&state=STATE&nbCode=123',
+        state: encodeURI(json),
+        style:'black',
+        href:'',
       })
     },
-    init (url) {
-      if (typeof (WebSocket) === 'undefined') {
-        alert('您的浏览器不支持socket,请升级浏览器或更换浏览器')
-      } else {
-        // 实例化socket
-        this.socket = new WebSocket(url)
-        // 监听socket连接
-        this.socket.onopen = this.open
-        // 监听socket错误信息
-        this.socket.onerror = this.error
-        // 监听socket消息
-        this.socket.onmessage = this.getMessage
-        this.socket.onclose = this.wsClose
+    // 验证是否扫码登录
+    async checkWxLogin () {
+      if (this.$route.query.code) {
+         console.log('已扫码')
+        let json = {
+          code : this.$route.query.code[1]
+        }
+
+        let res = await wxUserLogin(json)
+        // console.log(res)
+        if (res.data.code === 'success') {
+          this.$Notice.success({
+            title: '提示',
+            desc: data.result,
+            duration: 0
+          });
+        } else {
+          this.$Notice.error({
+            title: '提示',
+            desc: data.result,
+            duration: 0
+          });
+        }
       }
-    },
-    open () {
-      //console.log('socket连接成功')
-    },
-    error () {
-      //console.log('连接错误')
-    },
-    getMessage (msg) {
-      //console.log(msg)
-      let data
-      if (msg.data === '连接成功') {
-        return
-      } else {
-        data = JSON.parse(msg.data)
-       // console.log(data)
-      }
-      if (data.code === 'success') {
-        this.$Notice.success({
-          title: '提示',
-          desc: data.result,
-          duration: 0
-        });
-        this.wsClose()
-      } else {
-        this.$Notice.error({
-          title: '提示',
-          desc: data.result,
-          duration: 0
-        });
-      }
-    },
-    send () {
-      this.socket.send('')
-    },
-    wsClose () {
-       console.log('socket已经关闭')
-    },
-  },
-  mounted () {
-    if (!this.$route.query.nbCode) {
-      this.$router.push({ path: '/404' })
     }
   },
-  destroyed () {
-    this.wsClose()
+  mounted () {
+    let json = this.$route.query
+    console.log(json)
+    /*if (!this.$route.query.nbCode) {
+      this.$router.push({ path: '/404' })
+    }*/
+    this.checkWxLogin()
+
   }
 
 }
