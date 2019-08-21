@@ -93,46 +93,53 @@ export default {
         id:'qrcode',
         appid:'wx243ad0422689c414',
         scope:'snsapi_login',
-        redirect_uri: 'http://nc.wingsbro.com/visitorLogin?code=CODE&state=STATE&nbCode=123',
-        state: encodeURI(json),
+        redirect_uri: 'http://nc.wingsbro.com/visitorLogin?code=CODE&state=STATE',
+        state: '123',
         style:'black',
         href:'',
       })
     },
     // 验证是否扫码登录
     async checkWxLogin () {
-      if (this.$route.query.code) {
-         console.log('已扫码')
-        let json = {
-          code : this.$route.query.code[1]
+      if (this.$route.query.code || this.$route.query.nbCode){
+        // 存储参数
+        if (this.$route.query.nbCode) {
+          let visitorParams = JSON.stringify(this.$route.query)
+          sessionStorage.setItem('visitorParams', visitorParams)
         }
+        // 重定向后取出参数
+        if (this.$route.query.code) {
+          let visitorParams = JSON.parse(sessionStorage.getItem('visitorParams'))
+          if (!visitorParams) return
+          let json = {
+            code : this.$route.query.code[1],
+            ...visitorParams
+          }
 
-        let res = await wxUserLogin(json)
-        // console.log(res)
-        if (res.data.code === 'success') {
-          this.$Notice.success({
-            title: '提示',
-            desc: data.result,
-            duration: 0
-          });
-        } else {
-          this.$Notice.error({
-            title: '提示',
-            desc: data.result,
-            duration: 0
-          });
+          let res = await wxUserLogin(json)
+           // console.log(res)
+          if (res.data.code === 'success') {
+            this.$Notice.success({
+              title: '提示',
+              desc: res.data.result,
+              duration: 0
+            });
+          } else {
+            this.$Notice.error({
+              title: '提示',
+              desc: res.data.result,
+              duration: 0
+            });
+          }
         }
+      } else {
+        this.$router.push({ path: '/404' })
       }
+
     }
   },
   mounted () {
-    let json = this.$route.query
-    console.log(json)
-    /*if (!this.$route.query.nbCode) {
-      this.$router.push({ path: '/404' })
-    }*/
     this.checkWxLogin()
-
   }
 
 }

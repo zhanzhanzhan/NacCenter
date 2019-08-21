@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <Row class="list-head" type="flex" justify="space-between" align="top">
-      <Col span="6"><h3>固定IP列表:</h3></Col>
+      <Col span="6"><h3>回收IP列表:</h3></Col>
       <!--<Col span="6">
         <Input suffix="ios-search" placeholder="Enter text" />
       </Col>-->
@@ -59,7 +59,7 @@
 <script>
   import { selIpManage, insIpManage, uptIpManage } from '../../../api/ipManage'
   export default {
-    name: 'ip',
+    name: 'ipRecovery',
     data () {
       const ipaddressRules = (rule, value, callback) => {
         if (!value) callback(new Error('请输入ip地址！'))
@@ -69,41 +69,21 @@
         }
         callback()
       }
-      const macAddressRules = (rule, value, callback) => {
-        if (!value) callback(new Error('请输入mac地址！'))
-        let reg = /^[a-fA-F0-9]{2}([:-][a-fA-F0-9]{2}){5}$/
-        if (!reg.test(value)) {
-          callback(new Error('请检查IP地址格式！'))
-        }
-        callback()
-      }
       return {
         ipModifyModal: false,
         ipModifyForm: {},
         ipModifyFormRules: {
-          macAddress: [
-            { required: true, validator: macAddressRules, trigger: 'blur' }
-          ],
           ipAddress: [
             { required: true, validator: ipaddressRules, trigger: 'blur' }
           ],
-          type: [
-            { required: true,  message: '请选择类型', trigger: 'change' }
-          ]
         },
         type: 0, // 修改
         loading: false,
         table: [
           {
-            title: 'Mac地址',
-            slot: 'macAddress',
-            width: 350
-          },
-          {
             title: 'Ip地址',
             slot: 'ipAddress'
           },
-
           {
             title: 'Action',
             slot: 'action',

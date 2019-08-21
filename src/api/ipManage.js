@@ -1,6 +1,20 @@
 import axios from '@/libs/api.request'
 
 /*
+* 根据类型查询IP段信息
+* */
+
+export const getIpParam = ({ nbCode, type }) => {
+  return axios.request({
+    url: '/getIpParam',
+    method: 'post',
+    params: {
+      nbCode, type
+    }
+  })
+}
+
+/*
 * 获取需要回收的IP
 * */
 
@@ -32,13 +46,12 @@ export const insIpManage = ({ ipManage }) => {
 * 添加ip段设置
 * */
 
-export const insIpParam = ({ ipParam }) => {
+export const insIpParam = ( ipParam ) => {
   return axios.request({
     url: '/insIpParam',
     method: 'post',
-    data: {
-      ipParam
-    }
+    data: ipParam
+
   })
 }
 

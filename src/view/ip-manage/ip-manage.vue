@@ -10,12 +10,13 @@
         </div>
       </div>
       <!--固定ip-->
-      <div class="nav-content" v-show="activeNav === 0">
-
+      <div class="nav-content" v-if="activeNav === 0">
+        <IP :nb-code="activeNb.nbCode"></IP>
       </div>
       <!--ip段-->
-      <div class="nav-content" v-show="activeNav === 1">
+      <div class="nav-content" v-if="activeNav === 1">
 
+        <ip-param :nb-code="activeNb.nbCode"></ip-param>
       </div>
     </div>
   </div>
@@ -23,17 +24,18 @@
 <script>
   import { mapState, mapActions } from 'vuex'
   import IP from './component/ip.vue'
+  import ipParam from './component/ipParam.vue'
   export default {
     name: 'ipManage',
     components: {
-      IP
+      IP,ipParam
     },
     data () {
       return {
         activeNav: 0,
         navList: [
           '固定IP',
-          'IP段',
+          'IP管理',
           'IP回收'
         ]
       }
@@ -44,7 +46,7 @@
       })
     },
     watch: {
-      activeNb: {
+      /*activeNb: {
         handler (newVal, old) {
           this.$Loading.start()
           // this.getDefaultConfig(this.activeNb.nbCode)
@@ -52,7 +54,7 @@
         },
         deep: true
         // immediate: true
-      },
+      },*/
       $route: {
         handler (val, oldVal) {
           this.activeNav = 0

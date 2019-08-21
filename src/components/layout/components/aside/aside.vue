@@ -142,13 +142,7 @@ export default {
     changeActive (index, item) {
       this.isActive = index || 0
       this.setActiveNb(item)
-      if (this.$route.name === 'chartChild') {
-        this.$router.push({ path: `/chart`, query: { nbCode: this.activeNb.nbCode } })
-      } else if (this.$route.name === 'configChild') {
-        this.$router.push({ path: `/config`, query: { nbCode: this.activeNb.nbCode }  })
-      } else if (this.$route.name === 'managementChild') {
-        this.$router.push({ path: `/management`, query: { nbCode: this.activeNb.nbCode  } })
-      }
+      this.$router.push({ path: this.$route.path, query: { nbCode: this.activeNb.nbCode } })
     },
     getAllNbList (refresh) {
       this.getAsideList(refresh)
