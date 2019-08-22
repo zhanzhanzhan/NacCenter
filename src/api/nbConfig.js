@@ -2,12 +2,12 @@ import axios from '@/libs/api.request'
 /*
 * 1.添加白名单,2.添加忽略名单，3.添加阻拦名单
 * */
-export const addIp = ({ nbCode, type, ipAddress, macAddress }) => {
+export const addIp = ({ nbCode, type, ipAddress, macAddress, userName }) => {
   return axios.request({
     url: `/nb/run/addip`,
     method: 'post',
     params: {
-      nbCode, type, ipAddress, macAddress
+      nbCode, type, ipAddress, macAddress, userName
     }
   })
 }
@@ -105,6 +105,18 @@ export const getNameList = ({ nbCode, type }) => {
     method: 'post',
     params: {
       nbCode, type
+    }
+  })
+}
+/*
+*  修改名单使用者名称
+* */
+export const updNameListById = ({ id, userName }) => {
+  return axios.request({
+    url: '/updNameListById',
+    method: 'put',
+    params: {
+      id, userName
     }
   })
 }

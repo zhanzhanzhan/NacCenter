@@ -34,7 +34,7 @@
       return {
         activeNav: 0,
         navList: [
-          '固定IP',
+          'IP配置',
           'IP管理',
           'IP回收'
         ]

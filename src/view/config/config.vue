@@ -83,40 +83,6 @@
       <!--网络配置-->
       <div class="nav-content" v-show="activeNav === 1">
         <div class="form-group">
-          <!-- <Row :gutter="30">
-             <Col span="12">
-               <div class="form-item">
-                 <label for="" class="my-label">网关:</label>
-                 <input type="text" class="my-input" v-model.trim="netConfig.gateway" placeholder="请输入网关数据">
-                 &lt;!&ndash; <span>请输入网关数据</span>&ndash;&gt;
-               </div>
-             </Col>
-             <Col span="12">
-               <div class="form-item">
-                 <label for="" class="my-label">IP地址:</label>
-                 <input type="text" class="my-input" v-model="netConfig.ipaddress" placeholder="请输入IP地址">
-                 &lt;!&ndash;<span>请输入IP地址</span>&ndash;&gt;
-               </div>
-             </Col>
-           </Row>
-           <Row :gutter="30">
-             <Col span="12">
-               <div class="form-item">
-                 <label for="" class="my-label">IP子网:</label>
-                 <input type="text" class="my-input" v-model="netConfig.ipsubnet" placeholder="请输入IP子网">
-                 &lt;!&ndash;<span>请输入IP子网</span>&ndash;&gt;
-               </div>
-             </Col>
-             <Col span="12">
-               <div class="form-item">
-                 <label for="" class="my-label">DNS服务地址:</label>
-                 <input type="text" class="my-input" v-model="netConfig.dnsser" placeholder="请输入DNS服务地址">
- &lt;!&ndash;
-                 <span>请输入DNS服务地址</span>
- &ndash;&gt;
-               </div>
-             </Col>
-           </Row>-->
           <Form ref="netConfigForm" :model="netConfig" :rules="netConfigRules" :label-width="130" label-position="left">
             <Row :gutter="30">
               <Col span="12">
@@ -158,10 +124,19 @@
           <Table :columns="white" :data="whiteList" :loading="loading" height="300" :show-header="false" stripe
                  size="small">
             <template slot-scope="{ row }" slot="macAddress">
-              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
+              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 10px">{{ row.macAddress }}</span></span>
             </template>
             <template slot-scope="{ row }" slot="ipAddress">
-              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.ipAddress }}</span></span>
+              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 10px">{{ row.ipAddress }}</span></span>
+            </template>
+            <template slot-scope="{ row }" slot="hostName">
+              <span style="font-size: 12px;color: #666">主机名：<span style="color: #00e9bc;margin-left: 10px">{{ row.hostName || 'unknow' }}</span></span>
+            </template>
+            <template slot-scope="{ row, index }" slot="userName">
+                <span style="font-size: 12px;color: #666; display: flex;align-items: center">别名：
+                  <span style="color: #00e9bc;margin-left:10px">{{ row.userName || '未命名' }}</span>
+                  <Icon style="cursor: pointer" type="ios-create-outline" size="16" @click="changeName(row.id)"/>
+                </span>
             </template>
             <template slot-scope="{ row, index }" slot="action">
               <Icon type="ios-trash" size="24" color="#00e9bc" @click="removeList(row.id, index)"/>
@@ -188,11 +163,18 @@
               <FormItem label="ip地址" prop="ipAdress">
                 <Input v-model.trim="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>
+              <FormItem label="别名">
+                <Input v-model.trim="addWhiteForm.userName" placeholder="可以输入自定义别名"></Input>
+              </FormItem>
               <FormItem label="导入表格" >
                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
                   <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件
                   </Button>
                 </Upload>
+                <a :href="$config.baseUrl.pro+'/'+download.name" target="_blank" :download="download.name">
+                  <Icon type="ios-cloud-download-outline" />
+                  下载模板
+                </a>
                 <Row>
                   <div class="ivu-upload-list-file" v-if="file !== null">
                     <Icon type="ios-stats"></Icon>
@@ -234,8 +216,18 @@
             <template slot-scope="{ row }" slot="mac">
               <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
             </template>
-            <template slot-scope="{ row }" slot="ip">
+            <!--<template slot-scope="{ row }" slot="ip">
               <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.ipAddress }}</span></span>
+            </template>-->
+            <template slot-scope="{ row }" slot="hostName">
+              <span style="font-size: 12px;color: #666">主机名：<span style="color: #00e9bc;margin-left: 20px">{{ row.hostName || 'unknow' }}</span></span>
+            </template>
+            <template slot-scope="{ row }" slot="userName">
+              <span style="font-size: 12px;color: #666; display: flex;align-items: center">别名：
+                <span style="color: #00e9bc;margin-left: 20px" contenteditable="true">{{ row.userName || '未命名' }}</span>
+                <Icon style="cursor: pointer" type="ios-create-outline" size="16" @click="changeName(row.id)"/>
+              </span>
+
             </template>
             <template slot-scope="{ row, index }" slot="action">
               <Icon type="ios-trash" size="24" color="#00e9bc" @click="removeList(row.id, index)"/>
@@ -263,11 +255,19 @@
             <!--  <FormItem label="ip地址" prop="ipAdress">
                 <Input v-model.trim="addIgnoreForm.ipAdress" placeholder="请输入ip地址"></Input>
               </FormItem>-->
+              <FormItem label="别名">
+                <Input v-model.trim="addIgnoreForm.userName" placeholder="可以输入自定义别名"></Input>
+              </FormItem>
               <FormItem label="导入表格">
                 <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
                   <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件
                   </Button>
+
                 </Upload>
+                <a :href="$config.baseUrl.pro+'/'+download.name" target="_blank" :download="download.name">
+                  <Icon type="ios-cloud-download-outline" />
+                  下载模板
+                </a>
                 <Row>
                   <div class="ivu-upload-list-file" v-if="file !== null">
                     <Icon type="ios-stats"></Icon>
@@ -327,6 +327,23 @@
         </Row>
       </div>
     </div>
+
+    <!--修改别名-->
+    <Modal v-model="editName" width="360">
+      <p slot="header" style="color:#333;text-align:center">
+        <span>修改别名</span>
+      </p>
+      <div style="text-align:center">
+        <Form :model="editNameForm"  label-position="left">
+          <FormItem label="别名">
+            <Input v-model.trim="editNameForm.userName" placeholder="可以输入自定义别名"></Input>
+          </FormItem>
+        </Form>
+      </div>
+      <div slot="footer">
+        <Button type="info" size="large" long  @click="updNameListById">确认</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -338,11 +355,12 @@ import {
   getNameList,
   deleteNbList,
   deleteNbLists,
-  addIp
+  addIp,
+  updNameListById
 } from '../../api/nbConfig'
 import { getMasterInfo, uptBlockRoster } from '../../api/chart'
 import { uploadFile } from '../../api/upload'
-
+import axios from 'axios'
 export default {
   name: 'config',
   data () {
@@ -411,6 +429,13 @@ export default {
       }
     }
     return {
+      editName: false,
+      editNameForm: {
+      },
+      download:{
+       // url: 'http://app.wingbro.com:8070/名单导入模板.xls',
+        name: '名单导入模板.xls'
+      },
       baseUrl: '',
       activeNav: 0,
       navList: [
@@ -423,15 +448,27 @@ export default {
       loading: false,
       white: [
         {
+          type: 'index',
+          width: 60,
+          align: 'center'
+        },
+        {
           title: 'Mac地址',
           slot: 'macAddress',
-          width: 350
+          // width: 350
         },
         {
           title: 'Ip地址',
           slot: 'ipAddress'
         },
-
+        {
+          title: '主机名',
+          slot: 'hostName'
+        },
+        {
+          title: '别名',
+          slot: 'userName'
+        },
         {
           title: 'Action',
           slot: 'action',
@@ -442,15 +479,23 @@ export default {
       whiteList: [],
       ignore: [
         {
-          title: 'Mac地址',
-          slot: 'mac',
-          width: 350
+          type: 'index',
+          width: 60,
+          align: 'center'
         },
         {
-          title: 'Ip地址',
-          slot: 'ip'
+          title: 'Mac地址',
+          slot: 'mac',
+         // width: 350
         },
-
+        {
+          title: '主机名',
+          slot: 'hostName'
+        },
+        {
+          title: '别名',
+          slot: 'userName'
+        },
         {
           title: 'Action',
           slot: 'action',
@@ -473,7 +518,8 @@ export default {
       addWhiteLoading: false,
       addWhiteForm: {
         macAdress: '',
-        ipAdress: ''
+        ipAdress: '',
+        userName: '',
       },
       whiteFormRules: {
         macAdress: [
@@ -487,6 +533,7 @@ export default {
       addIgnoreModel: false,
       addIgnoreForm: {
         macAdress: '',
+        userName: ''
         /*ipAdress: ''*/
       },
       ignoreFormRules: {
@@ -524,9 +571,14 @@ export default {
       },
       block: [
         {
+          type: 'index',
+          width: 60,
+          align: 'center'
+        },
+        {
           title: 'Mac地址',
           slot: 'mac',
-          width: 350
+          //width: 350
         },
         {
           title: 'Ip地址',
@@ -735,6 +787,23 @@ export default {
         }
       })
     },
+    // 修改别名
+    async updNameListById () {
+      let res = await updNameListById({...this.editNameForm})
+      let type = this.activeNav + 2
+      if (res.data.code === 'success') {
+        this.$Message.success('修改成功！')
+        this.getNameList(type)
+        this.editName = false
+      } else {
+        this.$Message.error(res.data.result)
+      }
+    },
+    changeName (id) {
+      this.editName = true
+      this.editNameForm.id = id
+      this.editNameForm.userName = ''
+    },
     async upload (type) {
       if (!this.file) return
       let fileFormData = new FormData()
@@ -768,7 +837,8 @@ export default {
           nbCode: this.activeNb.nbCode,
           type: type,
           ipAddress: this.addWhiteForm.ipAdress,
-          macAddress: this.addWhiteForm.macAdress
+          macAddress: this.addWhiteForm.macAdress,
+          userName: this.addWhiteForm.userName
         }
         let res = await addIp(json)
         this.addWhiteLoading = false
@@ -794,7 +864,8 @@ export default {
           nbCode: this.activeNb.nbCode,
           type: type,
           ipAddress: this.addIgnoreForm.ipAdress,
-          macAddress: this.addIgnoreForm.macAdress
+          macAddress: this.addIgnoreForm.macAdress,
+          userName: this.addIgnoreForm.userName
         }
         let res = await addIp(json)
         this.addIgnoreModel = false
@@ -863,6 +934,7 @@ export default {
     handleUploadFile () {
       this.initUpload()
     },
+
     handleRemove () {
       this.initUpload()
       this.$Message.info('上传的文件已删除！')

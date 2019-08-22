@@ -1,12 +1,21 @@
 <template>
   <div class="">
-    <Row class="list-head" type="flex" justify="space-between" align="top">
-      <Col span="6"><h3>固定IP列表:</h3></Col>
-      <!--<Col span="6">
-        <Input suffix="ios-search" placeholder="Enter text" />
-      </Col>-->
+    <Row class="list-head" :gutter="20" type="flex"  align="top">
+      <Col>
+        <h3>DHCP:</h3>
+      </Col>
+      <Col >
+        <i-switch type="small" v-model="dhcp">
+        </i-switch>
+      </Col>
     </Row>
-    <Row class="table-container">
+    <Row>
+      <h3>固定IP:</h3>
+      <div class="form-group">
+
+      </div>
+    </Row>
+    <!--<Row class="table-container">
       <Table :columns="table" :data="list" :loading="loading" height="300" :show-header="false" stripe
              size="small">
         <template slot-scope="{ row }" slot="macAddress">
@@ -19,13 +28,12 @@
           <Icon type="ios-build" size="24" color="#00e9bc" style="cursor: pointer" @click="modifyIp(row)"/>
         </template>
       </Table>
-    </Row>
+    </Row>-->
     <Row type="flex" justify="space-between" class="opera">
       <Col>
       </Col>
       <Col class="btn-group">
         <span @click="addIp" >添加</span>
-
       </Col>
     </Row>
     <Modal v-model="ipModifyModal" @on-visible-change="modalChange" width="360">
@@ -78,6 +86,7 @@
         callback()
       }
       return {
+        dhcp: false,
         ipModifyModal: false,
         ipModifyForm: {},
         ipModifyFormRules: {
