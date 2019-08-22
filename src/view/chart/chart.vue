@@ -90,7 +90,7 @@
             <div style="text-align: center" class="item-content" v-if="!whiteList.length ">暂无数据</div>
             <div class="item-content" v-if="whiteList.length">
               <div class="list-item2" v-for="(item, index) in whiteList">
-                <span>{{item.ipAddress}}</span>
+                <span><span>{{index}}</span> {{item.ipAddress}}</span>
                 <span>{{item.macAddress}}</span>
               </div>
             </div>
@@ -104,7 +104,7 @@
             <div class="item-content">
               <div style="text-align: center" v-if="!ignoreList.length">暂无数据</div>
               <div class="list-item2" v-for="(item, index) in ignoreList" v-if="ignoreList.length">
-                <span>{{item.ipAddress}}</span>
+                <span><span>{{index}}</span>{{item.ipAddress}}</span>
                 <span>{{item.macAddress}}</span>
               </div>
             </div>
@@ -119,7 +119,7 @@
             <div class="item-content">
               <div style="text-align: center" v-if="!onlineMasteList.length">暂无数据</div>
               <div class="list-item2" v-for="(item, index) in onlineMasteList" v-if="onlineMasteList.length">
-                <span>{{item.macAddress}}</span>
+                <span><span>{{index}}</span>{{item.macAddress}}</span>
                 <span>{{item.ipAddress}}</span>
               </div>
             </div>
@@ -133,7 +133,7 @@
             <div class="item-content">
               <div style="text-align: center" v-if="!blockingHost.length">暂无数据</div>
               <div class="list-item2" v-for="(item, index) in blockingHost" v-if="blockingHost.length">
-                <span>{{item.macAddress}}</span>
+                <span><span>{{index}}</span>{{item.macAddress}}</span>
                 <span>{{item.ipAddress}}</span>
               </div>
             </div>
@@ -147,7 +147,7 @@
             <div class="item-content">
               <div style="text-align: center" v-if="!liveMasteList.length">暂无数据</div>
               <div class="list-item2" v-for="(item, index) in liveMasteList" v-if="liveMasteList.length">
-                <span>{{item.macAddress}}</span>
+                <span><span>{{index}}</span>{{item.macAddress}}</span>
                 <span>{{item.ipAddress}}</span>
               </div>
             </div>
@@ -211,7 +211,7 @@ export default {
     ...mapActions([
       'getAsideList'
     ]),
-    /* 网络信息*/
+    /* 网络信息 */
     async getNetworkInfo (nbCode) {
       let res = await getNetworkInfo({ nbCode: nbCode })
       //  console.log(res)
@@ -219,11 +219,11 @@ export default {
         this.networkInfo = res.data.result
       }
     },
-    /* 主机列表*/
+    /* 主机列表 */
     async getMasterInfo (nbCode, type) {
       let res = await getMasterInfo({ nbCode: nbCode, type: type })
       if (res.data.code === 'success') {
-       // console.log(res)
+        // console.log(res)
         switch (type) {
           case 1:
             this.onlineMasteList = res.data.result ? res.data.result : []
