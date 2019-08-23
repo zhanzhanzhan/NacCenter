@@ -113,3 +113,17 @@ export const getBackPassWord = ({ phoneNumber, codeMsg, password }) => {
     }
   })
 }
+
+/*
+*  雇员登录使用网络接口
+* */
+
+export const addStaffNetworking = ({ staffName, staffTel, staffIP, staffMAC, nbCode, smsCode }) => {
+  return axios.request({
+    url: `/network/addStaffNetworking`,
+    method: 'post',
+    params: {
+      staffName, staffTel, staffIP, staffMAC, nbCode, smsCode
+    }
+  })
+}

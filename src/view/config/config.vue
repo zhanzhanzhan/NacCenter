@@ -121,20 +121,20 @@
           </Col>-->
         </Row>
         <Row class="table-container">
-          <Table :columns="white" :data="whiteList" :loading="loading" height="300" :show-header="false" stripe
+          <Table :columns="white" :data="whiteList" :loading="loading" height="300" stripe
                  size="small">
             <template slot-scope="{ row }" slot="macAddress">
-              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 10px">{{ row.macAddress }}</span></span>
+              <span style="font-size: 12px;color: #666"><span style="color: #00e9bc;">{{ row.macAddress }}</span></span>
             </template>
             <template slot-scope="{ row }" slot="ipAddress">
-              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 10px">{{ row.ipAddress }}</span></span>
+              <span style="font-size: 12px;color: #666"><span style="color: #00e9bc;">{{ row.ipAddress }}</span></span>
             </template>
             <template slot-scope="{ row }" slot="hostName">
-              <span style="font-size: 12px;color: #666">主机名：<span style="color: #00e9bc;margin-left: 10px">{{ row.hostName || 'unknow' }}</span></span>
+              <span style="font-size: 12px;color: #666"><span style="color: #00e9bc;">{{ row.hostName || 'unknow' }}</span></span>
             </template>
             <template slot-scope="{ row, index }" slot="userName">
-                <span style="font-size: 12px;color: #666; display: flex;align-items: center">别名：
-                  <span style="color: #00e9bc;margin-left:10px">{{ row.userName || '未命名' }}</span>
+                <span style="font-size: 12px;color: #666; display: flex;align-items: center">
+                  <span style="color: #00e9bc;">{{ row.userName || '未命名' }}</span>
                   <Icon style="cursor: pointer" type="ios-create-outline" size="16" @click="changeName(row.id)"/>
                 </span>
             </template>
@@ -211,20 +211,20 @@
            </Col>-->
         </Row>
         <Row class="table-container">
-          <Table :columns="ignore" height="300" :data="ignoreList" :loading="loading" :show-header="false" stripe
+          <Table :columns="ignore" height="300" :data="ignoreList" :loading="loading" stripe
                  size="small">
             <template slot-scope="{ row }" slot="mac">
-              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
+              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;">{{ row.macAddress }}</span></span>
             </template>
             <!--<template slot-scope="{ row }" slot="ip">
-              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.ipAddress }}</span></span>
+              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;">{{ row.ipAddress }}</span></span>
             </template>-->
             <template slot-scope="{ row }" slot="hostName">
-              <span style="font-size: 12px;color: #666">主机名：<span style="color: #00e9bc;margin-left: 20px">{{ row.hostName || 'unknow' }}</span></span>
+              <span style="font-size: 12px;color: #666">主机名：<span style="color: #00e9bc;">{{ row.hostName || 'unknow' }}</span></span>
             </template>
             <template slot-scope="{ row }" slot="userName">
               <span style="font-size: 12px;color: #666; display: flex;align-items: center">别名：
-                <span style="color: #00e9bc;margin-left: 20px" contenteditable="true">{{ row.userName || '未命名' }}</span>
+                <span style="color: #00e9bc;" contenteditable="true">{{ row.userName || '未命名' }}</span>
                 <Icon style="cursor: pointer" type="ios-create-outline" size="16" @click="changeName(row.id)"/>
               </span>
 
@@ -304,13 +304,13 @@
            </Col>-->
         </Row>
         <Row class="table-container">
-          <Table :columns="block" height="300" :data="blockList" :loading="loading" :show-header="false" stripe
+          <Table :columns="block" height="300" :data="blockList" :loading="loading"  stripe
                  size="small">
             <template slot-scope="{ row }" slot="mac">
-              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.macAddress }}</span></span>
+              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;">{{ row.macAddress }}</span></span>
             </template>
             <template slot-scope="{ row }" slot="ip">
-              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.ipAddress }}</span></span>
+              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;">{{ row.ipAddress }}</span></span>
             </template>
             <template slot-scope="{ row, index }" slot="action">
               <Icon type="md-add-circle" size="24" style="cursor: pointer" color="#00e9bc" @click="changeBlockToWhite(row)"/>
@@ -360,7 +360,6 @@ import {
 } from '../../api/nbConfig'
 import { getMasterInfo, uptBlockRoster } from '../../api/chart'
 import { uploadFile } from '../../api/upload'
-import axios from 'axios'
 export default {
   name: 'config',
   data () {
@@ -620,9 +619,6 @@ export default {
 
   },
   methods: {
-    ...mapActions([
-      'getAsideList'
-    ]),
     /* 切换tab */
     changeNav (index) {
       this.activeNav = index
@@ -982,10 +978,7 @@ export default {
   },
   mounted () {
     this.getDefaultConfig(this.activeNb.nbCode)
-  },
-  /*beforeDestroy () {
-    this.getAsideList()
-  }*/
+  }
 }
 </script>
 <style lang="less" scoped>

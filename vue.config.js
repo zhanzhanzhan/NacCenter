@@ -51,12 +51,14 @@ module.exports = {
   //     }
   //   }
   // }
-
+  devServer: {
+   // https: true
+  },
   // 构建时开启多进程处理 babel 编译
   parallel: require('os').cpus().length > 1,
   transpileDependencies: [
     'iview',
-    'axios'
+    'axios',
   ],
   // gzip压缩
   configureWebpack: config => {
@@ -65,7 +67,7 @@ module.exports = {
         performance: {
           hints:'warning',
           //入口起点的最大体积 整数类型（以字节为单位）
-          maxEntrypointSize: 50000000,
+          maxEntrypointSize: 100000000,
           //生成文件的最大体积 整数类型（以字节为单位 300k）
           maxAssetSize: 30000000,
           //只给出 js 文件的性能提示

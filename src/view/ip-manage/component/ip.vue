@@ -86,7 +86,7 @@
         callback()
       }
       return {
-        dhcp: false,
+
         ipModifyModal: false,
         ipModifyForm: {},
         ipModifyFormRules: {

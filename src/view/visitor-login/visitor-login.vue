@@ -18,10 +18,17 @@
             </div>
             <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" class="form">
               <FormItem label="" prop="name">
-                <Input v-model="formValidate.name" placeholder="用户账号"></Input>
+                <Input v-model="formValidate.name" placeholder="用户名"></Input>
               </FormItem>
-              <FormItem label="" prop="password">
-                <Input v-model="formValidate.password" placeholder="密码"></Input>
+              <FormItem label="" prop="phone">
+                <Input v-model="formValidate.phone" placeholder="手机号"></Input>
+              </FormItem>
+              <FormItem label="" prop="code">
+                <div style="display: flex; align-items: center;justify-content: center">
+                  <Input v-model="formValidate.code" placeholder="请输入验证码" style="width: 50%;">
+                  </Input>
+                  <Button style="flex: 1;margin-left: 20px;" @click="getCode">{{this.content}}</Button>
+                </div>
               </FormItem>
               <FormItem>
                 <Button type="primary" long @click="handleSubmit('formValidate')">登录</Button>
@@ -46,35 +53,77 @@
   </div>
 </template>
 <script>
-import { wxUserLogin } from '../../api/login'
-import qs from 'qs'
+import { wxUserLogin, getSmsCode, addStaffNetworking } from '../../api/login'
 export default {
   data () {
+    const  validatePhone = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('手机号不能为空'))
+      } else if (!/^1[34578]\d{9}$/.test(value)) {
+        callback('手机号格式不正确')
+      } else {
+        callback()
+      }
+    }
     return {
       tab: 'tab1',
       formValidate: {
         name: '',
-        password: ''
+        phone: '',
+        code: ''
       },
       ruleValidate: {
         name: [
           { required: true, message: '请填写账号', trigger: 'blur' }
         ],
-        password: [
-          { required: true, message: '请填写密码', trigger: 'blur' }
+        phone: [
+          { required: true, validator: validatePhone, trigger: 'blur' }
+        ],
+        code: [
+          { required: true, message: '验证码不能为空', trigger: 'blur' },
+          { type: 'string', min: 4, message: '验证码输入错误', max: 4 }
         ]
-      }
+      },
+      content: '获取验证码', // 按钮内容
+      totalTime: 60,  // 倒计时
+      canClick: true // 是否可点击
     }
   },
   methods: {
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          this.$Message.success('Success!')
+          this.addStaffNetworking()
         } else {
-          this.$Message.error('Fail!')
+          this.$Message.error('请检查输入信息是否正确!')
         }
       })
+    },
+    // 雇员登录
+    async addStaffNetworking () {
+      let json = {
+        staffName: this.formValidate.name,
+        staffTel: this.formValidate.phone,
+        smsCode: this.formValidate.code,
+        staffIP: this.$route.query.ip,
+        nbCode: this.$route.query.nbCode
+      }
+      let res = await addStaffNetworking(json)
+      //console.log(res)
+      if (res.data.code === 'success') {
+        this.$Notice.success({
+          title: '提示',
+          desc: res.data.result,
+          duration: 0
+        });
+      } else {
+        this.$Notice.error({
+          title: '提示',
+          desc: res.data.result,
+          duration: 0
+        });
+      }
+
     },
     // 访客登录
     visitorLogin () {
@@ -136,9 +185,33 @@ export default {
         this.$router.push({ path: '/404' })
       }
 
+    },
+    async getCode () {
+      if (!this.canClick) return  // 不可重复点击
+      if (this.formValidate.phone === ''){
+        this.$Message.error('请填写手机号')
+        return
+      }
+      let res = await getSmsCode({ userNo: this.formValidate.phone })
+      if (res.data.code === 'success') {
+        this.$Message.success(res.data.result)
+      }
+      this.canClick = false
+      this.content = this.totalTime + 's后重新发送'
+      let clock = window.setInterval(() => {
+        this.totalTime--
+        this.content = this.totalTime + 's后重新发送'
+        if (this.totalTime < 0) {
+          window.clearInterval(clock)
+          this.content = '重新发送'
+          this.totalTime = 60
+          this.canClick = true
+        }
+      }, 1000)
     }
   },
   mounted () {
+    this.visitorLogin()
     this.checkWxLogin()
   }
 

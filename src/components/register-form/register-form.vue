@@ -156,6 +156,10 @@ export default {
     },
     getCode () {
       if (!this.canClick) return  // 不可重复点击
+      if (this.form.userNo === '') {
+        this.$Message.error('请输入手机号码！')
+        return
+      }
       this.$emit('on-getCode', this.form.userNo)
       this.canClick = false
       this.content = this.totalTime + 's后重新发送'
