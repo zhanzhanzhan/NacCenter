@@ -60,7 +60,7 @@
       </Row>
 
     </Modal>
-   <!-- <Particles/>-->
+    <Particles/>
   </div>
 </template>
 
@@ -69,7 +69,7 @@ import LoginForm from '_c/login-form'
 import { wxUserLogin } from '../../api/login'
 import { mapActions, mapMutations } from 'vuex'
 import Icons from '_c/icons'
-//import Particles from '_c/particles'
+import Particles from '_c/particles'
 export default {
   data () {
     return {
@@ -79,7 +79,8 @@ export default {
     }
   },
   components: {
-    LoginForm, Icons, Particles
+    LoginForm, Icons,
+    Particles
   },
   methods: {
     ...mapActions([

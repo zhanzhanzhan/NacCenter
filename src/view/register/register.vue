@@ -10,6 +10,9 @@
         <div class="form-con">
           <reg-form @on-success-valid="handleSubmit" @on-getCode="getCode"></reg-form>
           <p class="login-tip"></p>
+          <div style="text-align: right">
+            <router-link to="/login">已有账号？返回登陆</router-link>
+          </div>
         </div>
       </Card>
     </div>

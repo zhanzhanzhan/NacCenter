@@ -1,5 +1,6 @@
 const path = require('path')
 const CompressionPlugin = require('compression-webpack-plugin')
+const UglifyPlugin = require('uglifyjs-webpack-plugin')
 const resolve = dir => {
   return path.join(__dirname, dir)
 }
@@ -36,6 +37,23 @@ module.exports = {
       .set('@', resolve('src')) // key,value自行定义，比如.set('@@', resolve('src/components'))
       .set('_c', resolve('src/components'))
       .set('~', resolve('public'))
+
+    config.module.rule('compile')
+      .test(/\.js$/)
+      .include
+      .add(resolve('src'))
+      .add(resolve('/node_modules/'))
+      .end()
+      .use('babel')
+      .loader('babel-loader')
+      .options({
+        presets: [
+          ['@babel/preset-env', {
+            modules: false
+          }]
+        ]
+      });
+
   },
   // 设为false打包时不生成.map文件
   productionSourceMap: false,
@@ -63,7 +81,43 @@ module.exports = {
   // gzip压缩
   configureWebpack: config => {
     if (process.env.NODE_ENV === 'production') {
-      return {
+      // 为生产环境修改配置...
+      config.mode = 'production'
+      // 将每个依赖包打包成单独的js文件
+      let optimization = {
+        runtimeChunk: 'single',
+        splitChunks: {
+          chunks: 'all',
+          maxInitialRequests: Infinity,
+          minSize: 20000,
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name (module) {
+                // get the name. E.g. node_modules/packageName/not/this/part.js
+                // or node_modules/packageName
+                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1]
+                // npm package names are URL-safe, but some servers don't like @ symbols
+                return `npm.${packageName.replace('@', '')}`
+              }
+            }
+          }
+        },
+        minimizer: [new UglifyPlugin({
+          uglifyOptions: {
+            compress: {
+              warnings: false,
+              drop_console: true, // console
+              drop_debugger: false,
+              pure_funcs: ['console.log'] // 移除console
+            }
+          }
+        })]
+      }
+      Object.assign(config, {
+        optimization
+      })
+      /*return {
         performance: {
           hints:'warning',
           //入口起点的最大体积 整数类型（以字节为单位）
@@ -80,7 +134,7 @@ module.exports = {
           threshold: 10240, // 对超过10kb的数据压缩
           deleteOriginalAssets: false //是否删除原文件
         })]
-      }
+      }*/
     }
   }
 }
