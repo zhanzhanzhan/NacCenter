@@ -38,7 +38,7 @@ module.exports = {
       .set('_c', resolve('src/components'))
       .set('~', resolve('public'))
 
-    config.module.rule('compile')
+   /* config.module.rule('compile')
       .test(/\.js$/)
       .include
       .add(resolve('src'))
@@ -52,7 +52,7 @@ module.exports = {
             modules: false
           }]
         ]
-      });
+      });*/
 
   },
   // 设为false打包时不生成.map文件
@@ -77,6 +77,7 @@ module.exports = {
   transpileDependencies: [
     'iview',
     'axios',
+    /vue-particles/
   ],
   // gzip压缩
   configureWebpack: config => {
