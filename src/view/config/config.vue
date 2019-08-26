@@ -307,10 +307,10 @@
           <Table :columns="block" height="300" :data="blockList" :loading="loading"  stripe
                  size="small">
             <template slot-scope="{ row }" slot="mac">
-              <span style="font-size: 12px;color: #666">MAC地址：<span style="color: #00e9bc;">{{ row.macAddress }}</span></span>
+              <span style="font-size: 12px;color: #666"><span style="color: #00e9bc;">{{ row.macAddress }}</span></span>
             </template>
             <template slot-scope="{ row }" slot="ip">
-              <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;">{{ row.ipAddress }}</span></span>
+              <span style="font-size: 12px;color: #666"><span style="color: #00e9bc;">{{ row.ipAddress }}</span></span>
             </template>
             <template slot-scope="{ row, index }" slot="action">
               <Icon type="md-add-circle" size="24" style="cursor: pointer" color="#00e9bc" @click="changeBlockToWhite(row)"/>

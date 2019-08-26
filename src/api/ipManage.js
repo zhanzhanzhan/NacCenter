@@ -1,12 +1,28 @@
 import axios from '@/libs/api.request'
 
 /*
+* 根据参数返回相应的名单信息
+* type 0:固定 1：动态
+* */
+
+export const getNameListByType = ({ nbCode, type }) => {
+  return axios.request({
+    url: '/getNameListByType',
+    method: 'post',
+    params: {
+      nbCode, type
+    }
+  })
+}
+
+
+/*
 * 根据类型查询IP段信息
 * */
 
 export const getIpParam = ({ nbCode, type }) => {
   return axios.request({
-    url: '/getIpParam',
+    url: '/ipmanage/getIpParam',
     method: 'post',
     params: {
       nbCode, type
@@ -20,7 +36,7 @@ export const getIpParam = ({ nbCode, type }) => {
 
 export const getIpRecovery = ({ nbCode }) => {
   return axios.request({
-    url: '/getIpRecovery',
+    url: '/ipmanage/getIpRecovery',
     method: 'post',
     params: {
       nbCode

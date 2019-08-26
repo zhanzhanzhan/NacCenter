@@ -16,8 +16,11 @@ const resolve = dir => {
 const TEST_URL = process.env.NODE_ENV === 'production'
   ? 'http://wingsbro.mynetgear.com:8081'
   : '/'
-const BASE_URL = process.env.NODE_ENV === 'production'
+/*const BASE_URL = process.env.NODE_ENV === 'production'
   ? 'http://nc.wingsbro.com'
+  : '/'*/
+const BASE_URL = process.env.NODE_ENV === 'production'
+  ? ''
   : '/'
 module.exports = {
   // Project deployment base
@@ -79,46 +82,10 @@ module.exports = {
     'axios',
     /vue-particles/
   ],
-  // gzip压缩
   configureWebpack: config => {
     if (process.env.NODE_ENV === 'production') {
-      // 为生产环境修改配置...
-      config.mode = 'production'
-      // 将每个依赖包打包成单独的js文件
-      let optimization = {
-        runtimeChunk: 'single',
-        splitChunks: {
-          chunks: 'all',
-          maxInitialRequests: Infinity,
-          minSize: 20000,
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name (module) {
-                // get the name. E.g. node_modules/packageName/not/this/part.js
-                // or node_modules/packageName
-                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1]
-                // npm package names are URL-safe, but some servers don't like @ symbols
-                return `npm.${packageName.replace('@', '')}`
-              }
-            }
-          }
-        },
-        minimizer: [new UglifyPlugin({
-          uglifyOptions: {
-            compress: {
-              warnings: false,
-              drop_console: true, // console
-              drop_debugger: false,
-              pure_funcs: ['console.log'] // 移除console
-            }
-          }
-        })]
-      }
-      Object.assign(config, {
-        optimization
-      })
-      /*return {
+
+      return {
         performance: {
           hints:'warning',
           //入口起点的最大体积 整数类型（以字节为单位）
@@ -128,14 +95,47 @@ module.exports = {
           //只给出 js 文件的性能提示
           assetFilter: function(assetFilename) {
             return assetFilename.endsWith('.js');
-          }
+          },
+
         },
-        plugins: [new CompressionPlugin({
-          test: /\.js$|\.html$|\.css/,
-          threshold: 10240, // 对超过10kb的数据压缩
-          deleteOriginalAssets: false //是否删除原文件
-        })]
-      }*/
+        optimization: {
+          runtimeChunk: 'single',
+          splitChunks: {
+            chunks: 'all',
+            maxInitialRequests: Infinity,
+            minSize: 20000,
+            cacheGroups: {
+              vendor: {
+                test: /[\\/]node_modules[\\/]/,
+                name (module) {
+                  // get the name. E.g. node_modules/packageName/not/this/part.js
+                  // or node_modules/packageName
+                  const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1]
+                  // npm package names are URL-safe, but some servers don't like @ symbols
+                  return `npm.${packageName.replace('@', '')}`
+                }
+              }
+            }
+          },
+        },
+        plugins: [
+          new CompressionPlugin({
+            test: /\.js$|\.html$|\.css/,
+            threshold: 10240, // 对超过10kb的数据压缩
+            deleteOriginalAssets: false //是否删除原文件
+          }),
+          new UglifyPlugin({
+            uglifyOptions: {
+              compress: {
+                //warnings: false,
+                drop_console: true, // console
+                drop_debugger: false,
+                pure_funcs: ['console.log'] // 移除console
+              }
+            }
+          })
+        ]
+      }
     }
   }
 }

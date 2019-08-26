@@ -107,16 +107,7 @@ export default {
     },
     /* weixin */
     createWxQrcode () {
-      var obj=new WxLogin({
-        self_redirect:false,
-        id:'qrcode',
-        appid:'wx243ad0422689c414',
-        scope:'snsapi_login',
-        redirect_uri: 'http://nc.wingsbro.com/login?code=CODE&state=STATE',
-        state:'1211111',
-        style:'black',
-        href:'',
-      })
+      var obj=new WxLogin(this.$config.wxConfig)
     },
     // 验证是否扫码登录
     async checkWxLogin () {
@@ -143,7 +134,7 @@ export default {
     }
   },
   mounted() {
-    // console.log(this.$route.query.code)
+    console.log(this.$config.wxConfig.redirect_uri)
     this.checkWxLogin()
   },
   destroyed () {

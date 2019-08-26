@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Row class="list-head" :gutter="20" type="flex"  align="top">
+    <Row class="list-head" :gutter="30" type="flex"  align="middle">
       <Col>
         <h3>DHCP:</h3>
       </Col>
@@ -10,34 +10,43 @@
       </Col>
     </Row>
     <div v-show="dhcp">
-      <div>
-        <div class="form-group">
-          <Form ref="netConfigForm" :model="netConfig" :rules="netConfigRules" :label-width="90" label-position="left">
-            <Row :gutter="30" type="flex" align="middle">
-              <Col  style="font-size: 14px;font-weight: bold">
-                固定IP:
-              </Col>
-              <Col span="2">
-                <i-switch type="small" v-model="ipConfig">
-                </i-switch>
-              </Col>
+      <div style="margin-top: 20px;">
+        <Row :gutter="30" type="flex" align="middle">
+          <Col  style="font-size: 14px;font-weight: bold">
+            固定IP:
+          </Col>
+          <Col span="2">
+            <i-switch type="small" v-model="ipConfig">
+            </i-switch>
+          </Col>
 
-            </Row>
+        </Row>
+        <div class="form-group">
+          <Form ref="netConfigForm" :model="netConfig" :rules="netConfigRules" :label-width="130" label-position="left">
+
             <Row :gutter="30" style="margin-top: 20px;" type="flex" align="middle">
-              <Col span="10">
-                <FormItem label="起始ip：" prop="ipAddress">
-                  <Input type="text" v-model.trim="netConfig.ipaddress" placeholder="请输入起始IP地址"></Input>
+              <Col span="12">
+                <FormItem label="起始ip：" prop="ipStart">
+                  <Input type="text" v-model.trim="netConfig.ipStart" placeholder="请输入起始IP地址"></Input>
                 </FormItem>
               </Col>
-              <Col span="10">
-                <FormItem label="结束ip：" prop="ipAddress">
-                  <Input type="text" v-model.trim="netConfig.gateway" placeholder="请输入结束IP"></Input>
+              <Col span="12">
+                <FormItem label="结束ip：" prop="ipEnd">
+                  <Input type="text" v-model.trim="netConfig.ipEnd" placeholder="请输入结束IP"></Input>
                 </FormItem>
               </Col>
-              <Col>
-                <div class="save"><span style="font-size: 14px" @click="saveNetInfoHandle">保存</span></div>
+              <Col span="12">
+                <FormItem label="DNS服务地址：" prop="dnsServer">
+                  <Input type="text" v-model.trim="netConfig.dnsServer" placeholder="请输入起始DNS服务地址"></Input>
+                </FormItem>
+              </Col>
+              <Col span="12">
+                <FormItem label="网关地址：" prop="gateway">
+                  <Input type="text" v-model.trim="netConfig.gateway" placeholder="请输入网关地址"></Input>
+                </FormItem>
               </Col>
             </Row>
+            <div class="save"><span style="font-size: 14px" @click="saveNetInfoHandle">保存</span></div>
           </Form>
         </div>
 
@@ -71,7 +80,7 @@
                 </span>
               </template>
               <template slot-scope="{ row, index }" slot="action">
-                <Icon type="ios-trash" size="24" color="#00e9bc" @click="removeList(row.id, index)"/>
+                <Icon type="ios-trash" size="24" color="#00e9bc" @click="removeList(row, index)"/>
               </template>
             </Table>
           </Row>
@@ -80,66 +89,96 @@
             </Col>
             <Col class="btn-group">
               <span @click="addWhiteModel = true">添加</span>
-              <span @click="removeAll" v-if="whiteList.length>0">清空列表</span>
             </Col>
           </Row>
-          <Modal v-model="addWhiteModel" width="360">
-            <p slot="header" style="color:#333;text-align:center">
-              <span>添加白名单</span>
-            </p>
-            <div style="text-align:center">
-              <Form :model="addWhiteForm"  label-position="left" ref="whiteFormValidate" :rules="whiteFormRules">
-                <FormItem label="mac地址" prop="macAdress">
-                  <Input v-model.trim="addWhiteForm.macAdress" placeholder="请输入mac地址"></Input>
-                </FormItem>
-                <FormItem label="ip地址" prop="ipAdress">
-                  <Input v-model.trim="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
-                </FormItem>
-                <FormItem label="别名">
-                  <Input v-model.trim="addWhiteForm.userName" placeholder="可以输入自定义别名"></Input>
-                </FormItem>
-                <FormItem label="导入表格" >
-                  <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
-                    <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件
-                    </Button>
-                  </Upload>
-                  <a :href="$config.baseUrl.pro+'/'+download.name" target="_blank" :download="download.name">
-                    <Icon type="ios-cloud-download-outline" />
-                    下载模板
-                  </a>
-                  <Row>
-                    <div class="ivu-upload-list-file" v-if="file !== null">
-                      <Icon type="ios-stats"></Icon>
-                      {{ file.name }}
-                      <Icon v-show="showRemoveFile" type="ios-close" class="ivu-upload-list-remove"
-                            @click.native="handleRemove()"></Icon>
-                    </div>
-                  </Row>
-                  <Row>
-                    <transition name="fade">
-                      <Progress v-if="showProgress" :percent="progressPercent" :stroke-width="2">
-                        <div v-if="progressPercent == 100">
-                          <Icon type="ios-checkmark-circle"></Icon>
-                          <span>成功</span>
-                        </div>
-                      </Progress>
-                    </transition>
-                  </Row>
-                </FormItem>
 
-              </Form>
-            </div>
-            <div slot="footer">
-              <Button type="info" size="large" long :loading="addWhiteLoading" @click="handleSubmit('whiteFormValidate')">确认添加</Button>
-            </div>
-          </Modal>
         </div>
         <!--自由分配-->
+        <div class="nav-content2" style="padding: 0;">
+
+          <Row class="list-head" type="flex" justify="space-between" align="top">
+            <Col span="6"><h3>动态IP列表:</h3></Col>
+          </Row>
+          <Row class="table-container">
+            <Table :columns="liveIp" :data="liveIpList" :loading="loading" height="300" stripe
+                   size="small">
+              <template slot-scope="{ row }" slot="macAddress">
+                <span style="font-size: 12px;color: #666"><span style="color: #00e9bc;">{{ row.macAddress }}</span></span>
+              </template>
+              <template slot-scope="{ row }" slot="ipAddress">
+                <span style="font-size: 12px;color: #666"><span style="color: #00e9bc;">{{ row.ipAddress }}</span></span>
+              </template>
+              <template slot-scope="{ row }" slot="hostName">
+                <span style="font-size: 12px;color: #666"><span style="color: #00e9bc;">{{ row.hostName || 'unknow' }}</span></span>
+              </template>
+              <template slot-scope="{ row, index }" slot="userName">
+                <span style="font-size: 12px;color: #666; display: flex;align-items: center">
+                  <span style="color: #00e9bc;">{{ row.userName || '未命名' }}</span>
+                  <Icon style="cursor: pointer" type="ios-create-outline" size="16" @click="changeName(row.id)"/>
+                </span>
+              </template>
+              <template slot-scope="{ row, index }" slot="action">
+                <Icon type="ios-trash" size="24" color="#00e9bc" @click="removeList(row.id, index)"/>
+              </template>
+            </Table>
+          </Row>
+
+        </div>
       </div>
 
 
     </div>
+    <!--添加名单-->
+    <Modal v-model="addWhiteModel" width="360">
+      <p slot="header" style="color:#333;text-align:center">
+        <span>添加白名单</span>
+      </p>
+      <div style="text-align:center">
+        <Form :model="addWhiteForm"  label-position="left" ref="whiteFormValidate" :rules="whiteFormRules">
+          <FormItem label="mac地址" prop="macAdress">
+            <Input v-model.trim="addWhiteForm.macAdress" placeholder="请输入mac地址"></Input>
+          </FormItem>
+          <FormItem label="ip地址" prop="ipAdress">
+            <Input v-model.trim="addWhiteForm.ipAdress" placeholder="请输入ip地址"></Input>
+          </FormItem>
+          <FormItem label="别名">
+            <Input v-model.trim="addWhiteForm.userName" placeholder="可以输入自定义别名"></Input>
+          </FormItem>
+          <FormItem label="导入表格" >
+            <Upload :action="baseUrl" :before-upload="handleBeforeUpload" accept=".xls, .xlsx">
+              <Button icon="ios-cloud-upload-outline" :loading="uploadLoading" @click="handleUploadFile">上传文件
+              </Button>
+            </Upload>
+            <a :href="$config.baseUrl.pro+'/'+download.name" target="_blank" :download="download.name">
+              <Icon type="ios-cloud-download-outline" />
+              下载模板
+            </a>
+            <Row>
+              <div class="ivu-upload-list-file" v-if="file !== null">
+                <Icon type="ios-stats"></Icon>
+                {{ file.name }}
+                <Icon v-show="showRemoveFile" type="ios-close" class="ivu-upload-list-remove"
+                      @click.native="handleRemove()"></Icon>
+              </div>
+            </Row>
+            <Row>
+              <transition name="fade">
+                <Progress v-if="showProgress" :percent="progressPercent" :stroke-width="2">
+                  <div v-if="progressPercent == 100">
+                    <Icon type="ios-checkmark-circle"></Icon>
+                    <span>成功</span>
+                  </div>
+                </Progress>
+              </transition>
+            </Row>
+          </FormItem>
 
+        </Form>
+      </div>
+      <div slot="footer">
+        <Button type="info" size="large" long :loading="addWhiteLoading" @click="handleSubmit('whiteFormValidate')">确认添加</Button>
+      </div>
+    </Modal>
     <!--修改别名-->
     <Modal v-model="editName" width="360">
       <p slot="header" style="color:#333;text-align:center">
@@ -161,15 +200,12 @@
 </template>
 
 <script>
-  import { mapState, mapActions } from 'vuex'
   import {
-    getNameList,
     deleteNbList,
-    deleteNbLists,
     addIp,
     updNameListById
   } from '../../../api/nbConfig'
-  import { getMasterInfo, uptBlockRoster } from '../../../api/chart'
+  import { getNameListByType, insIpParam, uptIpManage } from '../../../api/ipManage'
   import { uploadFile } from '../../../api/upload'
   export default {
     name: 'config',
@@ -179,6 +215,22 @@
         let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
         if (!reg.test(value)) {
           callback(new Error('请检查IP地址格式！'))
+        }
+        callback()
+      }
+      const dnsserRules = (rule, value, callback) => {
+        if (!value) callback()
+        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+        if (!reg.test(value)) {
+          callback(new Error('请检查DNS地址格式！'))
+        }
+        callback()
+      }
+      const gatewayRules = (rule, value, callback) => {
+        if (!value) callback()
+        let reg = /^192\.168(\.(\d|([1-9]\d)|(1\d{2})|(2[0-4]\d)|(25[0-5]))){2}$/
+        if (!reg.test(value)) {
+          callback(new Error('请检查网关格式！'))
         }
         callback()
       }
@@ -256,6 +308,35 @@
           }
         ],
         whiteList: [],
+        liveIp: [
+          {
+            type: 'index',
+            width: 60,
+          },
+          {
+            title: 'Mac地址',
+            slot: 'macAddress',
+            // width: 350
+          },
+          {
+            title: 'Ip地址',
+            slot: 'ipAddress'
+          },
+          {
+            title: '主机名',
+            slot: 'hostName'
+          },
+          {
+            title: '别名',
+            slot: 'userName'
+          },
+          {
+            title: '操作',
+            slot: 'action',
+            width: 150,
+          }
+        ],
+        liveIpList: [],
         addWhiteModel: false,
         addWhiteLoading: false,
         addWhiteForm: {
@@ -278,42 +359,34 @@
         showRemoveFile: false,
         file: null,
         netConfig: {
-          ipaddress: '',
-          dnsser: '',
-          ipsubnet: '',
-          gateway: ''
         },
         netConfigRules: {
-          ipaddress: [
+          ipStart: [
             { validator: ipaddressRules, trigger: 'blur' }
           ],
-
+          ipEnd: [
+            { validator: ipaddressRules, trigger: 'blur' }
+          ],
+          dnsServer: [
+            { validator: dnsserRules, trigger: 'blur' }
+          ],
+          gateway: [
+            { validator: gatewayRules, trigger: 'blur' }
+          ]
         },
       }
     },
-    computed: {
-      ...mapState({
-        activeNb: state => state.app.activeNb
-      })
+    props: {
+      nbCode: {
+        type: String,
+        default: ''
+      }
     },
     watch: {
-      activeNb: {
-        handler (newVal, old) {
-          this.$Loading.start()
-          this.getNameList(4)
-          this.$Loading.finish()
-        },
-        deep: true
-        // immediate: true
-      },
-      $route: {
-        handler (val, oldVal) {
-          this.activeNav = 0
-        },
-        // 深度观察监听
-        deep: true
-      },
-
+      nbCode () {
+        this.getNameList(0)
+        this.getNameList(1)
+      }
     },
     methods: {
 
@@ -321,20 +394,30 @@
         this.$refs['netConfigForm'].validate((valid) => {
           if (valid) {
             console.log('保存')
+            this.insIpParam()
           } else {
             this.$Message.error('请检查输入格式是否正确!')
           }
         })
       },
+      // 保存ip段
+      async insIpParam () {
+
+        let res = await insIpParam(this.netConfig)
+        console.log(res)
+        if (res.data.code === 'success') {
+          this.$Message.success('保存成功!')
+        } else {
+          this.$Message.error(res.data.result)
+        }
+      },
       /* 获取名单 */
       async getNameList (type) {
         this.loading = true
-        let res = await getNameList({ nbCode: this.activeNb.nbCode, type: type })
+        let res = await getNameListByType({ nbCode: this.nbCode, type: type })
         this.loading = false
         if (res.data.code === 'success') {
-          if (type === 4) {
-            this.whiteList = res.data.result || []
-          }
+          type ? this.liveIpList = res.data.result || [] : this.whiteList = res.data.result || []
         }
       },
       handleSubmit (name) {
@@ -351,7 +434,7 @@
         let res = await updNameListById({...this.editNameForm})
         if (res.data.code === 'success') {
           this.$Message.success('修改成功！')
-          this.getNameList(4)
+          this.getNameList(0)
           this.editName = false
         } else {
           this.$Message.error(res.data.result)
@@ -366,7 +449,7 @@
         if (!this.file) return
         let fileFormData = new FormData()
         fileFormData.append('file', this.file)
-        let res = await uploadFile({ file: fileFormData, nbCode: this.activeNb.nbCode })
+        let res = await uploadFile({ file: fileFormData, nbCode: this.nbCode })
         if (type === 4) {
           this.addWhiteModel = false
         } else {
@@ -374,7 +457,7 @@
         }
         if (res.data.code === 'success') {
           this.$Message.success('上传成功！')
-          this.getNameList(type)
+          this.getNameList(0)
         } else {
           this.$Message.error('上传失败！')
         }
@@ -390,66 +473,47 @@
 
         this.addWhiteLoading = true
         let json = {
-          nbCode: this.activeNb.nbCode,
+          nbCode: this.nbCode,
           type: type,
           ipAddress: this.addWhiteForm.ipAdress,
           macAddress: this.addWhiteForm.macAdress,
           userName: this.addWhiteForm.userName
         }
         let res = await addIp(json)
+        console.log(res)
         this.addWhiteLoading = false
         this.addWhiteModel = false
         if (res.data.code === 'success') {
           this.$Message.success('添加成功')
-          this.getNameList(4)
+          this.getNameList(0)
         } else {
           this.$Message.error(res.data.result)
         }
         this.upload(type)
       },
       /* 删除列表 */
-      removeList (id, index) {
+      removeList (item, index) {
         this.$Modal.confirm({
           title: '提示',
           content: '<p>确定要删除这条列表吗？</p>',
           loading: true,
           onOk: async () => {
-            let res = await deleteNbList({ id: id })
+            let json = {
+              id: item.id,
+              macAddress: item.macAddress,
+              ipAddress: null,
+              nbCode: this.nbCode
+            }
+            let res = await uptIpManage(json)
+            console.log(res)
             if (res.data.code === 'success') {
               this.$Modal.remove()
               this.$Message.info(res.data.result)
-              if (this.activeNav === 2) {
-                this.whiteList.splice(index, 1)
-              } else if (this.activeNav === 3) {
-                this.ignoreList.splice(index, 1)
-              }
+              this.getNameList(0)
+              this.getNameList(1)
             } else {
               this.$Modal.remove()
               this.$Message.error(res.data.result)
-            }
-          }
-        })
-      },
-      /* 清空列表 */
-      removeAll () {
-        let type = this.activeNav === 2 ? 4 : 5
-        this.$Modal.confirm({
-          title: '提示',
-          content: '<p>确定清空当前列表吗？</p>',
-          loading: true,
-          onOk: async () => {
-            let res = await deleteNbLists({ nbCode: this.activeNb.nbCode, type: type })
-            if (res.data.code === 'success') {
-              this.$Modal.remove()
-              this.$Message.info('删除成功')
-              if (this.activeNav === 2) {
-                this.whiteList = []
-              } else if (this.activeNav === 3) {
-                this.ignoreList = []
-              }
-            } else {
-              this.$Modal.remove()
-              this.$Message.error('删除失败')
             }
           }
         })
@@ -505,7 +569,8 @@
 
     },
     mounted () {
-      getNameList(4)
+      this.getNameList(0)
+      this.getNameList(1)
     },
     /*beforeDestroy () {
       this.getAsideList()
@@ -514,4 +579,14 @@
 </script>
 <style lang="less" scoped>
   @import "../../config/config.less";
+  /deep/ .ivu-form .ivu-form-item-label {
+    font-size: 14px !important;
+  }
+  /deep/.ivu-switch-checked{
+    border-color: #00e9bc;
+    background-color: #00e9bc;
+  }
+  .view-content .nav-content .form-group[data-v-83d6f400] {
+    margin: 20px;
+  }
 </style>

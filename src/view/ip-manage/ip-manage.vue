@@ -11,31 +11,32 @@
       </div>
       <!--固定ip-->
       <div class="nav-content" v-if="activeNav === 0">
-       <ip-config></ip-config>
+       <ip-config :nb-code="activeNb.nbCode" v-if="reload"></ip-config>
       </div>
       <!--ip管理-->
       <div class="nav-content" v-if="activeNav === 1">
-
+        <ip-recovery :nb-code="activeNb.nbCode"></ip-recovery>
         <!--<ip-param :nb-code="activeNb.nbCode"></ip-param>-->
       </div>
     </div>
   </div>
 </template>
 <script>
-  import { mapState, mapActions } from 'vuex'
-  import IP from './component/ip.vue'
+  import { mapState } from 'vuex'
   import ipConfig from './component/ipConfig.vue'
   import ipParam from './component/ipParam.vue'
+  import ipRecovery from './component/ipRecovery.vue'
   export default {
     name: 'ipManage',
     components: {
-      IP,ipParam, ipConfig
+      ipParam, ipConfig, ipRecovery
     },
     data () {
       return {
+        reload: true,
         activeNav: 0,
         navList: [
-          'IP配置',
+          'DHCP配置',
           'IP回收'
         ]
       }
@@ -46,15 +47,15 @@
       })
     },
     watch: {
-      /*activeNb: {
+      activeNb: {
         handler (newVal, old) {
-          this.$Loading.start()
-          // this.getDefaultConfig(this.activeNb.nbCode)
-          this.$Loading.finish()
+          this.reload = false
+          this.$nextTick(() => {
+
+            this.reload = true
+          })
         },
-        deep: true
-        // immediate: true
-      },*/
+      },
       $route: {
         handler (val, oldVal) {
           this.activeNav = 0

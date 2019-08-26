@@ -9,9 +9,9 @@
     <Row class="table-container">
       <Table :columns="table" :data="list" :loading="loading" height="300"  stripe
              size="small">
-        <template slot-scope="{ row }" slot="ipAddress">
-          <span style="font-size: 12px;color: #666">IP地址：<span style="color: #00e9bc;margin-left: 20px">{{ row.ipAddress }}</span></span>
-        </template>
+       <!-- <template slot-scope="{ row }" slot="ipAddress">
+          <span style="font-size: 12px;color: #666"><span style="color: #00e9bc;margin-left: 20px">{{ row }}</span></span>
+        </template>-->
        <!-- <template slot-scope="{ row, index }" slot="action">
           <Icon type="ios-build" size="24" color="#00e9bc" style="cursor: pointer" @click="modifyIp(row)"/>
         </template>-->
@@ -66,20 +66,15 @@
           {
             title: 'Ip地址',
             slot: 'ipAddress'
-          },
-          /*{
-            title: 'Action',
-            slot: 'action',
-            width: 150,
-            align: 'center'
-          }*/
+          }
         ],
         list: [],
+        ipModifyModal: false,
         ipModifyForm: {
           ipAddress: ''
         },
         ipModifyFormRules: {
-          ipaddress: [
+          ipAddress: [
             { validator: ipaddressRules, trigger: 'blur' }
           ],
         }
@@ -87,7 +82,7 @@
     },
     watch: {
       nbCode () {
-        this.selIpManage()
+        this.getIpRecovery()
       }
     },
     props: {
@@ -97,10 +92,50 @@
       }
     },
     methods: {
+      // 获取回收的IP列表
+      async getIpRecovery () {
+        let res = await getIpRecovery({ nbCode: this.nbCode })
+        console.log(res)
+        if (res.data.code === 'success') {
+          if (res.data.result) {
+            /*res.data.result.map((item, index) => {
+              this.list[index] = {
+                ip: item
+              }
+            })*/
+          }
+        }
+      },
+      // 添加回收的ip
+      async insIpRecovery () {
+        let res = await insIpRecovery({ nbCode: this.nbCode, ipAddress: this.ipModifyForm.ipAddress })
+        console.log(res)
+        if (res.data.code === 'success') {
+          this.$Message.success('添加成功！')
+          this.getIpRecovery()
+          this.ipModifyModal = false
+        } else {
+          this.$Message.error(res.data.result)
+        }
+      },
+      addIp() {
+        this.ipModifyModal = true
+      },
+      modalChange () {
 
+      },
+      handleSubmit (name) {
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            this.insIpRecovery()
+          } else {
+            this.$Message.error('请检查输入信息是否有误')
+          }
+        })
+      },
     },
     mounted () {
-
+      this.getIpRecovery()
     }
   }
 </script>

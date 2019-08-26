@@ -137,16 +137,7 @@ export default {
     createWxQrcode () {
       let json = this.$route.query
       console.log(json)
-      var obj=new WxLogin({
-        self_redirect:false,
-        id:'qrcode',
-        appid:'wx243ad0422689c414',
-        scope:'snsapi_login',
-        redirect_uri: 'http://nc.wingsbro.com/visitorLogin?code=CODE&state=STATE',
-        state: '123',
-        style:'black',
-        href:'',
-      })
+      var obj=new WxLogin(this.$config.wxConfig)
     },
     // 验证是否扫码登录
     async checkWxLogin () {
