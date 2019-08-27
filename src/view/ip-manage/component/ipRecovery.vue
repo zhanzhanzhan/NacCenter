@@ -9,9 +9,9 @@
     <Row class="table-container">
       <Table :columns="table" :data="list" :loading="loading" height="300"  stripe
              size="small">
-       <!-- <template slot-scope="{ row }" slot="ipAddress">
-          <span style="font-size: 12px;color: #666"><span style="color: #00e9bc;margin-left: 20px">{{ row }}</span></span>
-        </template>-->
+        <template slot-scope="{ row }" slot="ipAddress">
+          <span style="font-size: 12px;color: #666"><span style="color: #00e9bc">{{ row.ip }}</span></span>
+        </template>
        <!-- <template slot-scope="{ row, index }" slot="action">
           <Icon type="ios-build" size="24" color="#00e9bc" style="cursor: pointer" @click="modifyIp(row)"/>
         </template>-->
@@ -96,15 +96,12 @@
       async getIpRecovery () {
         let res = await getIpRecovery({ nbCode: this.nbCode })
         console.log(res)
-        if (res.data.code === 'success') {
-          if (res.data.result) {
-            /*res.data.result.map((item, index) => {
-              this.list[index] = {
-                ip: item
-              }
-            })*/
-          }
+        if (res.data.code === 'success' && res.data.result) {
+            res.data.result.map((item, index) => {
+              this.list.push({ip: item})
+            })
         }
+        console.log(this.list)
       },
       // 添加回收的ip
       async insIpRecovery () {
